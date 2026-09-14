@@ -39,6 +39,26 @@ npm ci
 npm run dev                 # http://localhost:3000, hot-reloads
 ```
 
+Before running `npm run dev`, check whether one is already running (e.g.
+`lsof -i :3000` or `ss -ltnp | grep 3000`) — there's often already an
+instance up with a browser attached to it. Reuse that one instead of
+starting a second instance on the same port.
+
+To verify a change actually renders correctly — not just that `npm run
+build` passes, which does **not** catch a runtime error inside a page's
+reactive JS block (see below) — drive the running dev server with
+Playwright over CDP rather than poking at it by hand or touching the user's
+own browser tabs. Launch a disposable, separate headless browser (its own
+`--remote-debugging-port` and `--user-data-dir`, e.g. under `/tmp`), connect
+with `chromium.connectOverCDP("http://localhost:<port>")`, then navigate to
+`http://localhost:3000/<page>`. From there, script things like: reading
+`page.url()` after changing a filter to confirm URL params sync, checking
+`document.querySelectorAll("svg path")` bounding rects for absurdly large
+values (a real bug this caught: `percent: true` combined with an explicit
+`domain` in Observable Plot silently sends a chart's marks off-canvas), and
+capturing screenshots for layout review. Kill the disposable browser when
+done.
+
 CI instead uses a dedicated per-query key (`REDASH_API_KEY_<LOADER_NAME>`,
 one per row in `src/data/_queries.md`) set as a `production` GitHub
 environment secret — see the README for the `gh secret set` command.
