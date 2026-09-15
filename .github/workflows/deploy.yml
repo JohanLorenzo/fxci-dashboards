@@ -54,7 +54,7 @@ jobs:
           REDASH_API_KEY_CHECKOUT_CACHES_WORKERPOOL: ${{ secrets.REDASH_API_KEY_CHECKOUT_CACHES_WORKERPOOL }}
           REDASH_API_KEY_MACOS_TEST_POOLS_USAGE: ${{ secrets.REDASH_API_KEY_MACOS_TEST_POOLS_USAGE }}
           REDASH_API_KEY_MACOS_TEST_POOLS_PROJECTS: ${{ secrets.REDASH_API_KEY_MACOS_TEST_POOLS_PROJECTS }}
-          REDASH_API_KEY_USAGE_BY_USER: ${{ secrets.REDASH_API_KEY_USAGE_BY_USER }}
+          REDASH_API_KEY_USAGE: ${{ secrets.REDASH_API_KEY_USAGE }}
       - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ vars.GCPV2_GITHUB_WORKLOAD_IDENTITY_PROVIDER }}

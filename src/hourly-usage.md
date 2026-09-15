@@ -14,7 +14,7 @@ Which projects, worker pools and users are consuming the most hours.
 function relabelUntagged(rows) {
   return rows.map((r) => (r.project === "(untagged)" ? {...r, project: "Unknown"} : r));
 }
-const userRows = relabelUntagged(await FileAttachment("data/usage-by-user.json").json());
+const userRows = relabelUntagged(await FileAttachment("data/usage.json").json());
 ```
 
 ```js
