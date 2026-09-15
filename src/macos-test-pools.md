@@ -52,7 +52,7 @@ today is still accumulating. See `data/_queries.yaml` for the queries that
 back this page.
 
 ```js
-const rows = await FileAttachment("data/macos-test-pools-usage.json").json();
+const rows = (await FileAttachment("data/macos-test-pools-usage.parquet").parquet()).toArray();
 ```
 
 ```js
@@ -727,7 +727,7 @@ rather than what it was. Every filter above applies here too.
 // query — only the breakdown dimension differs — so a pool-day's hours are
 // the same total on both sides, which the coverage check below verifies
 // rather than assumes.
-const originData = await FileAttachment("data/macos-test-pools-projects.json").json();
+const originData = (await FileAttachment("data/macos-test-pools-projects.parquet").parquet()).toArray();
 ```
 
 ```js

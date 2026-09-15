@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@observablehq/framework": "^1.13.4",
-    "js-yaml": "^5.2.1"
+    "apache-arrow": "^21.2.0",
+    "js-yaml": "^5.2.1",
+    "parquet-wasm": "^0.7.2"
   },
   "devDependencies": {
     "prettier": "^3.3.3",

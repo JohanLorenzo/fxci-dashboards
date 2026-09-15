@@ -11,9 +11,9 @@ Snapshot taken at build time from STMO — see `data/_queries.yaml` for which
 queries back this page.
 
 ```js
-const trend = await FileAttachment("data/gecko2github-trend.json").json();
-const workerPool = await FileAttachment("data/gecko2github-workerpool.json").json();
-const gitTasks = await FileAttachment("data/gecko2github-gittasks.json").json();
+const trend = (await FileAttachment("data/gecko2github-trend.parquet").parquet()).toArray();
+const workerPool = (await FileAttachment("data/gecko2github-workerpool.parquet").parquet()).toArray();
+const gitTasks = (await FileAttachment("data/gecko2github-gittasks.parquet").parquet()).toArray();
 ```
 
 ```js

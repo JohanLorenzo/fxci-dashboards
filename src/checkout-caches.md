@@ -16,7 +16,7 @@ clone. Each task falls into one of three states, from best to worst:
 (`nopull` + `pull`). See `data/_queries.yaml` for which query backs this page.
 
 ```js
-const rows = await FileAttachment("data/checkout-caches-workerpool.json").json();
+const rows = (await FileAttachment("data/checkout-caches-workerpool.parquet").parquet()).toArray();
 ```
 
 ```js

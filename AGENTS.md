@@ -15,12 +15,19 @@ build-time snapshots of STMO data, not a live app.
    the README for the `gh secret set` command).
 2. Add a row to `src/data/_queries.yaml` — the only place the query-to-secret
    mapping is documented, since the SQL itself lives on STMO, not in this
-   repo. The shared data loader (`src/data/[name].json.js`) then produces
-   `data/<name>.json` for it automatically; no new loader file needed.
+   repo. The shared data loader (`src/data/[name].parquet.js`) then produces
+   `data/<name>.parquet` for it automatically; no new loader file needed.
+   Output is Parquet rather than JSON since some of these queries are large
+   enough (tens of MB) that plain JSON loads fine from the local dev server
+   but fails to fetch once deployed — Parquet's columnar encoding shrinks
+   that dramatically.
 3. Add (or extend) `src/<name>.md` that reads
-   `FileAttachment("data/<name>.json").json()` and renders it with `Plot` /
-   `Inputs` (implicit globals, no import needed). A page can pull from more
-   than one query — see `gecko2github.md`, which combines three.
+   `(await FileAttachment("data/<name>.parquet").parquet()).toArray()` and
+   renders it with `Plot` / `Inputs` (implicit globals, no import needed).
+   `.toArray()` gives back plain row objects, so the rest of the page's code
+   doesn't need to know the data ever passed through Arrow/Parquet. A page
+   can pull from more than one query — see `gecko2github.md`, which combines
+   three.
 4. Add a `{name, path}` entry to `pages` in `observablehq.config.js` so it
    shows up in the sidebar (only needed for a genuinely new page — not for a
    new query feeding an existing one).
