@@ -40,7 +40,8 @@ export default {
       name: "Worker Pools",
       open: true,
       pages: [
-        {name: "MacOS Test Pools", path: "/macos-test-pools"}
+        {name: "MacOS Test Pools", path: "/macos-test-pools"},
+        {name: "Pending Times", path: "/pending-times"}
       ]
     }
   ],

@@ -47,3 +47,8 @@
   title: "CI Usage: daily task runs, machine-hours, pending time and pushes by user and project"
   queryId: 126750
   secretEnv: REDASH_API_KEY_USAGE
+
+- name: pending-times
+  title: "Pending Times: daily pending-time histogram by pool, project and priority, plus deadline-exceeded counts"
+  queryId: 126751
+  secretEnv: REDASH_API_KEY_PENDING_TIMES
