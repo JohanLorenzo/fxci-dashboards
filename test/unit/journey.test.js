@@ -86,6 +86,15 @@ describe("durationsOf", () => {
     assert.equal(durations.total, 10 * HOUR);
   });
 
+  test("measures the CI of the push from the push, and of the merge from the merge", () => {
+    const durations = durationsOf(journeyOf(row()));
+    assert.equal(durations.ciAutoland, 2 * HOUR);
+    assert.equal(durations.ciMain, 3 * HOUR);
+    const unrecorded = durationsOf(journeyOf(row({autoland_ci_done_s: null, merged_s: null, central_ci_done_s: null})));
+    assert.equal(unrecorded.ciAutoland, null);
+    assert.equal(unrecorded.ciMain, null);
+  });
+
   test("has no duration for a stage that did not end, nor for one that did not begin", () => {
     const durations = durationsOf(journeyOf(row({merged_s: null, nightly_started_s: null, nightly_published_s: null})));
     assert.equal(durations.queue, 300);
@@ -145,6 +154,11 @@ describe("mergesOf", () => {
       journeyOf(row({revision_id: 3, central_rev: "y", merged_s: T0 + 9 * HOUR}))
     ];
     assert.deepEqual(mergesOf(journeys).map(({rev, merged}) => [rev, merged]), [["x", T0 + 6 * HOUR], ["y", T0 + 9 * HOUR]]);
+  });
+
+  test("gives when the CI of each merge completed", () => {
+    const journeys = [journeyOf(row({central_rev: "x", central_ci_done_s: T0 + 9 * HOUR})), journeyOf(row({central_rev: "y", merged_s: T0 + 9 * HOUR, central_ci_done_s: null}))];
+    assert.deepEqual(mergesOf(journeys).map(({rev, ciDone}) => [rev, ciDone]), [["x", T0 + 9 * HOUR], ["y", null]]);
   });
 
   test("counts the revisions each merge carried", () => {
@@ -248,7 +262,7 @@ describe("matchesQuery", () => {
 
 describe("the candle segments", () => {
   test("go from what happens first to what happens last", () => {
-    assert.deepEqual(CANDLE_SEGMENTS.map(({key}) => key), ["queueOpen", "queueClosed", "lando", "autoland", "waiting", "build"]);
+    assert.deepEqual(CANDLE_SEGMENTS.map(({key}) => key), ["queueOpen", "queueClosed", "lando", "autolandCi", "autoland", "mainCi", "waiting", "build"]);
     assert.ok(CANDLE_SEGMENTS.every(({title, color}) => title && /^#[0-9a-f]{6}$/i.test(color)));
     assert.equal(new Set(CANDLE_SEGMENTS.map(({color}) => color)).size, CANDLE_SEGMENTS.length);
   });
@@ -261,7 +275,7 @@ describe("candleOf", () => {
 
   test("stacks every stage up to the publication for a landing that shipped", () => {
     const {segments, total, end, kind} = candle();
-    assert.deepEqual(segments, {queueOpen: 300, queueClosed: 0, lando: 120, autoland: 6 * HOUR - 420, waiting: 2 * HOUR, build: 2 * HOUR});
+    assert.deepEqual(segments, {queueOpen: 300, queueClosed: 0, lando: 120, autolandCi: 2 * HOUR, autoland: 4 * HOUR - 420, mainCi: 2 * HOUR, waiting: 0, build: 2 * HOUR});
     assert.equal(kind, "shipped");
     assert.equal(end, T0 + 10 * HOUR);
     assert.equal(total, 10 * HOUR);
@@ -285,9 +299,9 @@ describe("candleOf", () => {
     const {segments, kind, end, total} = candle({backed_out: true, backout_by: "sheriff-b", backout_s: T0 + 5 * HOUR});
     assert.equal(kind, "backed out on autoland");
     assert.equal(end, T0 + 5 * HOUR);
-    assert.equal(segments.waiting, 0);
+    assert.equal(segments.mainCi + segments.waiting, 0);
     assert.equal(segments.build, 0);
-    assert.equal(segments.autoland, 5 * HOUR - 420);
+    assert.equal(segments.autolandCi + segments.autoland, 5 * HOUR - 420);
     assert.equal(sum(segments), total);
   });
 
@@ -302,8 +316,39 @@ describe("candleOf", () => {
 
   test("cuts the stage that a backout interrupted", () => {
     const {segments, total} = candle({backed_out: true, backout_by: "sheriff-b", backout_s: T0 + 9 * HOUR});
-    assert.equal(segments.waiting, 2 * HOUR);
+    assert.equal(segments.mainCi + segments.waiting, 2 * HOUR);
     assert.equal(segments.build, HOUR);
+    assert.equal(sum(segments), total);
+  });
+
+  test("splits the time on autoland into its CI and the wait after it", () => {
+    const {segments, total} = candle({autoland_ci_done_s: T0 + 3 * HOUR});
+    assert.equal(segments.autolandCi, 3 * HOUR - 420);
+    assert.equal(segments.autoland, 3 * HOUR);
+    assert.equal(sum(segments), total);
+  });
+
+  test("splits the time after the merge into the CI on main and the wait after it", () => {
+    const {segments, total} = candle({central_ci_done_s: T0 + 7 * HOUR});
+    assert.equal(segments.mainCi, HOUR);
+    assert.equal(segments.waiting, HOUR);
+    assert.equal(sum(segments), total);
+  });
+
+  test("does not count CI that went on after its stage ended", () => {
+    const late = candle({autoland_ci_done_s: T0 + 9 * HOUR, central_ci_done_s: T0 + 40 * HOUR});
+    assert.equal(late.segments.autolandCi, 6 * HOUR - 420);
+    assert.equal(late.segments.autoland, 0);
+    assert.equal(late.segments.mainCi, 2 * HOUR);
+    assert.equal(late.segments.waiting, 0);
+    assert.equal(sum(late.segments), late.total);
+  });
+
+  test("counts it all as waiting when no CI was recorded", () => {
+    const {segments, total} = candle({autoland_ci_done_s: null, central_ci_done_s: null});
+    assert.equal(segments.autolandCi + segments.mainCi, 0);
+    assert.equal(segments.autoland, 6 * HOUR - 420);
+    assert.equal(segments.waiting, 2 * HOUR);
     assert.equal(sum(segments), total);
   });
 
@@ -311,7 +356,7 @@ describe("candleOf", () => {
     const waiting = candle({nightly_started_s: null, nightly_published_s: null, nightly_decision_id: null});
     assert.equal(waiting.kind, "open");
     assert.equal(waiting.end, marks.treeherderUntil);
-    assert.equal(waiting.segments.waiting, marks.treeherderUntil - (T0 + 6 * HOUR));
+    assert.equal(waiting.segments.mainCi + waiting.segments.waiting, marks.treeherderUntil - (T0 + 6 * HOUR));
     assert.equal(waiting.segments.build, 0);
     assert.equal(sum(waiting.segments), waiting.total);
 

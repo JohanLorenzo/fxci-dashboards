@@ -46,7 +46,15 @@ const landings = journeys
     };
   })
   .sort((a, b) => a.time - b.time);
-const merges = mergesOf(journeys).map(({merged, ...merge}) => ({kind: "merge", time: secondsToDate(merged), ...merge}));
+// The CI of a push is only final once it had time to finish, so the tiles count the pushes that had.
+const ciFinal = (pushedAt) => pushedAt <= marks.treeherderUntil - PUBLISH_HORIZON_S;
+const merges = mergesOf(journeys).map(({merged, ciDone, ...merge}) => ({kind: "merge", time: secondsToDate(merged), ci: ciDone === null ? null : ciDone - merged, final: ciFinal(merged), ...merge}));
+const autolandPushes = [...new Map(journeys.filter((journey) => journey.autolandRev && journey.pushed !== null).map((journey) => [journey.autolandRev, journey])).values()].map((journey) => ({
+  kind: "push",
+  time: secondsToDate(journey.pushed),
+  ci: journey.autolandCiDone === null ? null : journey.autolandCiDone - journey.pushed,
+  final: ciFinal(journey.pushed)
+}));
 const nightlies = nightliesOf(journeys).map((nightly) => ({kind: "nightly", time: secondsToDate(nightly.started), ...nightly}));
 const closures = closureRows
   .filter((row) => row.status === "closed" && row.end_s !== null)
@@ -99,6 +107,11 @@ const stagePair = (key, color) => [
   {key: "p50", title: "p50", value: percentile("publishCohort", key, 0.5), color: color[0]},
   {key: "p95", title: "p95", value: percentile("publishCohort", key, 0.95), color: color[1]}
 ];
+const ciPercentile = (kind, share) => (items) => hoursOf(quantile(items.filter((item) => item.kind === kind && item.final && item.ci !== null).map((item) => item.ci), share));
+const ciPair = (kind, color) => [
+  {key: "p50", title: "p50", value: ciPercentile(kind, 0.5), color: color[0]},
+  {key: "p95", title: "p95", value: ciPercentile(kind, 0.95), color: color[1]}
+];
 const BLUES = ["#86b4ea", "#2f74d0", "#163f7a"];
 const closedHours = (items) => d3.sum(items.filter((item) => item.kind === "closure"), (item) => item.hours);
 
@@ -126,7 +139,9 @@ const METRICS = [
     series: [{key: "landed", title: "revisions", value: (items) => landingsOf(items).length, color: "#8a4fb5"}]
   },
   {key: "queue", title: "Waiting in the Lando queue", span: 2, countless: true, format: formatWait, series: stagePair("queue", ["#9bd0b0", "#237a4b"])},
+  {key: "ciautoland", title: "CI on autoland", span: 2, countless: true, format: formatWait, series: ciPair("push", ["#e8b07a", "#c46a10"])},
   {key: "autoland", title: "On autoland until merged to main", span: 2, countless: true, format: formatWait, series: stagePair("autoland", ["#f1c27d", "#d98324"])},
+  {key: "cimain", title: "CI on main", span: 2, countless: true, format: formatWait, series: ciPair("merge", ["#e58aa6", "#b5365e"])},
   {key: "waiting", title: "Merged to main until its Nightly starts", span: 2, countless: true, format: formatWait, series: stagePair("waiting", ["#f0a8bd", "#c2476f"])},
   {key: "build", title: "Nightly build and publish", span: 2, countless: true, format: formatWait, series: stagePair("build", ["#9fb6e8", "#5b6abf"])},
   {key: "merges", title: "Merges to main", countless: true, format: formatCount, series: [{key: "merges", title: "merges", value: (items) => items.filter((item) => item.kind === "merge").length, color: "#5b6abf"}]},
@@ -216,6 +231,11 @@ function outcomeLine({durations, status}) {
   return htl.html`<span>Still on its way</span>`;
 }
 
+function ciLine({ciAutoland, ciMain}) {
+  const parts = [ciAutoland !== null && `${hoursText(ciAutoland)} on autoland`, ciMain !== null && `${hoursText(ciMain)} on main`].filter(Boolean);
+  return parts.length ? htl.html`<span class="bw-tt-pool">CI took ${parts.join(" and ")}</span>` : "";
+}
+
 function landingLines(landing, linkRequester = true) {
   const {journey, durations, status} = landing;
   return htl.html`<span class="bw-tt-links"><b>${external(`https://phabricator.services.mozilla.com/D${journey.revision}`, `D${journey.revision}`)}</b>${journey.bug ? [" · ", external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${journey.bug}`, `bug ${journey.bug}`)] : ""}</span>
@@ -226,6 +246,7 @@ function landingLines(landing, linkRequester = true) {
     ${segmentLines(STAGE_LINES, {durations, subject: landing, format: formatWait})}
     ${journey.queueClosed ? htl.html`<span class="bw-tt-pool">autoland was closed for ${hoursText(journey.queueClosed)} of the Lando queue</span>` : ""}
     ${journey.autolandClosed ? htl.html`<span class="bw-tt-pool">and for ${hoursText(journey.autolandClosed)} of the time on autoland</span>` : ""}
+    ${ciLine(durations)}
     ${journey.failedAttempts ? htl.html`<span class="bw-tt-pool">${countOf(journey.failedAttempts, "attempt")} to land it failed before</span>` : ""}
     <div class="bw-tt-sep"></div>
     <div class="bw-tt-links">${journeyLink(landing)}</div>`;
@@ -282,6 +303,7 @@ function itemsIn(domain, requester) {
   return [
     ...landings.filter((landing) => inDomain(domain, landing.time) && (!requester || landing.journey.requester === requester)),
     ...merges.filter((merge) => inDomain(domain, merge.time)),
+    ...autolandPushes.filter((push) => inDomain(domain, push.time)),
     ...closures.filter((closure) => inDomain(domain, closure.time))
   ];
 }

@@ -104,6 +104,21 @@ describe("the fixtures of the Ship to Nightly queries", () => {
       assert.ok(rows.filter((row) => row.hg_rev !== null).every((row) => hash.test(row.hg_rev)));
     });
 
+    test("record the CI of a push and of its merge once it has started, the same for each landing it carried", () => {
+      const rows = journeys();
+      for (const row of rows) {
+        assert.equal(row.autoland_ci_done_s === null, row.autoland_rev === null, `revision ${row.revision_id}`);
+        assert.equal(row.central_ci_done_s === null, row.central_rev === null, `revision ${row.revision_id}`);
+        if (row.autoland_ci_done_s !== null) assert.ok(row.autoland_ci_done_s >= row.autoland_pushed_s && row.autoland_ci_done_s <= row.treeherder_until_s);
+        if (row.central_ci_done_s !== null) assert.ok(row.central_ci_done_s >= row.merged_s && row.central_ci_done_s <= row.treeherder_until_s);
+      }
+      const doneBy = new Map();
+      for (const row of rows.filter((landing) => landing.central_rev)) {
+        assert.equal(doneBy.get(row.central_rev) ?? row.central_ci_done_s, row.central_ci_done_s);
+        doneBy.set(row.central_rev, row.central_ci_done_s);
+      }
+    });
+
     test("have a landing in every state the page shows", () => {
       const rows = journeys();
       const has = (name, test) => assert.ok(rows.some(test), `no row is ${name}`);

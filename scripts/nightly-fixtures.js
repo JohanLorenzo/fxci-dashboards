@@ -185,6 +185,24 @@ function withCommits(rows) {
   return rows.map((row) => ({...row, git_rev: revision(rand), hg_rev: row.autoland_rev ? revision(rand) : null}));
 }
 
+// When the CI of the push on autoland and of its merge to main completed. A push has one
+// duration for all the landings it carried, and what the source has not recorded yet is not
+// there. It has its own stream, so that it leaves the rest of the data as it was.
+function withCi(rows) {
+  const rand = random(17);
+  const durations = new Map();
+  const durationOf = (rev, low, high) => {
+    if (!durations.has(rev)) durations.set(rev, between(rand, low, high));
+    return durations.get(rev);
+  };
+  const recorded = (done) => Math.min(done, WATERMARKS.treeherder_until_s);
+  return rows.map((row) => ({
+    ...row,
+    autoland_ci_done_s: row.autoland_rev ? recorded(row.autoland_pushed_s + durationOf(row.autoland_rev, 50 * 60, 4 * HOUR)) : null,
+    central_ci_done_s: row.central_rev ? recorded(row.merged_s + durationOf(row.central_rev, 90 * 60, 21 * HOUR)) : null
+  }));
+}
+
 let cached;
 function everything() {
   if (!cached) {
@@ -193,7 +211,7 @@ function everything() {
     const mergeList = merges(rand);
     const nightlyList = nightlies(rand, mergeList);
     cached = {
-      "nightly-journeys": withCommits(journeys(rand, closures, nightlyList, mergeList)),
+      "nightly-journeys": withCi(withCommits(journeys(rand, closures, nightlyList, mergeList))),
       "nightly-treestatus": withBackouts(closures)
     };
   }

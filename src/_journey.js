@@ -30,8 +30,10 @@ export const CANDLE_SEGMENTS = [
   {key: "queueOpen", title: "Lando queue", color: "#6fbf8e"},
   {key: "queueClosed", title: "Lando queue, while autoland was closed", color: "#e07b7b"},
   {key: "lando", title: "Lando landing", color: "#237a4b"},
-  {key: "autoland", title: "On autoland until merged to main", color: "#e0902c"},
-  {key: "waiting", title: "Merged to main until the Nightly starts", color: "#cf5b82"},
+  {key: "autolandCi", title: "CI on autoland", color: "#c46a10"},
+  {key: "autoland", title: "On autoland, after its CI, until merged to main", color: "#f0c27a"},
+  {key: "mainCi", title: "CI on main, until the Nightly starts", color: "#b5365e"},
+  {key: "waiting", title: "Merged to main, after its CI, until the Nightly starts", color: "#eba9bd"},
   {key: "build", title: "Nightly build and publish", color: "#5b6abf"}
 ];
 
@@ -64,6 +66,8 @@ export function journeyOf(row) {
     landoStarted: row.lando_started_s,
     pushed: row.autoland_pushed_s,
     merged: row.merged_s,
+    autolandCiDone: row.autoland_ci_done_s,
+    centralCiDone: row.central_ci_done_s,
     nightlyStarted: row.nightly_started_s,
     published: row.nightly_published_s,
     decisionId: row.nightly_decision_id,
@@ -83,6 +87,8 @@ export function durationsOf(journey) {
     autoland: between(journey.merged, journey.pushed),
     waiting: between(journey.nightlyStarted, journey.merged),
     build: between(journey.published, journey.nightlyStarted),
+    ciAutoland: between(journey.autolandCiDone, journey.pushed),
+    ciMain: between(journey.centralCiDone, journey.merged),
     total: between(journey.published, journey.requested)
   };
 }
@@ -155,8 +161,9 @@ export function spansOf(journey, marks) {
 const backoutKindOf = (journey) => (journey.merged !== null && journey.backout >= journey.merged ? "backed out on main" : "backed out on autoland");
 
 // What a landing's bar is made of, in seconds, and how it ends. The Lando queue is told
-// apart by whether the tree was closed, and a backout by whether the landing had been
-// merged to main by then.
+// apart by whether the tree was closed, the time on autoland and the time after the merge
+// by whether the CI of the push was still going on, and a backout by whether the landing
+// had been merged to main by then.
 export function candleOf(journey, marks) {
   const {spans, end, kind: spansKind} = spansOf(journey, marks);
   const kind = spansKind === "backed out" ? backoutKindOf(journey) : spansKind;
@@ -165,13 +172,21 @@ export function candleOf(journey, marks) {
     return span ? span.end - span.start : 0;
   };
   const queueClosed = Math.min(journey.queueClosed ?? 0, seconds("queue"));
+  const inCi = (stage, doneAt) => {
+    const span = spans.find(({key}) => key === stage);
+    return span && doneAt !== null ? Math.min(span.end - span.start, Math.max(0, doneAt - span.start)) : 0;
+  };
+  const autolandCi = inCi("autoland", journey.autolandCiDone);
+  const mainCi = inCi("waiting", journey.centralCiDone);
   return {
     segments: {
       queueOpen: seconds("queue") - queueClosed,
       queueClosed,
       lando: seconds("lando"),
-      autoland: seconds("autoland"),
-      waiting: seconds("waiting"),
+      autolandCi,
+      autoland: seconds("autoland") - autolandCi,
+      mainCi,
+      waiting: seconds("waiting") - mainCi,
       build: seconds("build")
     },
     total: end - journey.requested,
@@ -199,9 +214,9 @@ export function watermarksOf(rows) {
 
 export function mergesOf(journeys) {
   const merges = new Map();
-  for (const {centralRev, merged, mergedBy} of journeys) {
+  for (const {centralRev, merged, mergedBy, centralCiDone} of journeys) {
     if (centralRev === null || merged === null) continue;
-    const merge = merges.get(centralRev) ?? {rev: centralRev, merged, by: mergedBy, landed: 0};
+    const merge = merges.get(centralRev) ?? {rev: centralRev, merged, by: mergedBy, ciDone: centralCiDone, landed: 0};
     merge.landed += 1;
     merges.set(centralRev, merge);
   }

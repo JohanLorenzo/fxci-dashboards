@@ -22,6 +22,8 @@ export const row = (overrides = {}) => ({
   lando_started_s: T0 + 300,
   autoland_pushed_s: T0 + 420,
   merged_s: T0 + 6 * HOUR,
+  autoland_ci_done_s: T0 + 420 + 2 * HOUR,
+  central_ci_done_s: T0 + 9 * HOUR,
   nightly_started_s: T0 + 8 * HOUR,
   nightly_published_s: T0 + 10 * HOUR,
   nightly_decision_id: "d".repeat(22),
