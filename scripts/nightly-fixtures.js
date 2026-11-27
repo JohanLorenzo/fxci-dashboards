@@ -1,8 +1,8 @@
-// Stand-ins for the three Ship to Nightly queries, shaped like the real results: about
+// Stand-ins for the two Ship to Nightly queries, shaped like the real results: about
 // 17,000 landings over 90 days, two Nightlies a day, about 10 tree closures a day. The
 // sources lag the present by different amounts, as the real ones do, so the newest
-// landings are in flight, unmatched or not observed yet, and the page's handling of
-// those is tested. Everything is relative to a fixed moment.
+// landings are in flight or unmatched, and the page's handling of those is tested.
+// Everything is relative to a fixed moment.
 import {between, normal, pick, random, revision, taskId} from "./fixture-random.js";
 
 const HOUR = 3600;
@@ -16,8 +16,6 @@ const WATERMARKS = {
   commit_maps_until_s: NOW_S - 13 * HOUR
 };
 const JOBS_UNTIL_S = NOW_S - Math.round(6.2 * HOUR);
-const OBSERVED_UNTIL_S = Math.floor((NOW_S - Math.round(11.3 * HOUR)) / HOUR) * HOUR;
-const UPTAKE_REGIME_CHANGE_S = Date.parse("2026-10-27T12:00:00Z") / 1000;
 
 const PEOPLE = ["alice", "bob", "carol", "dave", "erin", "frank", "grace", "heidi", "ivan", "judy", "mallory", "niaj", "olivia", "peggy", "rupert", "sybil", "trent", "victor", "wendy", "xavier", "yolanda", "zed", "amir", "bianca"];
 const SHERIFFS = ["sheriff-a", "sheriff-b", "sheriff-c"];
@@ -32,8 +30,6 @@ function weighted(rand, table) {
   }
   return table[0][0];
 }
-
-const buildId = (seconds) => new Date(seconds * 1000).toISOString().replace(/[-:T]/g, "").slice(0, 14);
 
 function treeClosures(rand) {
   const rows = [];
@@ -69,7 +65,6 @@ function nightlies(rand, mergeList) {
         last_task_id: taskId(rand),
         started_s: started,
         pushed_s: pushed,
-        build_id: buildId(pushed),
         failed,
         published_s: failed || published > WATERMARKS.fxci_until_s ? null : published
       });
@@ -160,7 +155,6 @@ function journeys(rand, closures, nightlyList, mergeList) {
           nightly_published_s: nightly ? nightly.published_s : null,
           nightly_decision_id: nightly ? nightly.decision_id : null,
           nightly_last_task_id: nightly && nightly.published_s ? nightly.last_task_id : null,
-          nightly_build_id: nightly ? nightly.build_id : null,
           queue_closed_s: started <= WATERMARKS.lando_until_s ? overlap(closures, requested, started) : null,
           autoland_closed_s: merged ? overlap(closures, pushed, merged.merged_s) : null,
           backed_out: backedOut,
@@ -174,40 +168,6 @@ function journeys(rand, closures, nightlyList, mergeList) {
   return rows.sort((a, b) => a.land_requested_s - b.land_requested_s || a.revision_id - b.revision_id);
 }
 
-function uptake(rand, nightlyList) {
-  const rows = [];
-  for (const {started_s, published_s, build_id} of nightlyList) {
-    if (published_s === null) continue;
-    const firstSeen = published_s + between(rand, 15 * 60, 60 * 60);
-    const firstHour = Math.floor(firstSeen / HOUR) * HOUR;
-    if (firstSeen + 3 * HOUR > OBSERVED_UNTIL_S) continue;
-    const high = started_s >= UPTAKE_REGIME_CHANGE_S;
-    const level = (low, top) => low + (top - low) * rand();
-    const s6 = high ? level(0.2, 0.29) : level(0.1, 0.2);
-    const s24 = high ? level(0.5, 0.6) : level(0.22, 0.4);
-    const s72 = Math.max(s24 + 0.03, high ? level(0.68, 0.73) : level(0.3, 0.5));
-    const s12 = s6 + (s24 - s6) * level(0.2, 0.5);
-    const s48 = s24 + (s72 - s24) * level(0.4, 0.7);
-    const observed = (hours) => firstHour + hours * HOUR < OBSERVED_UNTIL_S;
-    const share = (hours, value) => (observed(hours) ? Math.round(value * 10000) / 10000 : null);
-    const reach = (hours) => (hours !== null && observed(hours) ? firstHour + hours * HOUR : null);
-    rows.push({
-      build_id,
-      first_seen_s: firstSeen,
-      observed_until_s: OBSERVED_UNTIL_S,
-      active_24h: observed(24) ? between(rand, high ? 6500 : 9000, high ? 9500 : 17000) : null,
-      share_6h: share(6, s6),
-      share_12h: share(12, s12),
-      share_24h: share(24, s24),
-      share_48h: share(48, s48),
-      share_72h: share(72, s72),
-      t25_s: reach(high ? between(rand, 5, 8) : between(rand, 9, 18)),
-      t50_s: reach(rand() < 0.04 ? null : high ? between(rand, 19, 24) : between(rand, 30, 66))
-    });
-  }
-  return rows;
-}
-
 let cached;
 function everything() {
   if (!cached) {
@@ -217,8 +177,7 @@ function everything() {
     const nightlyList = nightlies(rand, mergeList);
     cached = {
       "nightly-journeys": journeys(rand, closures, nightlyList, mergeList),
-      "nightly-treestatus": closures,
-      "nightly-uptake": uptake(rand, nightlyList)
+      "nightly-treestatus": closures
     };
   }
   return cached;
@@ -226,6 +185,5 @@ function everything() {
 
 export const NIGHTLY_TABLES = {
   "nightly-journeys": () => everything()["nightly-journeys"],
-  "nightly-treestatus": () => everything()["nightly-treestatus"],
-  "nightly-uptake": () => everything()["nightly-uptake"]
+  "nightly-treestatus": () => everything()["nightly-treestatus"]
 };

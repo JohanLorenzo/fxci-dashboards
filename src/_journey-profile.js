@@ -6,8 +6,8 @@ import {formatDuration, spansOf, STAGE_INFO} from "./_journey.js";
 const DAY_S = 86400;
 const HOUR_S = 3600;
 const TITLES = Object.fromEntries(STAGE_INFO.map(({key, title}) => [key, title]));
-const CATEGORIES = {queue: "Lando", lando: "Lando", autoland: "Autoland", waiting: "Nightly", build: "Nightly", uptake: "Uptake"};
-const COLORS = {queue: "green", lando: "teal", autoland: "orange", waiting: "yellow", build: "blue", uptake: "purple"};
+const CATEGORIES = {queue: "Lando", lando: "Lando", autoland: "Autoland", waiting: "Nightly", build: "Nightly"};
+const COLORS = {queue: "green", lando: "teal", autoland: "orange", waiting: "yellow", build: "blue"};
 const FIELDS = [
   {key: "label", label: "What", format: "string"},
   {key: "took", label: "Took", format: "string"}
@@ -51,8 +51,6 @@ function eventIntervals(journey, end) {
     ["Merged to main", journey.merged, "Merged to main", "lightblue"],
     ["Nightly started", journey.nightlyStarted, "Nightly started", "lightblue"],
     ["Nightly published", journey.published, "Nightly published", "lightblue"],
-    ["25% of the clients run it", journey.uptake?.t25 ?? null, "25% of the Nightly clients run the build", "purple"],
-    ["50% of the clients run it", journey.uptake?.t50 ?? null, "Half of the Nightly clients run the build", "purple"],
     ["Backed out", journey.backedOut ? journey.backout : null, `Backed out by ${journey.backoutBy}`, "red"]
   ];
   return events

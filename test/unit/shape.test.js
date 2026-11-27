@@ -51,7 +51,7 @@ describe("the registry of queries", () => {
   });
 
   test("lists the columns and the least rows of the Ship to Nightly queries", () => {
-    for (const name of ["nightly-journeys", "nightly-treestatus", "nightly-uptake"]) {
+    for (const name of ["nightly-journeys", "nightly-treestatus"]) {
       const entry = registry.find((query) => query.name === name);
       assert.ok(entry, `${name} is not in the registry`);
       assert.ok(entry.columns?.length > 0, `${name} lists no columns`);

@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import {describe, test} from "node:test";
-import {journeyOf, uptakeByBuild} from "../../src/_journey.js";
+import {journeyOf} from "../../src/_journey.js";
 import {journeyProfile} from "../../src/_journey-profile.js";
-import {HOUR, row, T0, uptakeRow} from "../fixtures/journey-rows.js";
+import {HOUR, row, T0} from "../fixtures/journey-rows.js";
 
-const marks = {landoUntil: T0 + 30 * 86400, treeherderUntil: T0 + 30 * 86400 - 5 * HOUR, fxciUntil: T0 + 30 * 86400 - 11 * HOUR, commitMapsUntil: T0 + 30 * 86400 - HOUR, uptakeUntil: T0 + 30 * 86400};
-const profileOf = (overrides = {}, {uptake = [uptakeRow()], closures = []} = {}) => journeyProfile(journeyOf(row(overrides), uptakeByBuild(uptake)), {marks, closures});
+const marks = {landoUntil: T0 + 30 * 86400, treeherderUntil: T0 + 30 * 86400 - 5 * HOUR, fxciUntil: T0 + 30 * 86400 - 11 * HOUR, commitMapsUntil: T0 + 30 * 86400 - HOUR};
+const profileOf = (overrides = {}, {closures = []} = {}) => journeyProfile(journeyOf(row(overrides)), {marks, closures});
 
 const INVISIBLE = /[​-‍⁠-⁤⁪-⁭]/g;
 const strings = (profile, thread, column) => profile.threads[thread].markers[column].map((value) => (column === "name" ? profile.shared.stringArray[value].replace(INVISIBLE, "") : value));
@@ -33,8 +33,7 @@ describe("journeyProfile", () => {
       "Lando landing",
       "On autoland until merged to main",
       "Merged to main until the Nightly starts",
-      "Nightly build and publish",
-      "Until half of the clients run it"
+      "Nightly build and publish"
     ]);
   });
 
@@ -78,12 +77,7 @@ describe("journeyProfile", () => {
   });
 
   test("marks the events of a landing that shipped, in the order they happened", () => {
-    assert.deepEqual(rowsOf(profileOf(), 2), ["Land requested", "Merged to main", "Nightly started", "Nightly published", "25% of the clients run it", "50% of the clients run it"]);
-  });
-
-  test("leaves out the uptake events that have not happened", () => {
-    const rows = rowsOf(profileOf({}, {uptake: [uptakeRow({t25_s: null, t50_s: null})]}), 2);
-    assert.deepEqual(rows, ["Land requested", "Merged to main", "Nightly started", "Nightly published"]);
+    assert.deepEqual(rowsOf(profileOf(), 2), ["Land requested", "Merged to main", "Nightly started", "Nightly published"]);
   });
 
   test("shows only the closures of the tree that overlap the journey", () => {
@@ -91,7 +85,7 @@ describe("journeyProfile", () => {
       {start_s: T0 - 5 * HOUR, end_s: T0 - 4 * HOUR, status: "closed", reason_tag: "checkin_test"},
       {start_s: T0 + HOUR, end_s: T0 + 2 * HOUR, status: "closed", reason_tag: "checkin_compilation"},
       {start_s: T0 + 40 * HOUR, end_s: T0 + 41 * HOUR, status: "closed", reason_tag: "infra"},
-      {start_s: T0 + 20 * HOUR, end_s: T0 + 21 * HOUR, status: "approval required", reason_tag: "waiting_for_coverage"}
+      {start_s: T0 + 8 * HOUR, end_s: T0 + 9 * HOUR, status: "approval required", reason_tag: "waiting_for_coverage"}
     ];
     const profile = profileOf({}, {closures});
     assert.deepEqual(rowsOf(profile, 1), ["Autoland closed", "Autoland: approval required"]);
@@ -101,8 +95,8 @@ describe("journeyProfile", () => {
   });
 
   test("counts a closure that has not ended up to the end of the journey", () => {
-    const profile = profileOf({}, {closures: [{start_s: T0 + 30 * HOUR, end_s: null, status: "closed", reason_tag: null}]});
-    assert.equal(dataOf(profile, 1, "Autoland closed")[0].took, "4 h 0 min");
+    const profile = profileOf({}, {closures: [{start_s: T0 + 8 * HOUR, end_s: null, status: "closed", reason_tag: null}]});
+    assert.equal(dataOf(profile, 1, "Autoland closed")[0].took, "2 h 0 min");
   });
 
   test("starts when the review did, but not more than two days before Land, or an hour before it without a review", () => {

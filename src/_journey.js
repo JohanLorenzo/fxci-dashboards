@@ -4,10 +4,8 @@
 
 // Percentiles over the landings that are done would drop the slow ones, so a tile only
 // counts landings that had time to finish. 48 hours is more than land to publish takes
-// for 99 of 100 landings. Half of the clients are on a build up to about 54 hours after
-// it is published, for 9 builds of 10, so uptake gets 96.
+// for 99 of 100 landings.
 export const PUBLISH_HORIZON_S = 48 * 3600;
-export const UPTAKE_HORIZON_S = 96 * 3600;
 export const UNMATCHED_AFTER_S = 7 * 86400;
 
 const STAGES = [
@@ -23,8 +21,7 @@ export const STAGE_INFO = [
   {key: "lando", title: "Lando landing", color: "#237a4b"},
   {key: "autoland", title: "On autoland until merged to main", color: "#e0902c"},
   {key: "waiting", title: "Merged to main until the Nightly starts", color: "#cf5b82"},
-  {key: "build", title: "Nightly build and publish", color: "#5b6abf"},
-  {key: "uptake", title: "Until half of the clients run it", color: "#8a4fb5"}
+  {key: "build", title: "Nightly build and publish", color: "#5b6abf"}
 ];
 
 // The Lando queue and the time on autoland are told apart by whether the tree was
@@ -36,8 +33,7 @@ export const CANDLE_SEGMENTS = [
   {key: "autolandOpen", title: "On autoland until merged to main", color: "#e0902c"},
   {key: "autolandClosed", title: "On autoland, while it was closed", color: "#b3202a"},
   {key: "waiting", title: "Merged to main until the Nightly starts", color: "#cf5b82"},
-  {key: "build", title: "Nightly build and publish", color: "#5b6abf"},
-  {key: "uptake", title: "Until half of the clients run it", color: "#8a4fb5"}
+  {key: "build", title: "Nightly build and publish", color: "#5b6abf"}
 ];
 
 export const MEASURES = [{key: "total", title: "Land to published in a Nightly"}, ...STAGE_INFO.map(({key, title}) => ({key, title}))];
@@ -52,27 +48,7 @@ export function quantile(values, share) {
   return sorted[below] + (at - below) * ((sorted[below + 1] ?? sorted[below]) - sorted[below]);
 }
 
-export function uptakeByBuild(rows) {
-  return new Map(
-    rows.map((row) => [
-      row.build_id,
-      {
-        firstSeen: row.first_seen_s,
-        observedUntil: row.observed_until_s,
-        active24: row.active_24h,
-        share6: row.share_6h,
-        share12: row.share_12h,
-        share24: row.share_24h,
-        share48: row.share_48h,
-        share72: row.share_72h,
-        t25: row.t25_s,
-        t50: row.t50_s
-      }
-    ])
-  );
-}
-
-export function journeyOf(row, uptake) {
+export function journeyOf(row) {
   return {
     revision: row.revision_id,
     bug: row.bug_id,
@@ -93,13 +69,11 @@ export function journeyOf(row, uptake) {
     published: row.nightly_published_s,
     decisionId: row.nightly_decision_id,
     lastTaskId: row.nightly_last_task_id,
-    buildId: row.nightly_build_id,
     queueClosed: row.queue_closed_s,
     autolandClosed: row.autoland_closed_s,
     backedOut: row.backed_out,
     backoutBy: row.backout_by,
-    backout: row.backout_s,
-    uptake: uptake.get(row.nightly_build_id) ?? null
+    backout: row.backout_s
   };
 }
 
@@ -110,9 +84,7 @@ export function durationsOf(journey) {
     autoland: between(journey.merged, journey.pushed),
     waiting: between(journey.nightlyStarted, journey.merged),
     build: between(journey.published, journey.nightlyStarted),
-    total: between(journey.published, journey.requested),
-    uptake: between(journey.uptake?.t50, journey.published),
-    toHalf: between(journey.uptake?.t50, journey.requested)
+    total: between(journey.published, journey.requested)
   };
 }
 
@@ -167,16 +139,16 @@ export function topNames(names, count) {
     .map(([name]) => name);
 }
 
-const STAGE_ORDER = [...STAGES.map(([stage]) => stage), "uptake"];
+const STAGE_ORDER = STAGES.map(([stage]) => stage);
 const OPEN_ENDS = {queue: "landoUntil", lando: "commitMapsUntil", autoland: "treeherderUntil", waiting: "treeherderUntil", build: "fxciUntil"};
 
 // The stages a landing went through, each from where it began to where it ended, and where
-// the journey ends: at half of the clients on the build, at its backout, or, for a landing
-// still on its way, at what the source of its next event has recorded, which is not the
-// present. A stage that began at or after that end is left out, and `open` is a stage that
-// is still going on at the end.
+// the journey ends: when a Nightly publishes it, at its backout, or, for a landing still
+// on its way, at what the source of its next event has recorded, which is not the present.
+// A stage that began at or after that end is left out, and `open` is a stage that is still
+// going on at the end.
 export function spansOf(journey, marks) {
-  const bounds = [journey.requested, journey.landoStarted, journey.pushed, journey.merged, journey.nightlyStarted, journey.published, journey.uptake?.t50 ?? null];
+  const bounds = [journey.requested, journey.landoStarted, journey.pushed, journey.merged, journey.nightlyStarted, journey.published];
   const openAt = bounds.indexOf(null);
   let end;
   let kind = "open";
@@ -184,11 +156,10 @@ export function spansOf(journey, marks) {
     end = journey.backout;
     kind = "backed out";
   } else if (openAt === -1) {
-    end = bounds[6];
+    end = journey.published;
     kind = "shipped";
   } else {
-    const stage = STAGE_ORDER[openAt - 1];
-    const watermark = stage === "uptake" ? (journey.uptake?.observedUntil ?? marks.uptakeUntil) : marks[OPEN_ENDS[stage]];
+    const watermark = marks[OPEN_ENDS[STAGE_ORDER[openAt - 1]]];
     end = Math.max(watermark ?? bounds[openAt - 1], bounds[openAt - 1]);
   }
   const spans = STAGE_ORDER.flatMap((key, index) => {
@@ -217,8 +188,7 @@ export function candleOf(journey, marks) {
       autolandOpen: seconds("autoland") - autolandClosed,
       autolandClosed,
       waiting: seconds("waiting"),
-      build: seconds("build"),
-      uptake: seconds("uptake")
+      build: seconds("build")
     },
     total: end - journey.requested,
     end,
@@ -235,14 +205,13 @@ export function formatDuration(seconds) {
 
 export const stackBucket = (size) => (size <= 2 ? String(size) : size <= 5 ? "3 to 5" : "6 or more");
 
-export function watermarksOf(rows, uptakeRows) {
+export function watermarksOf(rows) {
   const [first] = rows;
   return {
     landoUntil: first?.lando_until_s ?? null,
     treeherderUntil: first?.treeherder_until_s ?? null,
     fxciUntil: first?.fxci_until_s ?? null,
-    commitMapsUntil: first?.commit_maps_until_s ?? null,
-    uptakeUntil: uptakeRows[0]?.observed_until_s ?? null
+    commitMapsUntil: first?.commit_maps_until_s ?? null
   };
 }
 

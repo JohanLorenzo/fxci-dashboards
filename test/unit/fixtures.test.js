@@ -8,7 +8,7 @@ import {makeFixtures} from "../../scripts/make-fixtures.js";
 import {rowsToParquet} from "../../src/data/_parquet.js";
 import {checkShape} from "../../src/data/_shape.js";
 
-const NAMES = ["nightly-journeys", "nightly-treestatus", "nightly-uptake"];
+const NAMES = ["nightly-journeys", "nightly-treestatus"];
 
 describe("the fixtures of the Ship to Nightly queries", () => {
   const entries = {};
@@ -80,7 +80,7 @@ describe("the fixtures of the Ship to Nightly queries", () => {
       const first = new Map();
       for (const row of journeys()) {
         const reference = first.get(row.job_id) ?? first.set(row.job_id, row).get(row.job_id);
-        for (const column of ["land_requested_s", "lando_started_s", "autoland_pushed_s", "merged_s", "nightly_build_id", "requested_by"]) {
+        for (const column of ["land_requested_s", "lando_started_s", "autoland_pushed_s", "merged_s", "requested_by"]) {
           assert.equal(row[column], reference[column], `job ${row.job_id} ${column}`);
         }
       }
@@ -114,34 +114,6 @@ describe("the fixtures of the Ship to Nightly queries", () => {
       const days = (Math.max(...journeys().map((row) => row.land_requested_s)) - Math.min(...journeys().map((row) => row.land_requested_s))) / 86400;
       assert.ok(days > 85 && days < 91, `${days} days`);
       assert.ok(journeys().length > 10000 && journeys().length < 30000, `${journeys().length} rows`);
-    });
-  });
-
-  describe("of the uptake", () => {
-    const uptake = () => tables["nightly-uptake"];
-
-    test("have a build id that a journey has, for most of the journeys", () => {
-      const builds = new Set(uptake().map((row) => row.build_id));
-      const journeyBuilds = new Set(tables["nightly-journeys"].map((row) => row.nightly_build_id).filter(Boolean));
-      const covered = [...journeyBuilds].filter((build) => builds.has(build)).length;
-      assert.ok(covered / journeyBuilds.size > 0.9, `${covered} of ${journeyBuilds.size}`);
-      assert.ok([...builds].every((build) => /^\d{14}$/.test(build)));
-    });
-
-    test("leave a share empty until its hour is over, and never decrease it before it is", () => {
-      for (const row of uptake()) {
-        const shares = ["share_6h", "share_12h", "share_24h", "share_48h", "share_72h"].map((column) => row[column]);
-        const seen = shares.filter((share) => share !== null);
-        assert.deepEqual(shares.slice(0, seen.length), seen, `${row.build_id}: a share is empty before a later one is not`);
-        assert.deepEqual(seen, [...seen].sort((a, b) => a - b), `${row.build_id}: the share decreases`);
-        assert.ok(seen.every((share) => share > 0 && share < 1));
-      }
-    });
-
-    test("have the newest builds with milestones not reached yet", () => {
-      const newest = uptake().at(-1);
-      assert.equal(newest.share_72h, null);
-      assert.ok(uptake().some((row) => row.t50_s === null));
     });
   });
 

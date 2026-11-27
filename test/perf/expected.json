@@ -448,14 +448,6 @@
             "p50 13 h 41 min p90 27 h 21 min p99 38 h 36 min"
           ],
           [
-            "Land to half of the Nightly clients on the fix",
-            "p50 34 h 59 min p95 53 h 7 min"
-          ],
-          [
-            "Nightly clients on the fix 24 h after it is published",
-            "51.9%"
-          ],
-          [
             "Revisions that took over 24 h to publish",
             "17.4%"
           ],
@@ -508,16 +500,16 @@
             "0"
           ]
         ],
-        "svgs": 34,
+        "svgs": 31,
         "circles": 2767,
-        "lines": 12647,
-        "paths": 161,
+        "lines": 11072,
+        "paths": 160,
         "anchors": 0,
-        "nodes": 15949,
-        "bodyNodes": 16511,
+        "nodes": 14341,
+        "bodyNodes": 14876,
         "inlineErrors": 0,
-        "html": "6eacf92d0e682135",
-        "styles": "af937e3805be1bc0"
+        "html": "014a4861de72ab1d",
+        "styles": "c7c9f79996d38e06"
       },
       "hover": {
         "end to end": {
@@ -530,7 +522,7 @@
           "tooltips": 6
         },
         "candles": {
-          "tooltips": 50
+          "tooltips": 21
         }
       },
       "pin": {
@@ -564,7 +556,7 @@
           "pointerEvents": "none",
           "display": "block"
         },
-        "content": "0404edd9a57ad374"
+        "content": "873265b16b5afb63"
       },
       "legend": {
         "hidden": {
@@ -578,10 +570,10 @@
           ],
           "charts": 1,
           "circles": 2767,
-          "lines": 12647,
-          "nodes": 15949,
-          "html": "8098e343fd8560bf",
-          "styles": "5d3e749b5412402a"
+          "lines": 11072,
+          "nodes": 14341,
+          "html": "eaad5b64fbcf536f",
+          "styles": "3fc6b0863d40548e"
         },
         "shown": {
           "pressed": [
@@ -594,10 +586,10 @@
           ],
           "charts": 1,
           "circles": 2767,
-          "lines": 12647,
-          "nodes": 15949,
-          "html": "24390b88332ebbfe",
-          "styles": "58fb71fd8d4354cd"
+          "lines": 11072,
+          "nodes": 14341,
+          "html": "74269afc2be3406f",
+          "styles": "bc66d49431e2268a"
         },
         "alone": {
           "pressed": [
@@ -610,10 +602,10 @@
           ],
           "charts": 1,
           "circles": 1487,
-          "lines": 12647,
-          "nodes": 14668,
-          "html": "ac538a5327425125",
-          "styles": "13cbb324b49f45e1"
+          "lines": 11072,
+          "nodes": 13060,
+          "html": "682a14511ab32f25",
+          "styles": "c10a2e29ab59181a"
         },
         "all": {
           "pressed": [
@@ -626,19 +618,19 @@
           ],
           "charts": 1,
           "circles": 2767,
-          "lines": 12647,
-          "nodes": 15949,
-          "html": "24390b88332ebbfe",
-          "styles": "58fb71fd8d4354cd"
+          "lines": 11072,
+          "nodes": 14341,
+          "html": "74269afc2be3406f",
+          "styles": "bc66d49431e2268a"
         },
         "collapsed": {
           "pressed": [],
           "charts": 0,
           "circles": 1482,
-          "lines": 12634,
-          "nodes": 14584,
-          "html": "0bf2f48d9e2d5997",
-          "styles": "1c820c99279c5b30"
+          "lines": 11059,
+          "nodes": 12976,
+          "html": "304cbf664591230f",
+          "styles": "13b71298cd267239"
         },
         "expanded": {
           "pressed": [
@@ -651,10 +643,10 @@
           ],
           "charts": 1,
           "circles": 2767,
-          "lines": 12647,
-          "nodes": 15949,
-          "html": "24390b88332ebbfe",
-          "styles": "58fb71fd8d4354cd"
+          "lines": 11072,
+          "nodes": 14341,
+          "html": "74269afc2be3406f",
+          "styles": "bc66d49431e2268a"
         },
         "restored": true
       },
@@ -667,14 +659,6 @@
           [
             "Land to published in a Nightly",
             "p50 15 h 54 min p90 30 h 37 min p99 39 h 26 min"
-          ],
-          [
-            "Land to half of the Nightly clients on the fix",
-            "p50 34 h 59 min p95 53 h 7 min"
-          ],
-          [
-            "Nightly clients on the fix 24 h after it is published",
-            "51.9%"
           ],
           [
             "Revisions that took over 24 h to publish",
@@ -729,16 +713,16 @@
             "0"
           ]
         ],
-        "svgs": 34,
+        "svgs": 31,
         "circles": 952,
-        "lines": 3893,
-        "paths": 76,
+        "lines": 3412,
+        "paths": 75,
         "anchors": 0,
-        "nodes": 5267,
-        "bodyNodes": 5841,
+        "nodes": 4755,
+        "bodyNodes": 5302,
         "inlineErrors": 0,
-        "html": "1faeac236b69b830",
-        "styles": "e95d1706fb5c5e27"
+        "html": "e249f32aa058b136",
+        "styles": "abe94551b46fd7d9"
       },
       "errors": []
     },
@@ -748,14 +732,6 @@
           [
             "Land to published in a Nightly",
             "p50 13 h 43 min p90 25 h 26 min p99 64 h 47 min"
-          ],
-          [
-            "Land to half of the Nightly clients on the fix",
-            "p50 53 h 36 min p95 88 h 3 min"
-          ],
-          [
-            "Nightly clients on the fix 24 h after it is published",
-            "35.3%"
           ],
           [
             "Revisions that took over 24 h to publish",
@@ -810,16 +786,16 @@
             "0"
           ]
         ],
-        "svgs": 34,
+        "svgs": 31,
         "circles": 6881,
-        "lines": 16056,
-        "paths": 194,
+        "lines": 14050,
+        "paths": 188,
         "anchors": 0,
-        "nodes": 23507,
-        "bodyNodes": 24069,
+        "nodes": 21458,
+        "bodyNodes": 21993,
         "inlineErrors": 0,
-        "html": "5963b37cbb563216",
-        "styles": "86645e8b8742089c"
+        "html": "ff39f48123901c6c",
+        "styles": "849efaefd21c2c8c"
       },
       "hover": {
         "end to end": {
@@ -832,7 +808,7 @@
           "tooltips": 5
         },
         "candles": {
-          "tooltips": 1
+          "tooltips": 2
         }
       },
       "pin": {
@@ -866,7 +842,7 @@
           "pointerEvents": "none",
           "display": "block"
         },
-        "content": "b9a1593d493c871d"
+        "content": "ed30a691f545e204"
       },
       "legend": {
         "hidden": {
@@ -880,10 +856,10 @@
           ],
           "charts": 1,
           "circles": 6881,
-          "lines": 16056,
-          "nodes": 23507,
-          "html": "024a584381d4917f",
-          "styles": "232d3adbecedf7a1"
+          "lines": 14050,
+          "nodes": 21458,
+          "html": "14601d9ce25eeede",
+          "styles": "31a9157715e08e37"
         },
         "shown": {
           "pressed": [
@@ -896,10 +872,10 @@
           ],
           "charts": 1,
           "circles": 6881,
-          "lines": 16056,
-          "nodes": 23507,
-          "html": "044dd455e1957d4a",
-          "styles": "3db8b295370ea16a"
+          "lines": 14050,
+          "nodes": 21458,
+          "html": "3d978376493e11d4",
+          "styles": "f27b3848106bb5d2"
         },
         "alone": {
           "pressed": [
@@ -912,10 +888,10 @@
           ],
           "charts": 1,
           "circles": 1881,
-          "lines": 16056,
-          "nodes": 18506,
-          "html": "30970fe14fca9f46",
-          "styles": "14fa6d8c0280f86c"
+          "lines": 14050,
+          "nodes": 16457,
+          "html": "09676f0b452c319c",
+          "styles": "53c0e4cd91650d5e"
         },
         "all": {
           "pressed": [
@@ -928,19 +904,19 @@
           ],
           "charts": 1,
           "circles": 6881,
-          "lines": 16056,
-          "nodes": 23507,
-          "html": "044dd455e1957d4a",
-          "styles": "3db8b295370ea16a"
+          "lines": 14050,
+          "nodes": 21458,
+          "html": "3d978376493e11d4",
+          "styles": "f27b3848106bb5d2"
         },
         "collapsed": {
           "pressed": [],
           "charts": 0,
           "circles": 1876,
-          "lines": 16045,
-          "nodes": 18428,
-          "html": "ef91f1c32ed083ff",
-          "styles": "903daae7c49deccd"
+          "lines": 14039,
+          "nodes": 16379,
+          "html": "e89a54717ed5f489",
+          "styles": "608bb0c728ac178f"
         },
         "expanded": {
           "pressed": [
@@ -953,10 +929,10 @@
           ],
           "charts": 1,
           "circles": 6881,
-          "lines": 16056,
-          "nodes": 23507,
-          "html": "044dd455e1957d4a",
-          "styles": "3db8b295370ea16a"
+          "lines": 14050,
+          "nodes": 21458,
+          "html": "3d978376493e11d4",
+          "styles": "f27b3848106bb5d2"
         },
         "restored": true
       },
@@ -969,14 +945,6 @@
           [
             "Land to published in a Nightly",
             "p50 13 h 19 min p90 27 h 31 min p99 74 h 55 min"
-          ],
-          [
-            "Land to half of the Nightly clients on the fix",
-            "p50 63 h 48 min p95 94 h 54 min"
-          ],
-          [
-            "Nightly clients on the fix 24 h after it is published",
-            "33.8%"
           ],
           [
             "Revisions that took over 24 h to publish",
@@ -1031,16 +999,16 @@
             "0"
           ]
         ],
-        "svgs": 34,
+        "svgs": 31,
         "circles": 6912,
-        "lines": 16035,
-        "paths": 152,
+        "lines": 14034,
+        "paths": 149,
         "anchors": 0,
-        "nodes": 23447,
-        "bodyNodes": 24021,
+        "nodes": 21411,
+        "bodyNodes": 21958,
         "inlineErrors": 0,
-        "html": "98bb0b8e910b4f27",
-        "styles": "86645e8b8742089c"
+        "html": "9d75bc3b57f44c8c",
+        "styles": "849efaefd21c2c8c"
       },
       "errors": []
     },
@@ -1050,14 +1018,6 @@
           [
             "Land to published in a Nightly",
             "p50 13 h 42 min p90 30 h 39 min p99 61 h 0 min"
-          ],
-          [
-            "Land to half of the Nightly clients on the fix",
-            "p50 63 h 35 min p95 91 h 53 min"
-          ],
-          [
-            "Nightly clients on the fix 24 h after it is published",
-            "28.6%"
           ],
           [
             "Revisions that took over 24 h to publish",
@@ -1112,16 +1072,16 @@
             "0"
           ]
         ],
-        "svgs": 42,
+        "svgs": 39,
         "circles": 3421,
-        "lines": 14054,
-        "paths": 166,
+        "lines": 12296,
+        "paths": 158,
         "anchors": 0,
-        "nodes": 18014,
-        "bodyNodes": 18616,
+        "nodes": 16211,
+        "bodyNodes": 16783,
         "inlineErrors": 0,
-        "html": "4332be5a18120c8b",
-        "styles": "f8da076a36790be4"
+        "html": "18494ed34f962938",
+        "styles": "ef8c16ce9f575095"
       },
       "hover": {
         "end to end": {
@@ -1134,7 +1094,7 @@
           "tooltips": 4
         },
         "candles": {
-          "tooltips": 107
+          "tooltips": 22
         }
       },
       "pin": {
@@ -1168,7 +1128,7 @@
           "pointerEvents": "none",
           "display": "block"
         },
-        "content": "769f3b3e5c014fa3"
+        "content": "a341db0cc2494646"
       },
       "legend": {
         "hidden": {
@@ -1190,10 +1150,10 @@
           ],
           "charts": 1,
           "circles": 3318,
-          "lines": 14054,
-          "nodes": 17911,
-          "html": "8dba49198fb82385",
-          "styles": "26e2e9651f94de34"
+          "lines": 12296,
+          "nodes": 16108,
+          "html": "712f5d1fc588650c",
+          "styles": "dcc00e6181f82ca9"
         },
         "shown": {
           "pressed": [
@@ -1214,10 +1174,10 @@
           ],
           "charts": 1,
           "circles": 3421,
-          "lines": 14054,
-          "nodes": 18014,
-          "html": "806fa90286f2df53",
-          "styles": "ea976a365840371d"
+          "lines": 12296,
+          "nodes": 16211,
+          "html": "d158ebe565a291ed",
+          "styles": "63ad35fc5d00ce15"
         },
         "alone": {
           "pressed": [
@@ -1238,10 +1198,10 @@
           ],
           "charts": 1,
           "circles": 1770,
-          "lines": 14054,
-          "nodes": 16363,
-          "html": "9a8c16ac70ce876c",
-          "styles": "11770ba336e08d8a"
+          "lines": 12296,
+          "nodes": 14560,
+          "html": "2ec9da166573a392",
+          "styles": "49e422f805c48493"
         },
         "all": {
           "pressed": [
@@ -1262,19 +1222,19 @@
           ],
           "charts": 1,
           "circles": 3421,
-          "lines": 14054,
-          "nodes": 18014,
-          "html": "806fa90286f2df53",
-          "styles": "ea976a365840371d"
+          "lines": 12296,
+          "nodes": 16211,
+          "html": "d158ebe565a291ed",
+          "styles": "63ad35fc5d00ce15"
         },
         "collapsed": {
           "pressed": [],
           "charts": 0,
           "circles": 1655,
-          "lines": 14044,
-          "nodes": 16160,
-          "html": "e9f2dddc2f4ffc96",
-          "styles": "1c820c99279c5b30"
+          "lines": 12286,
+          "nodes": 14357,
+          "html": "32b59c6dff8261f5",
+          "styles": "13b71298cd267239"
         },
         "expanded": {
           "pressed": [
@@ -1295,10 +1255,10 @@
           ],
           "charts": 1,
           "circles": 3421,
-          "lines": 14054,
-          "nodes": 18014,
-          "html": "806fa90286f2df53",
-          "styles": "ea976a365840371d"
+          "lines": 12296,
+          "nodes": 16211,
+          "html": "d158ebe565a291ed",
+          "styles": "63ad35fc5d00ce15"
         },
         "restored": true
       },
@@ -1311,14 +1271,6 @@
           [
             "Land to published in a Nightly",
             "p50 13 h 46 min p90 27 h 3 min p99 39 h 54 min"
-          ],
-          [
-            "Land to half of the Nightly clients on the fix",
-            "p50 71 h 19 min p95 90 h 53 min"
-          ],
-          [
-            "Nightly clients on the fix 24 h after it is published",
-            "28.6%"
           ],
           [
             "Revisions that took over 24 h to publish",
@@ -1373,16 +1325,16 @@
             "0"
           ]
         ],
-        "svgs": 42,
+        "svgs": 39,
         "circles": 1947,
-        "lines": 7970,
-        "paths": 106,
+        "lines": 6975,
+        "paths": 101,
         "anchors": 0,
-        "nodes": 10382,
-        "bodyNodes": 10996,
+        "nodes": 9348,
+        "bodyNodes": 9932,
         "inlineErrors": 0,
-        "html": "40ec382e79451d2f",
-        "styles": "f8da076a36790be4"
+        "html": "483e3ccf85bd9d61",
+        "styles": "ef8c16ce9f575095"
       },
       "errors": []
     }

@@ -18,8 +18,8 @@ const PERF_BACKFILL_WAITS = {
   zoom: {chart: 7, from: 0.1, to: 0.35}
 };
 
-// The 16 tiles are the first 16 charts, the dots of the landings the 17th and the candles
-// the 18th.
+// The 14 tiles are the first 14 charts, the dots of the landings the 15th and the candles
+// the 16th.
 const SHIP_TO_NIGHTLY = {
   root: "#sn-charts",
   tiles: {item: ".bw-metric", title: ".bw-metric-title", value: ".bw-metric-value"},
@@ -30,10 +30,10 @@ const SHIP_TO_NIGHTLY = {
   hover: [
     {name: "end to end", chart: 0},
     {name: "stages", chart: 5},
-    {name: "landings", chart: 16},
-    {name: "candles", chart: 17}
+    {name: "landings", chart: 14},
+    {name: "candles", chart: 15}
   ],
-  pin: {chart: 16},
+  pin: {chart: 14},
   legend: {block: 1, entry: 1},
   zoom: {chart: 0, from: 0.1, to: 0.35}
 };

@@ -8,7 +8,7 @@ toc: false
 How long a patch takes from "Land" in Phabricator to a Nightly that people run.
 
 ```js
-import {candleOf, CANDLE_SEGMENTS, dominantStage, durationsOf, inCohort, journeyOf, matchesQuery, MEASURES, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, stackBucket, STAGE_INFO, statusOf, topNames, UNMATCHED_AFTER_S, UPTAKE_HORIZON_S, uptakeByBuild, watermarksOf} from "./_journey.js";
+import {candleOf, CANDLE_SEGMENTS, dominantStage, durationsOf, inCohort, journeyOf, matchesQuery, MEASURES, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, stackBucket, STAGE_INFO, statusOf, topNames, UNMATCHED_AFTER_S, watermarksOf} from "./_journey.js";
 import {journeyProfile} from "./_journey-profile.js";
 import {openProfile} from "./_profiler.js";
 import {attachPlotHover, createTooltip, nearestDot, timelineLink} from "./_tooltip.js";
@@ -20,18 +20,15 @@ import {candleChart, segmentLines} from "./_candles.js";
 
 ```js
 const journeyRows = (await FileAttachment("data/nightly-journeys.parquet").parquet()).toArray();
-const uptakeRows = (await FileAttachment("data/nightly-uptake.parquet").parquet()).toArray();
 const closureRows = (await FileAttachment("data/nightly-treestatus.parquet").parquet()).toArray();
 ```
 
 ```js
 // The sources lag the present by different amounts, so each has its own watermark.
 // A tile only counts the landings that had time to finish by the oldest of them.
-const marks = watermarksOf(journeyRows, uptakeRows);
+const marks = watermarksOf(journeyRows);
 const publishUntil = Math.min(marks.landoUntil, marks.commitMapsUntil);
-const uptakeUntil = Math.min(publishUntil, marks.uptakeUntil ?? publishUntil);
-const uptake = uptakeByBuild(uptakeRows);
-const journeys = journeyRows.map((row) => journeyOf(row, uptake));
+const journeys = journeyRows.map((row) => journeyOf(row));
 const secondsToDate = (seconds) => new Date(seconds * 1000);
 
 // The charts keep the newest when there are too many to draw, so the order is by request.
@@ -46,8 +43,7 @@ const landings = journeys
       stage: dominantStage(durations),
       candle: candleOf(journey, marks),
       status: statusOf(journey, marks),
-      publishCohort: inCohort(journey, publishUntil, PUBLISH_HORIZON_S),
-      uptakeCohort: inCohort(journey, uptakeUntil, UPTAKE_HORIZON_S)
+      publishCohort: inCohort(journey, publishUntil, PUBLISH_HORIZON_S)
     };
   })
   .sort((a, b) => a.time - b.time);
@@ -110,31 +106,6 @@ const METRICS = [
       {key: "p50", title: "p50", value: percentile("publishCohort", "total", 0.5), color: BLUES[0]},
       {key: "p90", title: "p90", value: percentile("publishCohort", "total", 0.9), color: BLUES[1]},
       {key: "p99", title: "p99", value: percentile("publishCohort", "total", 0.99), color: BLUES[2]}
-    ]
-  },
-  {
-    key: "tohalf",
-    title: "Land to half of the Nightly clients on the fix",
-    span: 2,
-    countless: true,
-    format: formatWait,
-    series: [
-      {key: "p50", title: "p50", value: percentile("uptakeCohort", "toHalf", 0.5), color: "#b49be6"},
-      {key: "p95", title: "p95", value: percentile("uptakeCohort", "toHalf", 0.95), color: "#6b3fbf"}
-    ]
-  },
-  {
-    key: "share24",
-    title: "Nightly clients on the fix 24 h after it is published",
-    countless: true,
-    format: formatPercent,
-    series: [
-      {
-        key: "share24",
-        title: "median",
-        value: (items) => quantile(shippedIn("uptakeCohort")(items).map((landing) => landing.journey.uptake?.share24), 0.5),
-        color: "#6b3fbf"
-      }
     ]
   },
   {
@@ -239,7 +210,7 @@ function colorScheme(mode, shown) {
   if (mode === "stack") {
     return {entries: Object.entries(STACK_COLORS).map(([key, color]) => ({key, title: key === "1" ? "1 revision" : `${key} revisions`, color})), keyOf: (landing) => stackBucket(landing.journey.stack.size)};
   }
-  return {entries: STAGE_INFO.slice(0, 5).map(({key, title, color}) => ({key, title, color})), keyOf: (landing) => landing.stage ?? "queue"};
+  return {entries: STAGE_INFO.map(({key, title, color}) => ({key, title, color})), keyOf: (landing) => landing.stage ?? "queue"};
 }
 
 const STAGE_LINES = STAGE_INFO.map((stage) => ({...stage, applies: (landing) => landing.durations[stage.key] !== null}));
@@ -368,18 +339,17 @@ function landingsChart({shown, width, hidden, domain, measure, scheme, modeKey})
   return htl.html`${chartBox(plot, LANDINGS_HEIGHT)}${notes.length ? htl.html`<p class="bw-note">${notes.join(" ")}</p>` : ""}`;
 }
 
-// How a candle ends is part of what it says: half of the clients on the build, a backout,
-// or the last thing recorded for a landing that is still on its way.
+// How a candle ends is part of what it says: a Nightly published it, it was backed out,
+// or it is still on its way and is drawn up to the last thing recorded.
 const END_KINDS = [
-  {key: "end-shipped", kind: "shipped", title: "reached half of the Nightly clients", marker: () => LEGEND_MARKERS.dot("currentColor")},
+  {key: "end-shipped", kind: "shipped", title: "was published in a Nightly", marker: () => LEGEND_MARKERS.dot("currentColor")},
   {key: "end-backed-out", kind: "backed out", title: "was backed out", marker: () => LEGEND_MARKERS.cross(BACKOUT_COLOR)},
   {key: "end-open", kind: "open", title: "still on its way, drawn up to what is recorded", marker: () => LEGEND_MARKERS.ring("currentColor")}
 ];
 const endKeyOf = (kind) => END_KINDS.find((end) => end.kind === kind).key;
 const swatch = ({key, title, color}) => ({key, title, marker: () => LEGEND_MARKERS.swatch(color, 0.8)});
 const candleGroups = () => [
-  {title: "Stage", entries: CANDLE_SEGMENTS.slice(0, -1).map(swatch)},
-  {title: "Then", entries: CANDLE_SEGMENTS.slice(-1).map(swatch)},
+  {title: "Stage", entries: CANDLE_SEGMENTS.map(swatch)},
   {title: "A candle ends when it", entries: END_KINDS.map(({key, title, marker}) => ({key, title, marker}))}
 ];
 
@@ -645,8 +615,7 @@ const tableRows = itemsIn(domain, requester)
     queue: landing.durations.queue,
     autoland: landing.durations.autoland,
     waiting: landing.durations.waiting,
-    build: landing.durations.build,
-    uptake: landing.durations.uptake
+    build: landing.durations.build
   }));
 const searchInput = Inputs.search(tableRows, {placeholder: "Search a D number, a bug, a requester or an hg revision", width: 460, filter: (query) => (row) => matchesQuery(row.journey, query)});
 const searched = Generators.input(searchInput);
@@ -659,9 +628,9 @@ searchInput
 ```js
 const duration = (seconds) => (seconds === null ? "–" : hoursText(seconds));
 display(Inputs.table(searched, {
-  columns: ["revision", "bug", "requester", "status", "requested", "total", "queue", "autoland", "waiting", "build", "uptake"],
-  header: {revision: "Revision", bug: "Bug", requester: "Requester", status: "Outcome", requested: "Land requested", total: "Land to published", queue: "Lando queue", autoland: "On autoland", waiting: "Waiting for Nightly", build: "Nightly build", uptake: "Until half run it"},
-  width: {revision: 80, bug: 80, requester: 100, status: 90, requested: 130, total: 130, queue: 100, autoland: 110, waiting: 130, build: 110, uptake: 130},
+  columns: ["revision", "bug", "requester", "status", "requested", "total", "queue", "autoland", "waiting", "build"],
+  header: {revision: "Revision", bug: "Bug", requester: "Requester", status: "Outcome", requested: "Land requested", total: "Land to published", queue: "Lando queue", autoland: "On autoland", waiting: "Waiting for Nightly", build: "Nightly build"},
+  width: {revision: 80, bug: 80, requester: 100, status: 90, requested: 130, total: 130, queue: 100, autoland: 110, waiting: 130, build: 110},
   format: {
     revision: (revision) => htl.html`<a href="?revision=D${revision}">D${revision}</a>`,
     bug: (bug) => (bug ? external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${bug}`, bug) : ""),
@@ -670,8 +639,7 @@ display(Inputs.table(searched, {
     queue: duration,
     autoland: duration,
     waiting: duration,
-    build: duration,
-    uptake: duration
+    build: duration
   },
   sort: "requested",
   reverse: true,
