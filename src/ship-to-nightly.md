@@ -202,8 +202,23 @@ const stageLink = (key) => (landing) => {
   const target = STAGE_LINK_TO[key]?.(landing);
   return target ? external(target[1], target[0]) : null;
 };
-const STAGE_LINES = STAGE_INFO.map((stage) => ({...stage, applies: (landing) => landing.durations[stage.key] !== null, link: stageLink(stage.key)}));
 const hoursText = (seconds) => formatWait(seconds / 3600);
+const SEGMENT_STYLE = Object.fromEntries(CANDLE_SEGMENTS.map(({key, title, color}) => [key, {title, color}]));
+const CI_OF_STAGE = {autoland: ["autolandCi", "ciAutoland"], waiting: ["mainCi", "ciMain"]};
+
+// The CI is part of the stage it runs in, as it is in the bar, and only what ran before the
+// stage ended counts there. The CI of a push on main goes on after the Nightly starts.
+const ciNote = (stage) => {
+  const [segment, ci] = CI_OF_STAGE[stage] ?? [];
+  if (!segment) return undefined;
+  const {title, color} = SEGMENT_STYLE[segment];
+  return ({durations}) => {
+    if (durations[ci] === null) return null;
+    const inStage = Math.max(0, Math.min(durations[ci], durations[stage]));
+    return htl.html`<span class="bw-tt-sub"><i class="bw-swatch" style="background:${color}"></i>${title}: <b>${hoursText(inStage)}</b>${durations[ci] > inStage ? ` (${hoursText(durations[ci])} in all)` : ""}</span>`;
+  };
+};
+const STAGE_LINES = STAGE_INFO.map((stage) => ({...stage, applies: (landing) => landing.durations[stage.key] !== null, link: stageLink(stage.key), note: ciNote(stage.key)}));
 
 // The profile is built when the link is clicked, and the profiler is opened inside the
 // click, which is the only time a browser lets a page open a window.
@@ -231,11 +246,6 @@ function outcomeLine({durations, status}) {
   return htl.html`<span>Still on its way</span>`;
 }
 
-function ciLine({ciAutoland, ciMain}) {
-  const parts = [ciAutoland !== null && `${hoursText(ciAutoland)} on autoland`, ciMain !== null && `${hoursText(ciMain)} on main`].filter(Boolean);
-  return parts.length ? htl.html`<span class="bw-tt-pool">CI took ${parts.join(" and ")}</span>` : "";
-}
-
 function landingLines(landing, linkRequester = true) {
   const {journey, durations, status} = landing;
   return htl.html`<span class="bw-tt-links"><b>${external(`https://phabricator.services.mozilla.com/D${journey.revision}`, `D${journey.revision}`)}</b>${journey.bug ? [" · ", external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${journey.bug}`, `bug ${journey.bug}`)] : ""}</span>
@@ -245,8 +255,7 @@ function landingLines(landing, linkRequester = true) {
     <div class="bw-tt-sep"></div>
     ${segmentLines(STAGE_LINES, {durations, subject: landing, format: formatWait})}
     ${journey.queueClosed ? htl.html`<span class="bw-tt-pool">autoland was closed for ${hoursText(journey.queueClosed)} of the Lando queue</span>` : ""}
-    ${journey.autolandClosed ? htl.html`<span class="bw-tt-pool">and for ${hoursText(journey.autolandClosed)} of the time on autoland</span>` : ""}
-    ${ciLine(durations)}
+    ${journey.autolandClosed ? htl.html`<span class="bw-tt-pool">autoland was closed for ${hoursText(journey.autolandClosed)} of the time on autoland</span>` : ""}
     ${journey.failedAttempts ? htl.html`<span class="bw-tt-pool">${countOf(journey.failedAttempts, "attempt")} to land it failed before</span>` : ""}
     <div class="bw-tt-sep"></div>
     <div class="bw-tt-links">${journeyLink(landing)}</div>`;

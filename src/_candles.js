@@ -78,12 +78,15 @@ export function candleChart({
 }
 
 // From the top down, the way the bar reads. A segment may have a `link`, which makes
-// the link to what it was about from the item, and goes at the end of its line.
+// the link to what it was about from the item, and goes at the end of its line, and a
+// `note`, a line of its own under it for a part of it.
 export const segmentLines = (segments, {durations, subject, format}) =>
   [...segments]
     .reverse()
     .filter(({applies}) => !applies || applies(subject))
-    .map(({key, title, color, link}) => {
+    .flatMap(({key, title, color, link, note}) => {
       const anchor = link?.(subject);
-      return html`<span class=${anchor ? "bw-tt-links" : null}><i class="bw-swatch" style="background:${color}"></i>${title}: <b>${format(durations[key] / 3600)}</b>${anchor ? [" ", anchor] : ""}</span>`;
+      const line = html`<span class=${anchor ? "bw-tt-links" : null}><i class="bw-swatch" style="background:${color}"></i>${title}: <b>${format(durations[key] / 3600)}</b>${anchor ? [" ", anchor] : ""}</span>`;
+      const detail = note?.(subject);
+      return detail ? [line, detail] : [line];
     });
