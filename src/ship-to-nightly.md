@@ -50,7 +50,7 @@ const merges = mergesOf(journeys).map(({merged, ...merge}) => ({kind: "merge", t
 const nightlies = nightliesOf(journeys).map((nightly) => ({kind: "nightly", time: secondsToDate(nightly.started), ...nightly}));
 const closures = closureRows
   .filter((row) => row.status === "closed" && row.end_s !== null)
-  .map((row) => ({kind: "closure", time: secondsToDate(row.start_s), days: (row.end_s - row.start_s) / 86400}));
+  .map((row) => ({kind: "closure", time: secondsToDate(row.start_s), hours: (row.end_s - row.start_s) / 3600}));
 const closedPeriods = closureRows
   .filter((row) => row.status === "closed")
   .map((row) => {
@@ -82,8 +82,7 @@ const selectedLandings = landings.filter((landing) => landing.journey.revision =
 ```js
 const formatCount = (n) => Math.round(n).toLocaleString("en-US");
 const formatPercent = (share) => `${Math.round(share * 1000) / 10}%`;
-const formatRatio = (n) => (Math.round(n * 10) / 10).toLocaleString("en-US");
-const formatDays = (days) => `${formatRatio(days)} d`;
+const formatDays = (days) => `${days.toFixed(1)}d`;
 function formatWait(hours) {
   const seconds = Math.round(hours * 3600);
   if (seconds < 60) return `${seconds} s`;
@@ -101,6 +100,7 @@ const stagePair = (key, color) => [
   {key: "p95", title: "p95", value: percentile("publishCohort", key, 0.95), color: color[1]}
 ];
 const BLUES = ["#86b4ea", "#2f74d0", "#163f7a"];
+const closedHours = (items) => d3.sum(items.filter((item) => item.kind === "closure"), (item) => item.hours);
 
 // Every tile counts its items by day: a landing by the day it was requested, a merge by
 // the day it happened, a closure by the day it began.
@@ -117,7 +117,14 @@ const METRICS = [
       {key: "p99", title: "p99", value: percentile("publishCohort", "total", 0.99), color: BLUES[2]}
     ]
   },
-  {key: "landed", title: "Revisions landed", countless: true, format: formatCount, series: [{key: "landed", title: "revisions", value: (items) => landingsOf(items).length, color: "#8a4fb5"}]},
+  {
+    key: "landed",
+    title: "Revisions landed per day",
+    countless: true,
+    format: formatCount,
+    headline: {value: (items, days) => landingsOf(items).length / days, format: formatCount},
+    series: [{key: "landed", title: "revisions", value: (items) => landingsOf(items).length, color: "#8a4fb5"}]
+  },
   {key: "queue", title: "Waiting in the Lando queue", span: 2, countless: true, format: formatWait, series: stagePair("queue", ["#9bd0b0", "#237a4b"])},
   {key: "autoland", title: "On autoland until merged to main", span: 2, countless: true, format: formatWait, series: stagePair("autoland", ["#f1c27d", "#d98324"])},
   {key: "waiting", title: "Merged to main until its Nightly starts", span: 2, countless: true, format: formatWait, series: stagePair("waiting", ["#f0a8bd", "#c2476f"])},
@@ -127,8 +134,9 @@ const METRICS = [
     key: "closed",
     title: "Autoland tree closed",
     countless: true,
-    format: formatDays,
-    series: [{key: "closed", title: "closed", value: (items) => d3.sum(items.filter((item) => item.kind === "closure"), (item) => item.days), color: "#b3202a"}]
+    format: formatWait,
+    headline: {value: (items) => closedHours(items) / 24, format: formatDays},
+    series: [{key: "closed", title: "closed", value: closedHours, color: "#b3202a"}]
   },
   {
     key: "backedout",
@@ -143,23 +151,6 @@ const METRICS = [
     countless: true,
     format: formatCount,
     series: [{key: "afternightly", title: "revisions", value: (items) => landingsOf(items).filter(({journey}) => journey.backedOut && journey.published !== null && journey.published < journey.backout).length, color: "#7a1f26"}]
-  },
-  {
-    key: "permerge",
-    title: "Revisions per merge to main",
-    countless: true,
-    format: formatRatio,
-    series: [
-      {
-        key: "permerge",
-        title: "revisions",
-        value: (items) => {
-          const merged = items.filter((item) => item.kind === "merge").length;
-          return merged ? landingsOf(items).length / merged : undefined;
-        },
-        color: "#d99a00"
-      }
-    ]
   }
 ];
 
