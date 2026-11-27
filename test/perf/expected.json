@@ -514,7 +514,7 @@
         "paths": 161,
         "anchors": 0,
         "nodes": 15951,
-        "bodyNodes": 16515,
+        "bodyNodes": 16549,
         "inlineErrors": 0,
         "html": "76edc6b94625d326",
         "styles": "c944d56a563d91c3"
@@ -735,7 +735,7 @@
         "paths": 76,
         "anchors": 0,
         "nodes": 5269,
-        "bodyNodes": 5845,
+        "bodyNodes": 5879,
         "inlineErrors": 0,
         "html": "b56abb03cd03af1c",
         "styles": "cf25b1e0ea0f62e5"
@@ -816,7 +816,7 @@
         "paths": 194,
         "anchors": 0,
         "nodes": 23509,
-        "bodyNodes": 24073,
+        "bodyNodes": 24107,
         "inlineErrors": 0,
         "html": "e2d27c717c761d86",
         "styles": "6d5ca385c9661bde"
@@ -1037,7 +1037,7 @@
         "paths": 152,
         "anchors": 0,
         "nodes": 23449,
-        "bodyNodes": 24025,
+        "bodyNodes": 24059,
         "inlineErrors": 0,
         "html": "f39ce6075b645291",
         "styles": "6d5ca385c9661bde"
@@ -1118,7 +1118,7 @@
         "paths": 166,
         "anchors": 0,
         "nodes": 18016,
-        "bodyNodes": 18620,
+        "bodyNodes": 18654,
         "inlineErrors": 0,
         "html": "72c2a3a03f3be7cc",
         "styles": "51dcf7be283b4b2b"
@@ -1379,7 +1379,7 @@
         "paths": 106,
         "anchors": 0,
         "nodes": 10384,
-        "bodyNodes": 11000,
+        "bodyNodes": 11034,
         "inlineErrors": 0,
         "html": "6159ddfe7319396d",
         "styles": "51dcf7be283b4b2b"
