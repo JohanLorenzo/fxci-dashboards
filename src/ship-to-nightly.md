@@ -50,6 +50,9 @@ const merges = mergesOf(journeys).map((merge) => ({kind: "merge", time: secondsT
 const closures = closureRows
   .filter((row) => row.status === "closed" && row.end_s !== null)
   .map((row) => ({kind: "closure", time: secondsToDate(row.start_s), hours: (row.end_s - row.start_s) / 3600}));
+const closedPeriods = closureRows
+  .filter((row) => row.status === "closed")
+  .map((row) => ({start: secondsToDate(row.start_s), end: secondsToDate(row.end_s ?? marks.landoUntil)}));
 
 const DATA_FIRST_DAY = d3.utcDay.floor(secondsToDate(d3.min(journeys, (journey) => journey.requested)));
 const DATA_LAST_DAY = d3.utcDay.floor(secondsToDate(marks.landoUntil));
@@ -257,8 +260,14 @@ const END_KINDS = [
 ];
 const endKeyOf = (kind) => END_KINDS.find((end) => end.kind === kind).key;
 const swatch = ({key, title, color}) => ({key, title, marker: () => LEGEND_MARKERS.swatch(color, 0.8)});
+const CLOSURES_KEY = "closures";
+const closuresIn = ([from, to]) =>
+  closedPeriods
+    .filter(({start, end}) => start < to && end > from)
+    .map(({start, end}) => ({start: new Date(Math.max(+start, +from)), end: new Date(Math.min(+end, +to))}));
 const candleGroups = () => [
   {title: "Stage", entries: CANDLE_SEGMENTS.map(swatch)},
+  {title: "Autoland", entries: [{key: CLOSURES_KEY, title: "was closed", marker: () => LEGEND_MARKERS.swatch(BACKOUT_COLOR, 0)}]},
   {title: "A candle ends when it", entries: END_KINDS.map(({key, title, marker}) => ({key, title, marker}))}
 ];
 
@@ -290,7 +299,10 @@ function candlesChart({shown, width, hidden, domain}) {
     hitRadius: HIT_RADIUS,
     tooltip,
     show: showCandle,
-    before: [eventRule(domain, new Set(), {key: CUTOFF_KEY, date: publishCutoff})],
+    before: [
+      eventRule(domain, new Set(), {key: CUTOFF_KEY, date: publishCutoff}),
+      ...(hidden.has(CLOSURES_KEY) ? [] : [Plot.rectX(closuresIn(domain), {x1: "start", x2: "end", fill: BACKOUT_COLOR, fillOpacity: 0.15})])
+    ],
     after: ({topHours, ends}) => {
       const ended = (kind) => ends.filter((landing) => landing.candle.kind === kind);
       return [
