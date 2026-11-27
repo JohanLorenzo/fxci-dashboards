@@ -440,74 +440,74 @@
       },
       "errors": []
     },
-    "ship-to-nightly, the last 7 days": {
+    "ship-to-nightly, the last 30 days": {
       "load": {
         "tiles": [
           [
             "Land to published in a Nightly",
-            "p50 13 h 41 min p90 27 h 21 min p99 38 h 36 min"
+            "p50 13 h 43 min p90 25 h 17 min p99 67 h 13 min"
           ],
           [
             "Revisions landed",
-            "1,574"
+            "7,701"
           ],
           [
             "Waiting in the Lando queue",
-            "p50 4 min p95 28 min"
+            "p50 5 min p95 1 h 16 min"
           ],
           [
             "On autoland until merged to main",
-            "p50 3 h 34 min p95 17 h 21 min"
+            "p50 3 h 9 min p95 32 h 1 min"
           ],
           [
             "Merged to main until its Nightly starts",
-            "p50 7 h 45 min p95 10 h 29 min"
+            "p50 6 h 4 min p95 11 h 52 min"
           ],
           [
             "Nightly build and publish",
-            "p50 2 h 27 min p95 2 h 54 min"
+            "p50 2 h 27 min p95 3 h 7 min"
           ],
           [
             "Merges to main",
-            "23"
+            "113"
           ],
           [
             "Autoland tree closed",
-            "45 h 6 min"
+            "227 h 14 min"
           ],
           [
             "Revisions backed out",
-            "5.7%"
+            "6.9%"
           ],
           [
             "Backed out after a Nightly had published them",
-            "0"
+            "8"
           ],
           [
             "Revisions per merge to main",
-            "68.4"
+            "68.2"
           ]
         ],
         "svgs": 23,
-        "circles": 1482,
-        "lines": 35,
-        "paths": 143,
+        "circles": 7175,
+        "lines": 32,
+        "paths": 572,
         "anchors": 0,
-        "nodes": 1975,
-        "bodyNodes": 2493,
+        "nodes": 8317,
+        "bodyNodes": 8835,
         "inlineErrors": 0,
-        "html": "88fb1a09f1a30aa5",
+        "html": "794b86eeb036c011",
         "styles": "a341697320c958f9"
       },
       "hover": {
         "end to end": {
-          "tooltips": 5
+          "tooltips": 22
         },
         "stages": {
-          "tooltips": 5
+          "tooltips": 16
         },
         "candles": {
-          "tooltips": 22
+          "tooltips": 21
         }
       },
       "pin": {
@@ -541,7 +541,7 @@
           "pointerEvents": "none",
           "display": "block"
         },
-        "content": "d1f8845b7e850231"
+        "content": "7709c83ae91dcdc3"
       },
       "legend": {
         "hidden": {
@@ -556,10 +556,10 @@
             "true"
           ],
           "charts": 1,
-          "circles": 1482,
-          "lines": 35,
-          "nodes": 1974,
-          "html": "5e614b2763f9c114",
+          "circles": 7175,
+          "lines": 32,
+          "nodes": 8316,
+          "html": "a934dc5c5589ac4a",
           "styles": "7cd6f012dd15c246"
         },
         "shown": {
@@ -574,10 +574,10 @@
             "true"
           ],
           "charts": 1,
-          "circles": 1482,
-          "lines": 35,
-          "nodes": 1975,
-          "html": "3160fc31a14e3487",
+          "circles": 7175,
+          "lines": 32,
+          "nodes": 8317,
+          "html": "49b36fe1a5206ded",
           "styles": "36cadebea8b32894"
         },
         "alone": {
@@ -592,10 +592,10 @@
             "false"
           ],
           "charts": 1,
-          "circles": 1482,
-          "lines": 35,
-          "nodes": 1969,
-          "html": "362b1047587e0a0c",
+          "circles": 7175,
+          "lines": 32,
+          "nodes": 8311,
+          "html": "684e040261e2779d",
           "styles": "ffede6c08e673b5f"
         },
         "all": {
@@ -610,10 +610,10 @@
             "true"
           ],
           "charts": 1,
-          "circles": 1482,
-          "lines": 35,
-          "nodes": 1975,
-          "html": "3160fc31a14e3487",
+          "circles": 7175,
+          "lines": 32,
+          "nodes": 8317,
+          "html": "49b36fe1a5206ded",
           "styles": "36cadebea8b32894"
         },
         "collapsed": {
@@ -622,7 +622,7 @@
           "circles": 0,
           "lines": 22,
           "nodes": 224,
-          "html": "cb9e0a828a64be2e",
+          "html": "072fd4e4c1504b5c",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -637,74 +637,74 @@
             "true"
           ],
           "charts": 1,
-          "circles": 1482,
-          "lines": 35,
-          "nodes": 1975,
-          "html": "3160fc31a14e3487",
+          "circles": 7175,
+          "lines": 32,
+          "nodes": 8317,
+          "html": "49b36fe1a5206ded",
           "styles": "36cadebea8b32894"
         },
         "restored": true
       },
       "zoom": {
         "range": [
-          "2026-11-20",
-          "2026-11-22"
+          "2026-10-30",
+          "2026-11-07"
         ],
         "tiles": [
           [
             "Land to published in a Nightly",
-            "p50 15 h 54 min p90 30 h 37 min p99 39 h 26 min"
+            "p50 13 h 27 min p90 28 h 57 min p99 40 h 37 min"
           ],
           [
             "Revisions landed",
-            "482"
+            "2,123"
           ],
           [
             "Waiting in the Lando queue",
-            "p50 5 min p95 40 min"
+            "p50 5 min p95 1 h 5 min"
           ],
           [
             "On autoland until merged to main",
-            "p50 4 h 8 min p95 18 h 51 min"
+            "p50 2 h 47 min p95 32 h 30 min"
           ],
           [
             "Merged to main until its Nightly starts",
-            "p50 8 h 38 min p95 10 h 29 min"
+            "p50 4 h 21 min p95 11 h 39 min"
           ],
           [
             "Nightly build and publish",
-            "p50 2 h 54 min p95 2 h 56 min"
+            "p50 2 h 12 min p95 3 h 6 min"
           ],
           [
             "Merges to main",
-            "7"
+            "34"
           ],
           [
             "Autoland tree closed",
-            "20 h 12 min"
+            "60 h 59 min"
           ],
           [
             "Revisions backed out",
-            "3.9%"
+            "7.3%"
           ],
           [
             "Backed out after a Nightly had published them",
-            "0"
+            "6"
           ],
           [
             "Revisions per merge to main",
-            "68.9"
+            "62.4"
           ]
         ],
         "svgs": 23,
-        "circles": 465,
-        "lines": 23,
-        "paths": 64,
+        "circles": 1971,
+        "lines": 21,
+        "paths": 199,
         "anchors": 0,
-        "nodes": 817,
-        "bodyNodes": 1347,
+        "nodes": 2519,
+        "bodyNodes": 3049,
         "inlineErrors": 0,
-        "html": "d69e5f42c1eceb25",
+        "html": "6378c3a2af7c27ef",
         "styles": "a341697320c958f9"
       },
       "errors": []
@@ -758,14 +758,14 @@
           ]
         ],
         "svgs": 23,
-        "circles": 1876,
+        "circles": 7444,
         "lines": 33,
-        "paths": 173,
+        "paths": 605,
         "anchors": 0,
-        "nodes": 3211,
-        "bodyNodes": 3729,
+        "nodes": 9211,
+        "bodyNodes": 9729,
         "inlineErrors": 0,
-        "html": "b44997208652084b",
+        "html": "f474c8a6d1e1d0ef",
         "styles": "1d6f5192f257f2e0"
       },
       "hover": {
@@ -776,7 +776,7 @@
           "tooltips": 46
         },
         "candles": {
-          "tooltips": 2
+          "tooltips": 8
         }
       },
       "pin": {
@@ -810,7 +810,7 @@
           "pointerEvents": "none",
           "display": "block"
         },
-        "content": "c8e68e12f2fe67f3"
+        "content": "2bc2b9a447729ddd"
       },
       "legend": {
         "hidden": {
@@ -825,10 +825,10 @@
             "true"
           ],
           "charts": 1,
-          "circles": 1876,
+          "circles": 7444,
           "lines": 33,
-          "nodes": 3210,
-          "html": "a9cd061098b4c2f5",
+          "nodes": 9210,
+          "html": "adf006386152f883",
           "styles": "df9694860ea521c7"
         },
         "shown": {
@@ -843,10 +843,10 @@
             "true"
           ],
           "charts": 1,
-          "circles": 1876,
+          "circles": 7444,
           "lines": 33,
-          "nodes": 3211,
-          "html": "9ce5aee2068f256f",
+          "nodes": 9211,
+          "html": "8190a2bb906c95b6",
           "styles": "2b3dea2cbfdf9590"
         },
         "alone": {
@@ -861,10 +861,10 @@
             "false"
           ],
           "charts": 1,
-          "circles": 1876,
+          "circles": 7444,
           "lines": 33,
-          "nodes": 3205,
-          "html": "70237940cbdc8d2e",
+          "nodes": 9205,
+          "html": "6cbb62dcc75d11c8",
           "styles": "c924056a78f79a2e"
         },
         "all": {
@@ -879,10 +879,10 @@
             "true"
           ],
           "charts": 1,
-          "circles": 1876,
+          "circles": 7444,
           "lines": 33,
-          "nodes": 3211,
-          "html": "9ce5aee2068f256f",
+          "nodes": 9211,
+          "html": "8190a2bb906c95b6",
           "styles": "2b3dea2cbfdf9590"
         },
         "collapsed": {
@@ -891,7 +891,7 @@
           "circles": 0,
           "lines": 22,
           "nodes": 224,
-          "html": "ddf8abe77ff8f2ad",
+          "html": "811ca885b07f8018",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -906,10 +906,10 @@
             "true"
           ],
           "charts": 1,
-          "circles": 1876,
+          "circles": 7444,
           "lines": 33,
-          "nodes": 3211,
-          "html": "9ce5aee2068f256f",
+          "nodes": 9211,
+          "html": "8190a2bb906c95b6",
           "styles": "2b3dea2cbfdf9590"
         },
         "restored": true
@@ -966,15 +966,15 @@
           ]
         ],
         "svgs": 23,
-        "circles": 1907,
+        "circles": 5581,
         "lines": 21,
-        "paths": 139,
+        "paths": 463,
         "anchors": 0,
-        "nodes": 2533,
-        "bodyNodes": 3063,
+        "nodes": 6530,
+        "bodyNodes": 7060,
         "inlineErrors": 0,
-        "html": "2a62677832aca0d5",
-        "styles": "1d6f5192f257f2e0"
+        "html": "f58ddf160e02857f",
+        "styles": "a341697320c958f9"
       },
       "errors": []
     },

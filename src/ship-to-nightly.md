@@ -65,7 +65,7 @@ const urlRevision = parseRevision(new URLSearchParams(window.location.search).ge
 const selectedLandings = landings.filter((landing) => landing.journey.revision === urlRevision);
 const focusDay = selectedLandings.length ? d3.utcDay.floor(selectedLandings[0].time) : null;
 const clampDay = (day) => new Date(Math.min(+DATA_LAST_DAY, Math.max(+DATA_FIRST_DAY, +day)));
-const DEFAULT_FROM = focusDay ? clampDay(new Date(+focusDay - 3 * DAY_MS)) : new Date(Math.max(+DATA_FIRST_DAY, +DATA_LAST_DAY - 6 * DAY_MS));
+const DEFAULT_FROM = focusDay ? clampDay(new Date(+focusDay - 3 * DAY_MS)) : new Date(Math.max(+DATA_FIRST_DAY, +DATA_LAST_DAY - 29 * DAY_MS));
 const DEFAULT_TO = focusDay ? clampDay(new Date(+focusDay + 3 * DAY_MS)) : DATA_LAST_DAY;
 ```
 
@@ -157,7 +157,7 @@ const publishCutoff = secondsToDate(publishUntil - PUBLISH_HORIZON_S);
 const METRICS_TITLE = {chartKey: "chart-metrics", title: "Top line metrics"};
 const E2E_TITLE = {chartKey: "chart-endtoend", title: "From Land to a Nightly that people run"};
 const CANDLES_HEIGHT = 300;
-const MAX_CANDLES = 2000;
+const MAX_CANDLES = 8000;
 const HIT_RADIUS = 8;
 ```
 
@@ -416,7 +416,7 @@ invalidation.then(() => document.removeEventListener("sn-requester", chooseReque
 ```js
 // The days the charts show, from the date inputs, the presets or by dragging across a
 // chart, and kept in the address as ?from= and ?to=. Both are days, so the last one
-// is shown whole. The default is the last 7 days of data.
+// is shown whole. The default is the last 30 days of data.
 const dayParam = (name) => {
   const text = new URLSearchParams(window.location.search).get(name);
   const day = /^\d{4}-\d{2}-\d{2}$/.test(text ?? "") ? new Date(`${text}T00:00:00Z`) : null;

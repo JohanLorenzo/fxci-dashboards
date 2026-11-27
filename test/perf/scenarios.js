@@ -39,7 +39,7 @@ const SHIP_TO_NIGHTLY = {
 export const SCENARIOS = [
   {name: "perf-backfill-waits, Linux talos, all days", path: "/perf-backfill-waits.html", ...PERF_BACKFILL_WAITS},
   {name: "perf-backfill-waits, mac M4, two weeks", path: "/perf-backfill-waits.html?platform=mac+M4&from=2026-09-01&to=2026-09-14", ...PERF_BACKFILL_WAITS},
-  {name: "ship-to-nightly, the last 7 days", path: "/ship-to-nightly.html", ...SHIP_TO_NIGHTLY},
+  {name: "ship-to-nightly, the last 30 days", path: "/ship-to-nightly.html", ...SHIP_TO_NIGHTLY},
   {name: "ship-to-nightly, 90 days", path: "/ship-to-nightly.html?from=2026-08-29&to=2026-11-26", ...SHIP_TO_NIGHTLY},
   {name: "ship-to-nightly, a revision by its D number", path: "/ship-to-nightly.html?revision=D350000", ...SHIP_TO_NIGHTLY}
 ];
