@@ -258,14 +258,24 @@ export async function legend(page, {root, block, entry}) {
     await action();
     await settle(page, {root, since: Date.now(), quiet: 500});
   };
+  // The two clicks of a double click are sent in one task. Sent as two mouse events,
+  // the charts can be redrawn between them on a busy machine, and the second click then
+  // lands on a button that is being replaced and is lost. The pointer goes to the button
+  // first, as it does for a person, since where it is leaves its mark on the charts.
+  const doubleClick = async (index) => {
+    await button(index).hover();
+    await button(index).evaluate((element) => {
+      for (const detail of [1, 2]) element.dispatchEvent(new MouseEvent("click", {bubbles: true, cancelable: true, detail}));
+    });
+  };
 
   await act(() => button(entry).click());
   const hidden = await state();
   await act(() => button(entry).click());
   const shown = await state();
-  await act(() => button(entry + 1).dblclick());
+  await act(() => doubleClick(entry + 1));
   const alone = await state();
-  await act(() => button(entry + 1).dblclick());
+  await act(() => doubleClick(entry + 1));
   const all = await state();
   await act(() => page.locator(`${blockAt} .bw-collapse`).click());
   const collapsed = await state();
