@@ -202,7 +202,7 @@ describe("parseRevision", () => {
 });
 
 describe("matchesQuery", () => {
-  const journey = journeyOf(row({revision_id: 343744, bug_id: 2022026, requested_by: "Alice", autoland_rev: "31dcede4f177", central_rev: "c64776bf9a03"}));
+  const journey = journeyOf(row({revision_id: 343744, bug_id: 2022026, requested_by: "Alice", git_rev: "a311ac37c550d7cc", hg_rev: "9f0e1d2c3b4a5968", autoland_rev: "31dcede4f177", central_rev: "c64776bf9a03"}));
 
   test("finds a landing by its D number, with or without the D", () => {
     assert.equal(matchesQuery(journey, "D343744"), true);
@@ -211,12 +211,23 @@ describe("matchesQuery", () => {
     assert.equal(matchesQuery(journey, "D343745"), false);
   });
 
-  test("finds a landing by its bug, its requester or the start of a revision", () => {
+  test("finds a landing by its bug or its requester", () => {
     assert.equal(matchesQuery(journey, "2022026"), true);
     assert.equal(matchesQuery(journey, "ali"), true);
+  });
+
+  test("finds a landing by the start of its git or hg revision, or of its pushes", () => {
+    assert.equal(matchesQuery(journey, "a311ac3"), true);
+    assert.equal(matchesQuery(journey, "9f0e1d2c3b4a5968"), true);
     assert.equal(matchesQuery(journey, "31dcede"), true);
     assert.equal(matchesQuery(journey, "c64776"), true);
+    assert.equal(matchesQuery(journey, "A311AC3"), true);
+  });
+
+  test("does not find a revision by its middle, or by too few characters", () => {
     assert.equal(matchesQuery(journey, "dcede"), false);
+    assert.equal(matchesQuery(journey, "311ac3"), false);
+    assert.equal(matchesQuery(journey, "c647"), false);
   });
 
   test("wants every word to match", () => {
@@ -228,8 +239,9 @@ describe("matchesQuery", () => {
   test("matches everything for an empty query, and copes with what is missing", () => {
     assert.equal(matchesQuery(journey, ""), true);
     assert.equal(matchesQuery(journey, "   "), true);
-    const bare = journeyOf(row({bug_id: null, autoland_rev: null, central_rev: null}));
+    const bare = journeyOf(row({bug_id: null, git_rev: null, hg_rev: null, autoland_rev: null, central_rev: null}));
     assert.equal(matchesQuery(bare, "zzz"), false);
+    assert.equal(matchesQuery(bare, "abcdef"), false);
     assert.equal(matchesQuery(bare, "345001"), true);
   });
 });

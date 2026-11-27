@@ -164,12 +164,16 @@ const E2E_TITLE = {chartKey: "chart-endtoend", title: "From Land to a shipped Ni
 const CANDLES_HEIGHT = 300;
 const MAX_CANDLES = 8000;
 const HIT_RADIUS = 8;
+const MAX_MARKED = 300;
+const MATCH_COLOR = "#0a84ff";
+const SEARCH_PAUSE_MS = 250;
 ```
 
 ```js
 // The tooltip is defined in the same cell as what uses it to filter by requester, as a
 // cell may not depend on one that depends on it.
 const tooltip = createTooltip({invalidation});
+const blockCache = new Map();
 const TC_URL = "https://firefox-ci-tc.services.mozilla.com";
 const TREEHERDER_URL = "https://treeherder.mozilla.org";
 const external = (href, text) => htl.html`<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
@@ -261,8 +265,6 @@ function closureLines({startS, endS, start, tag, backouts}) {
 ```
 
 ```js
-const blockCache = new Map();
-
 function itemsIn(domain, requester) {
   return [
     ...landings.filter((landing) => inDomain(domain, landing.time) && (!requester || landing.journey.requester === requester)),
@@ -404,7 +406,8 @@ function candlesChart({shown, width, hidden, domain}) {
         Plot.dot(ended("shipped"), {x: "time", y: topHours, r: 3, fill: "currentColor"}),
         Plot.dot(ended("backed out"), {x: "time", y: topHours, r: 5, symbol: "cross", stroke: BACKOUT_COLOR, strokeWidth: 2}),
         Plot.dot(ended("open"), {x: "time", y: topHours, r: 3, fill: "white", stroke: "currentColor"}),
-        Plot.dot(ends.filter((landing) => chosen.has(landing)), {x: "time", y: topHours, r: 9, stroke: BACKOUT_COLOR, strokeWidth: 2, fill: "none"})
+        Plot.dot(ends.filter((landing) => chosen.has(landing)), {x: "time", y: topHours, r: 9, stroke: BACKOUT_COLOR, strokeWidth: 2, fill: "none"}),
+        Plot.dot(ends.filter((landing) => found.has(landing)).slice(-MAX_MARKED), {x: "time", y: topHours, r: 7, stroke: MATCH_COLOR, strokeWidth: 2, fill: "none"})
       ];
     }
   });
@@ -428,7 +431,7 @@ function section(width, hidden, requester, domain) {
       hidden,
       state: {setHidden, setHiddenKeys},
       width,
-      context: [width, +domain[0], +domain[1], requester],
+      context: [width, +domain[0], +domain[1], requester, ...(item.chartKey === E2E_TITLE.chartKey ? [search] : [])],
       cache: blockCache,
       body: ({chartKey}, ownHidden) => ({groups: bodies[chartKey].groups(), content: bodies[chartKey].draw(ownHidden)})
     });
@@ -452,6 +455,10 @@ function section(width, hidden, requester, domain) {
 }
 .bw-clear {
   margin-bottom: 0.4rem;
+}
+.sn-search-count {
+  margin-bottom: 0.4rem;
+  color: var(--theme-foreground-muted, #888);
 }
 .sn-presets {
   display: inline-flex;
@@ -489,6 +496,48 @@ function section(width, hidden, requester, domain) {
   color: var(--theme-foreground-muted, #888);
 }
 </style>
+
+```js
+// What to look for among the revisions: a D number, a bug, a requester, or the start of a
+// git or hg revision. The candles of the ones that match are circled, once typing pauses.
+const searchBox = Inputs.text({
+  label: "Search",
+  placeholder: "D number, bug, requester, git or hg revision",
+  value: new URLSearchParams(window.location.search).get("search") ?? "",
+  width: 420,
+  autocomplete: "off",
+  spellcheck: false
+});
+const searchState = Object.assign(document.createElement("div"), {value: searchBox.value.trim()});
+{
+  let timer;
+  searchBox.addEventListener("input", () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      searchState.value = searchBox.value.trim();
+      searchState.dispatchEvent(new Event("input"));
+    }, SEARCH_PAUSE_MS);
+  });
+  invalidation.then(() => clearTimeout(timer));
+}
+const search = Generators.input(searchState);
+const searchCount = htl.html`<span class="sn-search-count"></span>`;
+```
+
+```js
+const matched = search ? landings.filter(({journey}) => matchesQuery(journey, search)) : [];
+const found = new Set(matched);
+```
+
+```js
+// Among the days and the requester shown, and beyond them.
+{
+  const here = matched.filter((landing) => inDomain(domain, landing.time) && (!requester || landing.journey.requester === requester));
+  const away = matched.length - here.length;
+  const count = countOf(here.length, "match", "matches");
+  searchCount.textContent = !search ? "" : !matched.length ? "No match" : `${count}${here.length > MAX_MARKED ? `, the ${MAX_MARKED} newest circled` : ""}${away ? `, ${away} elsewhere` : ""}`;
+}
+```
 
 ```js
 // Limits the page to one requester, chosen here or by clicking a name in a tooltip. It
@@ -551,7 +600,7 @@ const domain = (() => {
 resetButton.disabled = +domain[0] === +DEFAULT_FROM && +domain[1] === +dayAfter(DEFAULT_TO);
 ```
 
-<div class="bw-filters"><div>${requesterInput}</div><div>${fromInput}${toInput}${presets}${resetButton}</div></div>
+<div class="bw-filters"><div>${searchBox}${searchCount}</div><div>${requesterInput}</div><div>${fromInput}${toInput}${presets}${resetButton}</div></div>
 
 ```js
 {
@@ -559,6 +608,7 @@ resetButton.disabled = +domain[0] === +DEFAULT_FROM && +domain[1] === +dayAfter(
   // address says what the page shows.
   const params = new URLSearchParams(window.location.search);
   const isoDay = (day) => day.toISOString().slice(0, 10);
+  params.set("search", search);
   params.set("requester", requester);
   params.set("from", isoDay(domain[0]));
   params.set("to", isoDay(new Date(+domain[1] - DAY_MS)));
@@ -588,55 +638,3 @@ const {setHiddenKeys, setHidden} = hiddenKeys;
 <div class="card" id="sn-charts">
   ${resize((width) => section(width, hidden, requester, domain))}
 </div>
-
-## Revisions
-
-```js
-// The revisions of the days and requester shown, in a table that can be searched by D
-// number, bug, requester or the start of a revision.
-const tableRows = itemsIn(domain, requester)
-  .filter((item) => item.kind === "landing")
-  .map((landing) => ({
-    landing,
-    journey: landing.journey,
-    revision: landing.journey.revision,
-    bug: landing.journey.bug,
-    requester: landing.journey.requester,
-    status: landing.status,
-    requested: landing.time,
-    total: landing.durations.total,
-    queue: landing.durations.queue,
-    autoland: landing.durations.autoland,
-    waiting: landing.durations.waiting,
-    build: landing.durations.build
-  }));
-const searchInput = Inputs.search(tableRows, {placeholder: "Search a D number, a bug, a requester or an hg revision", width: 460, filter: (query) => (row) => matchesQuery(row.journey, query)});
-const searched = Generators.input(searchInput);
-```
-
-```js
-searchInput
-```
-
-```js
-const duration = (seconds) => (seconds === null ? "–" : hoursText(seconds));
-display(Inputs.table(searched, {
-  columns: ["revision", "bug", "requester", "status", "requested", "total", "queue", "autoland", "waiting", "build"],
-  header: {revision: "Revision", bug: "Bug", requester: "Requester", status: "Outcome", requested: "Land requested", total: "Land to published", queue: "Lando queue", autoland: "On autoland", waiting: "Waiting for Nightly", build: "Nightly build"},
-  width: {revision: 80, bug: 80, requester: 100, status: 90, requested: 130, total: 130, queue: 100, autoland: 110, waiting: 130, build: 110},
-  format: {
-    revision: (revision) => htl.html`<a href="?revision=D${revision}">D${revision}</a>`,
-    bug: (bug) => (bug ? external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${bug}`, bug) : ""),
-    requested: formatTime,
-    total: duration,
-    queue: duration,
-    autoland: duration,
-    waiting: duration,
-    build: duration
-  },
-  sort: "requested",
-  reverse: true,
-  rows: 12,
-  maxWidth: 1100
-}));
-```

@@ -178,6 +178,13 @@ function withBackouts(closures) {
   });
 }
 
+// The commit of each landing, in git and in hg, which only exists in hg once it is on autoland.
+// It has its own stream, so that it leaves the rest of the data as it was.
+function withCommits(rows) {
+  const rand = random(13);
+  return rows.map((row) => ({...row, git_rev: revision(rand), hg_rev: row.autoland_rev ? revision(rand) : null}));
+}
+
 let cached;
 function everything() {
   if (!cached) {
@@ -186,7 +193,7 @@ function everything() {
     const mergeList = merges(rand);
     const nightlyList = nightlies(rand, mergeList);
     cached = {
-      "nightly-journeys": journeys(rand, closures, nightlyList, mergeList),
+      "nightly-journeys": withCommits(journeys(rand, closures, nightlyList, mergeList)),
       "nightly-treestatus": withBackouts(closures)
     };
   }

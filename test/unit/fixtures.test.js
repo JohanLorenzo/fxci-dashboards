@@ -95,6 +95,15 @@ describe("the fixtures of the Ship to Nightly queries", () => {
       }
     });
 
+    test("give each landing its own commit, in hg only once it is on autoland", () => {
+      const rows = journeys();
+      const hash = /^[0-9a-f]{40}$/;
+      assert.ok(rows.every((row) => hash.test(row.git_rev)));
+      assert.equal(new Set(rows.map((row) => row.git_rev)).size, rows.length);
+      for (const row of rows) assert.equal(row.hg_rev === null, row.autoland_rev === null, `revision ${row.revision_id}`);
+      assert.ok(rows.filter((row) => row.hg_rev !== null).every((row) => hash.test(row.hg_rev)));
+    });
+
     test("have a landing in every state the page shows", () => {
       const rows = journeys();
       const has = (name, test) => assert.ok(rows.some(test), `no row is ${name}`);

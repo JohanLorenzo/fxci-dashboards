@@ -11,6 +11,8 @@ export const row = (overrides = {}) => ({
   stack_index: 1,
   requested_by: "alice",
   failed_attempts: 0,
+  git_rev: "b".repeat(40),
+  hg_rev: "e".repeat(40),
   autoland_rev: "a".repeat(40),
   central_rev: "c".repeat(40),
   merged_by: "sheriff-a",

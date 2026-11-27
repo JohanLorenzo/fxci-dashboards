@@ -494,7 +494,7 @@
         "paths": 575,
         "anchors": 0,
         "nodes": 8325,
-        "bodyNodes": 8843,
+        "bodyNodes": 8455,
         "inlineErrors": 0,
         "html": "da1f520e751ecaf5",
         "styles": "815a46bbd6103f0c"
@@ -697,7 +697,7 @@
         "paths": 202,
         "anchors": 0,
         "nodes": 2527,
-        "bodyNodes": 3057,
+        "bodyNodes": 2669,
         "inlineErrors": 0,
         "html": "47be799eb3ec70f0",
         "styles": "815a46bbd6103f0c"
@@ -758,7 +758,7 @@
         "paths": 608,
         "anchors": 0,
         "nodes": 9219,
-        "bodyNodes": 9737,
+        "bodyNodes": 9349,
         "inlineErrors": 0,
         "html": "72b2ea1429a8db63",
         "styles": "a46f4cf21b176bf2"
@@ -961,7 +961,7 @@
         "paths": 466,
         "anchors": 0,
         "nodes": 6538,
-        "bodyNodes": 7068,
+        "bodyNodes": 6680,
         "inlineErrors": 0,
         "html": "f1a170923b5d5ea2",
         "styles": "815a46bbd6103f0c"
@@ -1022,7 +1022,7 @@
         "paths": 148,
         "anchors": 0,
         "nodes": 2139,
-        "bodyNodes": 2692,
+        "bodyNodes": 2304,
         "inlineErrors": 0,
         "html": "65a2f67150f238c3",
         "styles": "815a46bbd6103f0c"
@@ -1225,9 +1225,273 @@
         "paths": 98,
         "anchors": 0,
         "nodes": 1332,
-        "bodyNodes": 1897,
+        "bodyNodes": 1509,
         "inlineErrors": 0,
         "html": "420929d790e514e6",
+        "styles": "815a46bbd6103f0c"
+      },
+      "errors": []
+    },
+    "ship-to-nightly, a search that matches many revisions": {
+      "load": {
+        "tiles": [
+          [
+            "Land to published in a Nightly",
+            "p50 13 h 43 min p90 25 h 26 min p99 64 h 47 min"
+          ],
+          [
+            "Revisions landed",
+            "22,485"
+          ],
+          [
+            "Waiting in the Lando queue",
+            "p50 5 min p95 1 h 30 min"
+          ],
+          [
+            "On autoland until merged to main",
+            "p50 3 h 8 min p95 21 h 25 min"
+          ],
+          [
+            "Merged to main until its Nightly starts",
+            "p50 5 h 40 min p95 15 h 31 min"
+          ],
+          [
+            "Nightly build and publish",
+            "p50 2 h 23 min p95 3 h 7 min"
+          ],
+          [
+            "Merges to main",
+            "324"
+          ],
+          [
+            "Autoland tree closed",
+            "29.6 d"
+          ],
+          [
+            "Revisions backed out",
+            "6.9%"
+          ],
+          [
+            "Backed out after a Nightly had published them",
+            "11"
+          ],
+          [
+            "Revisions per merge to main",
+            "69.4"
+          ]
+        ],
+        "svgs": 24,
+        "circles": 7743,
+        "lines": 33,
+        "paths": 608,
+        "anchors": 0,
+        "nodes": 9519,
+        "bodyNodes": 9649,
+        "inlineErrors": 0,
+        "html": "2a3e5638541003e8",
+        "styles": "a46f4cf21b176bf2"
+      },
+      "hover": {
+        "end to end": {
+          "tooltips": 62
+        },
+        "stages": {
+          "tooltips": 46
+        },
+        "candles": {
+          "tooltips": 184
+        }
+      },
+      "pin": {
+        "found": true,
+        "stays": true,
+        "releasedByEscape": true,
+        "releasedByClick": true,
+        "tooltip": {
+          "position": "fixed",
+          "zIndex": "1000",
+          "maxWidth": "520px",
+          "paddingTop": "8px",
+          "paddingLeft": "12px",
+          "borderTopLeftRadius": "4px",
+          "backgroundColor": "rgb(42, 42, 42)",
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+          "fontSize": "13px",
+          "lineHeight": "22.1px",
+          "display": "block"
+        },
+        "ring": {
+          "position": "fixed",
+          "zIndex": "999",
+          "width": "12px",
+          "height": "12px",
+          "borderTopWidth": "1px",
+          "borderTopColor": "rgb(27, 30, 35)",
+          "borderTopLeftRadius": "50%",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
+          "pointerEvents": "none",
+          "display": "none"
+        },
+        "content": "c77b35bec69c5e9a"
+      },
+      "legend": {
+        "hidden": {
+          "pressed": [
+            "true",
+            "false",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 7743,
+          "lines": 33,
+          "nodes": 9518,
+          "html": "01cbca9a94c7e670",
+          "styles": "55a7d2bc64133999"
+        },
+        "shown": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 7743,
+          "lines": 33,
+          "nodes": 9519,
+          "html": "4edd01b88cb54eb7",
+          "styles": "a447f261c1c93bba"
+        },
+        "alone": {
+          "pressed": [
+            "true",
+            "false",
+            "true",
+            "false",
+            "false",
+            "false",
+            "false"
+          ],
+          "charts": 1,
+          "circles": 7743,
+          "lines": 33,
+          "nodes": 9514,
+          "html": "c52b5c57b4752d07",
+          "styles": "0837680d068617ac"
+        },
+        "all": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 7743,
+          "lines": 33,
+          "nodes": 9519,
+          "html": "4edd01b88cb54eb7",
+          "styles": "a447f261c1c93bba"
+        },
+        "collapsed": {
+          "pressed": [],
+          "charts": 0,
+          "circles": 0,
+          "lines": 22,
+          "nodes": 224,
+          "html": "bf6e7588d985ac30",
+          "styles": "10d741139ccb98c8"
+        },
+        "expanded": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 7743,
+          "lines": 33,
+          "nodes": 9519,
+          "html": "4edd01b88cb54eb7",
+          "styles": "a447f261c1c93bba"
+        },
+        "restored": true
+      },
+      "zoom": {
+        "range": [
+          "2026-09-06",
+          "2026-09-29"
+        ],
+        "tiles": [
+          [
+            "Land to published in a Nightly",
+            "p50 13 h 19 min p90 27 h 31 min p99 74 h 55 min"
+          ],
+          [
+            "Revisions landed",
+            "5,998"
+          ],
+          [
+            "Waiting in the Lando queue",
+            "p50 5 min p95 1 h 23 min"
+          ],
+          [
+            "On autoland until merged to main",
+            "p50 3 h 0 min p95 18 h 14 min"
+          ],
+          [
+            "Merged to main until its Nightly starts",
+            "p50 5 h 14 min p95 21 h 57 min"
+          ],
+          [
+            "Nightly build and publish",
+            "p50 2 h 18 min p95 3 h 9 min"
+          ],
+          [
+            "Merges to main",
+            "86"
+          ],
+          [
+            "Autoland tree closed",
+            "7.9 d"
+          ],
+          [
+            "Revisions backed out",
+            "7%"
+          ],
+          [
+            "Backed out after a Nightly had published them",
+            "2"
+          ],
+          [
+            "Revisions per merge to main",
+            "69.7"
+          ]
+        ],
+        "svgs": 24,
+        "circles": 5859,
+        "lines": 21,
+        "paths": 466,
+        "anchors": 0,
+        "nodes": 6817,
+        "bodyNodes": 6959,
+        "inlineErrors": 0,
+        "html": "7e9e9c1737d5b584",
         "styles": "815a46bbd6103f0c"
       },
       "errors": []

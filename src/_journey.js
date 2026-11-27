@@ -53,6 +53,8 @@ export function journeyOf(row) {
     stack: {size: row.stack_size, index: row.stack_index},
     requester: row.requested_by ?? "unknown",
     failedAttempts: row.failed_attempts,
+    gitRev: row.git_rev,
+    hgRev: row.hg_rev,
     autolandRev: row.autoland_rev,
     centralRev: row.central_rev,
     mergedBy: row.merged_by,
@@ -98,8 +100,14 @@ export function parseRevision(text) {
   return match ? Number(match[1]) : null;
 }
 
+const REVISION_START = /^[0-9a-f]{6,40}$/;
+
+// A landing matches when each word of the query is in its D number, its bug or its
+// requester, or starts one of its revisions: the commit that landed, in git and in hg,
+// and the pushes it went through on autoland and on main.
 export function matchesQuery(journey, query) {
   const label = `d${journey.revision}`;
+  const revisions = [journey.gitRev, journey.hgRev, journey.autolandRev, journey.centralRev].map((rev) => rev ?? "");
   return query
     .toLowerCase()
     .split(/\s+/)
@@ -109,8 +117,7 @@ export function matchesQuery(journey, query) {
         label.includes(term) ||
         String(journey.bug ?? "").includes(term) ||
         journey.requester.toLowerCase().includes(term) ||
-        (journey.autolandRev ?? "").startsWith(term) ||
-        (journey.centralRev ?? "").startsWith(term)
+        (REVISION_START.test(term) && revisions.some((rev) => rev.startsWith(term)))
     );
 }
 
