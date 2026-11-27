@@ -5,33 +5,7 @@ toc: false
 
 # Ship to Nightly faster
 
-How long a patch takes from "Land" in Phabricator to a Nightly that people run. Each
-landing is followed through Lando, autoland, the merge to main, the Nightly build
-and, last, how soon the Nightly population runs the build.
-
-<details class="sn-howto">
-<summary>How to read this page</summary>
-
-**One row is one revision landed by one Lando job.** A stack shares its Lando times, and a revision landed again appears once per successful job. Only desktop Firefox is followed, and only Phabricator revisions landed on autoland. Requesters are shown by the part of their address before the @. The page implements [Ship to Nightly faster](https://docs.google.com/document/d/1ag1ae3po794Kes0GPS5uk9BglVOvrtHY9Qnl04aTuQ4).
-
-**Stages and where their times come from**
-
-- **Lando queue**: Land is requested until the Lando job starts. **Lando landing**: the job starts until it pushes to autoland. Both come from Lando's landing jobs.
-- **On autoland until merged to main**: the push to autoland until the merge to main. A merge is a mozilla-central push whose tip is an autoland push, and the first merge at or after a revision's push carries it. Both come from Treeherder, matched through Lando's commit map. The red part of a candle is the time autoland was closed.
-- **Merged to main until the Nightly starts**: the merge until the decision task of the next Nightly (nightly-all or nightly-desktop) is created.
-- **Nightly build and publish**: that decision task until the last of the 6 en-US Balrog tasks has completed. A Nightly in which one of them failed is skipped, and the revision takes the next one.
-- **Until half of the clients run it**: publish until half of the active Nightly clients run the build or a newer one. A build id is the time of its mozilla-central push, which joins the build to the Glean baseline pings. Only clients with telemetry enabled count. The 25% and 50% marks are the first hour the share of clients active in that hour reached them, and stay empty until it does. The share levels off around 70%, because many Nightly clients never update, so there is no 90% mark. Around 26 to 28 October 2026 the share 24 hours after publish rose from about 0.30 to 0.55, and the clients active in an hour fell from about 14,000 to 8,000, because a group of clients that never updated stopped sending pings. Uptake before and after those days does not compare.
-
-**Fresh data, and what counts**
-
-- The sources lag the present by different amounts, up to about a day for the Nightly clients, so the line under the filters says how far each is complete. The default range ends at the day of the newest Lando row, which is only partly over.
-- The tiles count the revisions that had time to finish: ${PUBLISH_HORIZON_S / 3600} hours before the cutoff for every stage up to publish, ${UPTAKE_HORIZON_S / 3600} for uptake, which half of the clients reach within about 54 hours of publish for 9 builds in 10. Counting only the ones that finished would drop the slow ones.
-- **In flight** means that the next event is not in its source yet. A revision of more than ${UNMATCHED_AFTER_S / 86400} days with no next event is **unmatched**, and is counted apart.
-- A revision is **backed out** when a sheriff classified a push as fixed by the hg revision of a Lando backout, and the backout is blamed on the first push classified so. That finds 85 to 93% of the backouts in the weekly counts of Ben's query 126024, and it can blame a push that carries a whole stack. A backed-out revision ends at its backout and has no uptake.
-
-**Queries** (STMO, refreshed every 6 hours): [journeys](https://sql.telemetry.mozilla.org/queries/132280), [autoland closures](https://sql.telemetry.mozilla.org/queries/132278), [Nightly uptake](https://sql.telemetry.mozilla.org/queries/132279).
-
-</details>
+How long a patch takes from "Land" in Phabricator to a Nightly that people run.
 
 ```js
 import {candleOf, CANDLE_SEGMENTS, dominantStage, durationsOf, inCohort, journeyOf, matchesQuery, MEASURES, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, stackBucket, STAGE_INFO, statusOf, topNames, UNMATCHED_AFTER_S, UPTAKE_HORIZON_S, uptakeByBuild, watermarksOf} from "./_journey.js";
@@ -338,9 +312,7 @@ function itemsIn(domain, requester) {
 }
 
 function metricsBlock(items, width, domain) {
-  const cohort = landingsOf(items).filter((landing) => landing.publishCohort).length;
-  const neverHalf = landingsOf(items).filter((landing) => landing.uptakeCohort && landing.status === "shipped" && landing.journey.uptake?.t50 === null).length;
-  return htl.html`${metricsRow({
+  return metricsRow({
     items,
     metrics: METRICS,
     domain,
@@ -348,7 +320,7 @@ function metricsBlock(items, width, domain) {
     tooltip,
     noun: "item",
     eventRules: (days) => [eventRule(days, new Set(), {key: CUTOFF_KEY, date: publishCutoff})]
-  })}<p class="bw-note">Times to publish count the ${formatCount(cohort)} of ${formatCount(landingsOf(items).length)} revisions that had ${PUBLISH_HORIZON_S / 3600} h to finish, which is every one requested before ${formatTime(publishCutoff)}. Times to uptake wait for ${UPTAKE_HORIZON_S / 3600} h${neverHalf ? ` and leave out the ${formatCount(neverHalf)} whose build did not get to half of the clients` : ""}. The dashed line marks the first: to its right, a day is not complete.</p>`;
+  });
 }
 
 function showLanding(event, point, chartRect) {
@@ -487,17 +459,6 @@ function section(width, hidden, requester, domain, measure, modeKey) {
 ```
 
 <style>
-.sn-howto {
-  max-width: 60rem;
-  margin: 1rem 0;
-}
-.sn-howto summary {
-  cursor: pointer;
-  font-weight: 600;
-}
-.sn-howto ul {
-  margin-top: 0.25rem;
-}
 .bw-note {
   margin: 1rem 0 0;
   color: var(--theme-foreground-muted, #888);
@@ -626,10 +587,6 @@ resetButton.disabled = +domain[0] === +DEFAULT_FROM && +domain[1] === +dayAfter(
 ```
 
 <div class="bw-filters"><div>${requesterInput}${measureInput}${modeInput}</div><div>${fromInput}${toInput}${presets}${resetButton}</div></div>
-
-```js
-display(htl.html`<p class="bw-note">Data complete until ${formatTime(secondsToDate(marks.landoUntil))} (Lando) · ${formatTime(secondsToDate(marks.treeherderUntil))} (Treeherder pushes) · ${formatTime(secondsToDate(marks.fxciUntil))} (Nightly build tasks) · ${marks.uptakeUntil ? formatTime(secondsToDate(marks.uptakeUntil)) : "?"} (uptake). The newest landings are still on their way.</p>`);
-```
 
 ```js
 {
