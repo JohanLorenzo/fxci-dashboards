@@ -10,8 +10,10 @@ landing is followed through Lando, autoland, the merge to main, the Nightly buil
 and, last, how soon the Nightly population runs the build.
 
 ```js
-import {candleOf, CANDLE_SEGMENTS, dominantStage, durationsOf, inCohort, journeyOf, matchesQuery, MEASURES, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, stackBucket, STAGE_INFO, statusOf, topNames, UPTAKE_HORIZON_S, uptakeByBuild, watermarksOf} from "./_journey.js";
-import {attachPlotHover, createTooltip, nearestDot} from "./_tooltip.js";
+import {candleOf, CANDLE_SEGMENTS, dominantStage, durationsOf, inCohort, journeyOf, matchesQuery, MEASURES, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, stackBucket, STAGE_INFO, statusOf, topNames, UNMATCHED_AFTER_S, UPTAKE_HORIZON_S, uptakeByBuild, watermarksOf} from "./_journey.js";
+import {journeyProfile} from "./_journey-profile.js";
+import {openProfile} from "./_profiler.js";
+import {attachPlotHover, createTooltip, nearestDot, timelineLink} from "./_tooltip.js";
 import {chartBox, dateAxis, DAY_MS, eventRule, formatTime, MARGINS, syncCharts} from "./_time-charts.js";
 import {collapsibleBlock, hiddenKeysState, LEGEND_MARKERS} from "./_legend.js";
 import {countOf, metricsRow} from "./_metrics.js";
@@ -245,8 +247,15 @@ function colorScheme(mode, shown) {
 const STAGE_LINES = STAGE_INFO.map((stage) => ({...stage, applies: (landing) => landing.durations[stage.key] !== null}));
 const hoursText = (seconds) => formatWait(seconds / 3600);
 
-function landingLinks({journey}) {
-  return htl.html`${external(`https://phabricator.services.mozilla.com/D${journey.revision}`, "→ Phabricator")}
+// The profile is built when the link is clicked, and the profiler is opened inside the
+// click, which is the only time a browser lets a page open a window.
+const journeyLink = ({journey}) =>
+  timelineLink("→ Journey in the Firefox Profiler", () => openProfile(() => journeyProfile(journey, {marks, closures: closureRows})), `D${journey.revision}-journey.json`);
+
+function landingLinks(landing) {
+  const {journey} = landing;
+  return htl.html`${journeyLink(landing)}
+    ${external(`https://phabricator.services.mozilla.com/D${journey.revision}`, "→ Phabricator")}
     ${external(`https://lando.moz.tools/D${journey.revision}/`, "→ Lando")}
     ${journey.bug ? external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${journey.bug}`, `→ Bug ${journey.bug}`) : ""}
     ${journey.autolandRev ? external(`${TREEHERDER_URL}/jobs?repo=autoland&revision=${journey.autolandRev}`, "→ Treeherder, its push on autoland") : ""}

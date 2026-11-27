@@ -6,6 +6,7 @@ import {
   currentStage,
   dominantStage,
   durationsOf,
+  formatDuration,
   inCohort,
   journeyOf,
   matchesQuery,
@@ -14,6 +15,7 @@ import {
   parseRevision,
   PUBLISH_HORIZON_S,
   quantile,
+  spansOf,
   stackBucket,
   STAGE_INFO,
   statusOf,
@@ -23,58 +25,7 @@ import {
   UPTAKE_HORIZON_S,
   watermarksOf
 } from "../../src/_journey.js";
-
-const HOUR = 3600;
-const T0 = 1_795_000_000;
-
-const row = (overrides = {}) => ({
-  revision_id: 345001,
-  bug_id: 2022026,
-  job_id: 85061,
-  stack_size: 2,
-  stack_index: 1,
-  requested_by: "alice",
-  failed_attempts: 0,
-  autoland_rev: "a".repeat(40),
-  central_rev: "c".repeat(40),
-  merged_by: "sheriff-a",
-  phab_created_s: T0 - 2 * 86400,
-  phab_approved_s: T0 - HOUR,
-  land_requested_s: T0,
-  lando_started_s: T0 + 300,
-  autoland_pushed_s: T0 + 420,
-  merged_s: T0 + 6 * HOUR,
-  nightly_started_s: T0 + 8 * HOUR,
-  nightly_published_s: T0 + 10 * HOUR,
-  nightly_decision_id: "d".repeat(22),
-  nightly_last_task_id: "t".repeat(22),
-  nightly_build_id: "20261126095627",
-  queue_closed_s: 0,
-  autoland_closed_s: 1800,
-  backed_out: false,
-  backout_by: null,
-  backout_s: null,
-  lando_until_s: T0 + 30 * 86400,
-  treeherder_until_s: T0 + 30 * 86400 + 4 * HOUR,
-  fxci_until_s: T0 + 30 * 86400 + 11 * HOUR,
-  commit_maps_until_s: T0 + 30 * 86400 - HOUR,
-  ...overrides
-});
-
-const uptakeRow = (overrides = {}) => ({
-  build_id: "20261126095627",
-  first_seen_s: T0 + 10 * HOUR + 600,
-  observed_until_s: T0 + 30 * 86400,
-  active_24h: 8000,
-  share_6h: 0.25,
-  share_12h: 0.3,
-  share_24h: 0.55,
-  share_48h: 0.65,
-  share_72h: 0.7,
-  t25_s: T0 + 16 * HOUR,
-  t50_s: T0 + 34 * HOUR,
-  ...overrides
-});
+import {HOUR, row, T0, uptakeRow} from "../fixtures/journey-rows.js";
 
 describe("quantile", () => {
   test("is nothing for no value", () => {
@@ -454,5 +405,49 @@ describe("candleOf", () => {
     assert.equal(kind, "open");
     assert.equal(segments.uptake, 0);
     assert.equal(end, T0 + 10 * HOUR);
+  });
+});
+
+describe("spansOf", () => {
+  const marks = {landoUntil: T0 + 30 * 86400, treeherderUntil: T0 + 30 * 86400 - 5 * HOUR, fxciUntil: T0 + 30 * 86400 - 11 * HOUR, commitMapsUntil: T0 + 30 * 86400 - HOUR};
+  const spans = (overrides = {}, uptake = [uptakeRow()]) => spansOf(journeyOf(row(overrides), uptakeByBuild(uptake)), marks);
+
+  test("lists the stages a landing went through, each beginning where the last ended", () => {
+    const {spans: list, end, kind} = spans();
+    assert.deepEqual(list.map(({key}) => key), ["queue", "lando", "autoland", "waiting", "build", "uptake"]);
+    for (let index = 1; index < list.length; index++) assert.equal(list[index].start, list[index - 1].end);
+    assert.equal(list[0].start, T0);
+    assert.equal(list.at(-1).end, end);
+    assert.equal(kind, "shipped");
+    assert.ok(list.every(({open}) => !open));
+  });
+
+  test("stops at the stage a landing is in, and draws it up to what is recorded", () => {
+    const {spans: list, kind} = spans({nightly_started_s: null, nightly_published_s: null, nightly_build_id: null});
+    assert.deepEqual(list.map(({key}) => key), ["queue", "lando", "autoland", "waiting"]);
+    assert.equal(kind, "open");
+    assert.equal(list.at(-1).open, true);
+    assert.equal(list.at(-1).end, marks.treeherderUntil);
+    assert.ok(list.slice(0, -1).every(({open}) => !open));
+  });
+
+  test("cuts the stage that a backout interrupted, and leaves out the ones after it", () => {
+    const {spans: list, end} = spans({backed_out: true, backout_by: "sheriff-b", backout_s: T0 + 9 * HOUR});
+    assert.deepEqual(list.map(({key}) => key), ["queue", "lando", "autoland", "waiting", "build"]);
+    assert.equal(list.at(-1).end, T0 + 9 * HOUR);
+    assert.equal(end, T0 + 9 * HOUR);
+    assert.ok(list.every(({open}) => !open));
+    assert.deepEqual(spans({backed_out: true, backout_by: "sheriff-b", backout_s: T0 + 5 * HOUR}).spans.map(({key}) => key), ["queue", "lando", "autoland"]);
+  });
+
+  test("leaves out a stage that has not begun when its source is behind", () => {
+    const behind = spansOf(journeyOf(row({lando_started_s: T0 + 300, autoland_pushed_s: null, merged_s: null, nightly_started_s: null, nightly_published_s: null, nightly_build_id: null}), new Map()), {...marks, commitMapsUntil: T0 + 100});
+    assert.deepEqual(behind.spans.map(({key}) => key), ["queue"]);
+  });
+});
+
+describe("formatDuration", () => {
+  test("says seconds, minutes, or hours and minutes", () => {
+    assert.deepEqual([0, 59, 60, 90, 3599, 3600, 11940, 70 * 3600 + 300].map(formatDuration), ["0 s", "59 s", "1 min", "2 min", "1 h 0 min", "1 h 0 min", "3 h 19 min", "70 h 5 min"]);
   });
 });

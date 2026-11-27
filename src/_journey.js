@@ -170,10 +170,12 @@ export function topNames(names, count) {
 const STAGE_ORDER = [...STAGES.map(([stage]) => stage), "uptake"];
 const OPEN_ENDS = {queue: "landoUntil", lando: "commitMapsUntil", autoland: "treeherderUntil", waiting: "treeherderUntil", build: "fxciUntil"};
 
-// What a landing's bar is made of, in seconds, and where it ends: at half of the clients
-// on the build, at its backout, or, for a landing still on its way, at what the source
-// of its next event has recorded, which is not the present.
-export function candleOf(journey, marks) {
+// The stages a landing went through, each from where it began to where it ended, and where
+// the journey ends: at half of the clients on the build, at its backout, or, for a landing
+// still on its way, at what the source of its next event has recorded, which is not the
+// present. A stage that began at or after that end is left out, and `open` is a stage that
+// is still going on at the end.
+export function spansOf(journey, marks) {
   const bounds = [journey.requested, journey.landoStarted, journey.pushed, journey.merged, journey.nightlyStarted, journey.published, journey.uptake?.t50 ?? null];
   const openAt = bounds.indexOf(null);
   let end;
@@ -189,19 +191,46 @@ export function candleOf(journey, marks) {
     const watermark = stage === "uptake" ? (journey.uptake?.observedUntil ?? marks.uptakeUntil) : marks[OPEN_ENDS[stage]];
     end = Math.max(watermark ?? bounds[openAt - 1], bounds[openAt - 1]);
   }
-  const [queue, lando, autoland, waiting, build, uptake] = STAGE_ORDER.map((_, index) => {
+  const spans = STAGE_ORDER.flatMap((key, index) => {
     const start = bounds[index];
-    if (start === null) return 0;
-    return Math.max(0, Math.min(bounds[index + 1] ?? end, end) - Math.min(start, end));
+    if (start === null || start >= end) return [];
+    return [{key, start, end: Math.min(bounds[index + 1] ?? end, end), open: kind === "open" && bounds[index + 1] === null}];
   });
-  const queueClosed = Math.min(journey.queueClosed ?? 0, queue);
-  const autolandClosed = Math.min(journey.autolandClosed ?? 0, autoland);
+  return {spans, end, kind};
+}
+
+// What a landing's bar is made of, in seconds. The Lando queue and the time on autoland
+// are each told apart by whether the tree was closed.
+export function candleOf(journey, marks) {
+  const {spans, end, kind} = spansOf(journey, marks);
+  const seconds = (stage) => {
+    const span = spans.find(({key}) => key === stage);
+    return span ? span.end - span.start : 0;
+  };
+  const queueClosed = Math.min(journey.queueClosed ?? 0, seconds("queue"));
+  const autolandClosed = Math.min(journey.autolandClosed ?? 0, seconds("autoland"));
   return {
-    segments: {queueOpen: queue - queueClosed, queueClosed, lando, autolandOpen: autoland - autolandClosed, autolandClosed, waiting, build, uptake},
+    segments: {
+      queueOpen: seconds("queue") - queueClosed,
+      queueClosed,
+      lando: seconds("lando"),
+      autolandOpen: seconds("autoland") - autolandClosed,
+      autolandClosed,
+      waiting: seconds("waiting"),
+      build: seconds("build"),
+      uptake: seconds("uptake")
+    },
     total: end - journey.requested,
     end,
     kind
   };
+}
+
+export function formatDuration(seconds) {
+  const whole = Math.round(seconds);
+  if (whole < 60) return `${whole} s`;
+  const minutes = Math.round(whole / 60);
+  return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
 }
 
 export const stackBucket = (size) => (size <= 2 ? String(size) : size <= 5 ? "3 to 5" : "6 or more");
