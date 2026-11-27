@@ -218,7 +218,7 @@ function outcomeLine({durations, status}) {
 
 function landingLines(landing, linkRequester = true) {
   const {journey, durations, status} = landing;
-  return htl.html`<span><b>${external(`https://phabricator.services.mozilla.com/D${journey.revision}`, `D${journey.revision}`)}</b>${journey.bug ? htl.html` · bug ${external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${journey.bug}`, journey.bug)}` : ""}</span>
+  return htl.html`<span><b>${external(`https://phabricator.services.mozilla.com/D${journey.revision}`, `D${journey.revision}`)}</b>${journey.bug ? htl.html` · ${external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${journey.bug}`, `bug ${journey.bug}`)}` : ""}</span>
     <span>land requested ${formatTime(landing.time)}</span>
     <div class="bw-tt-links">by ${linkRequester ? requesterLink(journey.requester) : journey.requester}${journey.stack.size > 1 ? `, revision ${journey.stack.index + 1} of a stack of ${journey.stack.size}` : ""}</div>
     ${status === "backed out" ? backoutLine(landing) : outcomeLine(landing)}
