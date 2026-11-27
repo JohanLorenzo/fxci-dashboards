@@ -36,8 +36,6 @@ export const CANDLE_SEGMENTS = [
   {key: "build", title: "Nightly build and publish", color: "#5b6abf"}
 ];
 
-export const MEASURES = [{key: "total", title: "Land to published in a Nightly"}, ...STAGE_INFO.map(({key, title}) => ({key, title}))];
-
 const between = (later, earlier) => (later == null || earlier == null ? null : later - earlier);
 
 export function quantile(values, share) {
@@ -94,20 +92,7 @@ export function statusOf(journey, {landoUntil}) {
   return landoUntil - journey.requested > UNMATCHED_AFTER_S ? "unmatched" : "in flight";
 }
 
-export function currentStage(journey) {
-  const [stage] = STAGES.find(([, end]) => journey[end] === null) ?? [null];
-  return stage;
-}
-
 export const inCohort = (journey, untilS, horizonS) => journey.requested <= untilS - horizonS;
-
-export function dominantStage(durations) {
-  let longest = null;
-  for (const [stage] of STAGES) {
-    if (durations[stage] !== null && (longest === null || durations[stage] > durations[longest])) longest = stage;
-  }
-  return longest;
-}
 
 export function parseRevision(text) {
   const match = /^\s*D?(\d{1,9})\s*$/i.exec(text ?? "");
@@ -128,15 +113,6 @@ export function matchesQuery(journey, query) {
         (journey.autolandRev ?? "").startsWith(term) ||
         (journey.centralRev ?? "").startsWith(term)
     );
-}
-
-export function topNames(names, count) {
-  const counts = new Map();
-  for (const name of names) counts.set(name, (counts.get(name) ?? 0) + 1);
-  return [...counts]
-    .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))
-    .slice(0, count)
-    .map(([name]) => name);
 }
 
 const STAGE_ORDER = STAGES.map(([stage]) => stage);
@@ -202,8 +178,6 @@ export function formatDuration(seconds) {
   const minutes = Math.round(whole / 60);
   return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} h ${minutes % 60} min`;
 }
-
-export const stackBucket = (size) => (size <= 2 ? String(size) : size <= 5 ? "3 to 5" : "6 or more");
 
 export function watermarksOf(rows) {
   const [first] = rows;

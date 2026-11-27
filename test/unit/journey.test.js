@@ -3,23 +3,18 @@ import {describe, test} from "node:test";
 import {
   candleOf,
   CANDLE_SEGMENTS,
-  currentStage,
-  dominantStage,
   durationsOf,
   formatDuration,
   inCohort,
   journeyOf,
   matchesQuery,
-  MEASURES,
   mergesOf,
   parseRevision,
   PUBLISH_HORIZON_S,
   quantile,
   spansOf,
-  stackBucket,
   STAGE_INFO,
   statusOf,
-  topNames,
   UNMATCHED_AFTER_S,
   watermarksOf
 } from "../../src/_journey.js";
@@ -121,22 +116,6 @@ describe("statusOf", () => {
   });
 });
 
-describe("currentStage", () => {
-  const at = (overrides) => currentStage(journeyOf(row(overrides)));
-
-  test("is the first stage that has not ended", () => {
-    assert.equal(at({lando_started_s: null, autoland_pushed_s: null, merged_s: null, nightly_started_s: null, nightly_published_s: null}), "queue");
-    assert.equal(at({autoland_pushed_s: null, merged_s: null, nightly_started_s: null, nightly_published_s: null}), "lando");
-    assert.equal(at({merged_s: null, nightly_started_s: null, nightly_published_s: null}), "autoland");
-    assert.equal(at({nightly_started_s: null, nightly_published_s: null}), "waiting");
-    assert.equal(at({nightly_published_s: null}), "build");
-  });
-
-  test("is nothing once it has published", () => {
-    assert.equal(at({}), null);
-  });
-});
-
 describe("inCohort", () => {
   test("keeps the landings that had the whole horizon to finish", () => {
     const until = T0;
@@ -170,36 +149,11 @@ describe("mergesOf", () => {
   });
 });
 
-describe("dominantStage", () => {
-  const durations = (overrides) => ({queue: 300, lando: 120, autoland: 6 * HOUR, waiting: 2 * HOUR, build: 2 * HOUR, ...overrides});
-
-  test("is the stage that took longest from Land to published", () => {
-    assert.equal(dominantStage(durations({})), "autoland");
-    assert.equal(dominantStage(durations({autoland: 100, waiting: 5 * HOUR})), "waiting");
-  });
-
-  test("looks only at the stages that ended", () => {
-    assert.equal(dominantStage(durations({autoland: null, waiting: null, build: null})), "queue");
-  });
-
-  test("is nothing when no stage ended", () => {
-    assert.equal(dominantStage({queue: null, lando: null, autoland: null, waiting: null, build: null}), null);
-  });
-
-  test("takes the earlier stage when two took the same time", () => {
-    assert.equal(dominantStage(durations({autoland: 2 * HOUR, waiting: 2 * HOUR, build: 2 * HOUR})), "autoland");
-  });
-});
-
 describe("the stages", () => {
   test("have a title and a colour each, in the order of the journey", () => {
     assert.deepEqual(STAGE_INFO.map(({key}) => key), ["queue", "lando", "autoland", "waiting", "build"]);
     assert.ok(STAGE_INFO.every(({title, color}) => title && /^#[0-9a-f]{6}$/i.test(color)));
     assert.equal(new Set(STAGE_INFO.map(({color}) => color)).size, STAGE_INFO.length);
-  });
-
-  test("are what a chart can measure, after the total", () => {
-    assert.deepEqual(MEASURES.map(({key}) => key), ["total", "queue", "lando", "autoland", "waiting", "build"]);
   });
 });
 
@@ -246,27 +200,6 @@ describe("matchesQuery", () => {
     const bare = journeyOf(row({bug_id: null, autoland_rev: null, central_rev: null}));
     assert.equal(matchesQuery(bare, "zzz"), false);
     assert.equal(matchesQuery(bare, "345001"), true);
-  });
-});
-
-describe("topNames", () => {
-  test("lists the most frequent names first, as many as asked", () => {
-    assert.deepEqual(topNames(["b", "a", "b", "c", "b", "a"], 2), ["b", "a"]);
-  });
-
-  test("breaks a tie by name", () => {
-    assert.deepEqual(topNames(["z", "y", "x"], 2), ["x", "y"]);
-  });
-
-  test("lists all there are when fewer than asked", () => {
-    assert.deepEqual(topNames(["a"], 5), ["a"]);
-    assert.deepEqual(topNames([], 5), []);
-  });
-});
-
-describe("stackBucket", () => {
-  test("groups the sizes of stacks", () => {
-    assert.deepEqual([1, 2, 3, 5, 6, 40].map(stackBucket), ["1", "2", "3 to 5", "3 to 5", "6 or more", "6 or more"]);
   });
 });
 

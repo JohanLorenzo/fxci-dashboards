@@ -8,10 +8,10 @@ toc: false
 How long a patch takes from "Land" in Phabricator to a Nightly that people run.
 
 ```js
-import {candleOf, CANDLE_SEGMENTS, dominantStage, durationsOf, inCohort, journeyOf, matchesQuery, MEASURES, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, stackBucket, STAGE_INFO, statusOf, topNames, UNMATCHED_AFTER_S, watermarksOf} from "./_journey.js";
+import {candleOf, CANDLE_SEGMENTS, durationsOf, inCohort, journeyOf, matchesQuery, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, STAGE_INFO, statusOf, UNMATCHED_AFTER_S, watermarksOf} from "./_journey.js";
 import {journeyProfile} from "./_journey-profile.js";
 import {openProfile} from "./_profiler.js";
-import {attachPlotHover, createTooltip, nearestDot, timelineLink} from "./_tooltip.js";
+import {createTooltip, timelineLink} from "./_tooltip.js";
 import {chartBox, dateAxis, DAY_MS, eventRule, formatTime, MARGINS, syncCharts} from "./_time-charts.js";
 import {collapsibleBlock, hiddenKeysState, LEGEND_MARKERS} from "./_legend.js";
 import {countOf, metricsRow} from "./_metrics.js";
@@ -40,7 +40,6 @@ const landings = journeys
       time: secondsToDate(journey.requested),
       journey,
       durations,
-      stage: dominantStage(durations),
       candle: candleOf(journey, marks),
       status: statusOf(journey, marks),
       publishCohort: inCohort(journey, publishUntil, PUBLISH_HORIZON_S)
@@ -166,14 +165,10 @@ const METRICS = [
 const CUTOFF_KEY = "cohort";
 const publishCutoff = secondsToDate(publishUntil - PUBLISH_HORIZON_S);
 const METRICS_TITLE = {chartKey: "chart-metrics", title: "Top line metrics"};
-const LANDINGS_TITLE = {chartKey: "chart-landings", title: "Landed revisions"};
 const E2E_TITLE = {chartKey: "chart-endtoend", title: "From Land to a Nightly that people run"};
-const LANDINGS_HEIGHT = 300;
 const CANDLES_HEIGHT = 300;
 const MAX_CANDLES = 2000;
-const MAX_DOTS = 5000;
 const HIT_RADIUS = 8;
-const DOT_RADIUS = 3;
 ```
 
 ```js
@@ -185,34 +180,6 @@ const TREEHERDER_URL = "https://treeherder.mozilla.org";
 const external = (href, text) => htl.html`<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
 
 const BACKOUT_COLOR = "#b3202a";
-const REQUESTER_COLORS = [...d3.schemeTableau10, "#17becf", "#bcbd22"];
-const STATUS_COLORS = {shipped: "#237a4b", "backed out": BACKOUT_COLOR, "in flight": "#d99a00", unmatched: "#888"};
-const STACK_COLORS = {"1": "#9ecae1", "2": "#6baed6", "3 to 5": "#3182bd", "6 or more": "#08519c"};
-const COLOR_MODES = [
-  {key: "stage", title: "Longest stage"},
-  {key: "requester", title: "Requester"},
-  {key: "status", title: "Outcome"},
-  {key: "stack", title: "Stack size"}
-];
-
-// The colours of the dots: what is told apart, with a key and a title for each, and the
-// key a landing has. Requesters are the most frequent ones of the days shown, and the
-// others together.
-function colorScheme(mode, shown) {
-  if (mode === "requester") {
-    const names = topNames(shown.map((landing) => landing.journey.requester), REQUESTER_COLORS.length);
-    const entries = [...names.map((name, index) => ({key: name, title: name, color: REQUESTER_COLORS[index]})), {key: "other", title: "everyone else", color: "#bbb"}];
-    return {entries, keyOf: (landing) => (names.includes(landing.journey.requester) ? landing.journey.requester : "other")};
-  }
-  if (mode === "status") {
-    return {entries: Object.entries(STATUS_COLORS).map(([key, color]) => ({key, title: key, color})), keyOf: (landing) => landing.status};
-  }
-  if (mode === "stack") {
-    return {entries: Object.entries(STACK_COLORS).map(([key, color]) => ({key, title: key === "1" ? "1 revision" : `${key} revisions`, color})), keyOf: (landing) => stackBucket(landing.journey.stack.size)};
-  }
-  return {entries: STAGE_INFO.map(({key, title, color}) => ({key, title, color})), keyOf: (landing) => landing.stage ?? "queue"};
-}
-
 const STAGE_LINES = STAGE_INFO.map((stage) => ({...stage, applies: (landing) => landing.durations[stage.key] !== null}));
 const hoursText = (seconds) => formatWait(seconds / 3600);
 
@@ -294,51 +261,6 @@ function metricsBlock(items, width, domain) {
   });
 }
 
-function showLanding(event, point, chartRect) {
-  if (!tooltip.open(event, point.landing, landingLines(point.landing))) return;
-  tooltip.showRing(chartRect, point, 14);
-}
-
-// A dot for each landing at the moment it was requested, as high as the stage chosen
-// took. The scales come from all the landings of the days shown, so that hiding some
-// does not rescale the chart. A landing that has not been through the stage has no dot.
-function landingsChart({shown, width, hidden, domain, measure, scheme, modeKey}) {
-  const value = (landing) => (landing.durations[measure] === null ? null : landing.durations[measure] / 3600);
-  const measured = shown.filter((landing) => value(landing) !== null);
-  const top = Math.max(1, d3.max(measured, value) ?? 1);
-  const visible = measured.filter((landing) => !hidden.has(`${modeKey}-${scheme.keyOf(landing)}`));
-  const dots = visible.slice(-MAX_DOTS);
-  const chosen = selectedLandings.filter((landing) => measured.includes(landing) && inDomain(domain, landing.time));
-  const plot = Plot.plot({
-    width,
-    height: LANDINGS_HEIGHT,
-    marginTop: MARGINS.top,
-    marginBottom: MARGINS.bottom,
-    marginLeft: MARGINS.left,
-    marginRight: MARGINS.right,
-    x: dateAxis(domain, width),
-    y: {domain: [0, top * 1.05], grid: true, label: "hours"},
-    color: {domain: scheme.entries.map(({key}) => key), range: scheme.entries.map(({color}) => color)},
-    marks: [
-      Plot.ruleY([0], {strokeOpacity: 0.3}),
-      eventRule(domain, new Set(), {key: CUTOFF_KEY, date: publishCutoff}),
-      Plot.dot(dots, {x: "time", y: value, r: DOT_RADIUS, fill: (landing) => scheme.keyOf(landing), fillOpacity: 0.75, stroke: "currentColor", strokeOpacity: 0.2}),
-      Plot.dot(chosen, {x: "time", y: value, r: DOT_RADIUS + 5, stroke: BACKOUT_COLOR, strokeWidth: 2, fill: "none"})
-    ]
-  });
-  const x = plot.scale("x");
-  const y = plot.scale("y");
-  const points = dots.map((landing) => ({landing, x: x.apply(landing.time), y: y.apply(value(landing)), radius: DOT_RADIUS}));
-  attachPlotHover(tooltip, plot, (px, py) => nearestDot(points, px, py, HIT_RADIUS), showLanding);
-  const notDrawn = shown.length - measured.length;
-  const cut = visible.length - dots.length;
-  const notes = [
-    notDrawn ? `${formatCount(notDrawn)} of the ${formatCount(shown.length)} revisions have no dot, because they have not been through this stage.` : "",
-    cut ? `Only the ${formatCount(MAX_DOTS)} most recent are drawn, of ${formatCount(visible.length)}.` : ""
-  ].filter(Boolean);
-  return htl.html`${chartBox(plot, LANDINGS_HEIGHT)}${notes.length ? htl.html`<p class="bw-note">${notes.join(" ")}</p>` : ""}`;
-}
-
 // How a candle ends is part of what it says: a Nightly published it, it was backed out,
 // or it is still on its way and is drawn up to the last thing recorded.
 const END_KINDS = [
@@ -396,33 +318,27 @@ function candlesChart({shown, width, hidden, domain}) {
   return htl.html`${chartBox(plot, CANDLES_HEIGHT)}${cut ? htl.html`<p class="bw-note">Only the ${formatCount(MAX_CANDLES)} most recent are drawn, of ${formatCount(wanted.length)}.</p>` : ""}`;
 }
 
-function section(width, hidden, requester, domain, measure, modeKey) {
+function section(width, hidden, requester, domain) {
   const items = itemsIn(domain, requester);
   const shown = landingsOf(items);
-  const scheme = colorScheme(modeKey, shown);
-  const modeTitle = COLOR_MODES.find(({key}) => key === modeKey).title;
   const none = () => htl.html`<p class="bw-note">No revisions in this range.</p>`;
   const bodies = {
     "chart-endtoend": {
       groups: () => (shown.length ? candleGroups() : null),
       draw: (ownHidden) => (shown.length ? candlesChart({shown, width, hidden: ownHidden, domain}) : none())
     },
-    "chart-metrics": {groups: () => null, draw: () => metricsBlock(items, width, domain)},
-    "chart-landings": {
-      groups: () => [{title: modeTitle, entries: scheme.entries.map(({key, title, color}) => ({key: `${modeKey}-${key}`, title, marker: () => LEGEND_MARKERS.dot(color)}))}],
-      draw: (ownHidden) => (shown.length ? landingsChart({shown, width, hidden: ownHidden, domain, measure, scheme, modeKey}) : none())
-    }
+    "chart-metrics": {groups: () => null, draw: () => metricsBlock(items, width, domain)}
   };
   const block = (item) =>
     collapsibleBlock(item, {
       hidden,
       state: {setHidden, setHiddenKeys},
       width,
-      context: [width, +domain[0], +domain[1], requester, measure, modeKey],
+      context: [width, +domain[0], +domain[1], requester],
       cache: blockCache,
       body: ({chartKey}, ownHidden) => ({groups: bodies[chartKey].groups(), content: bodies[chartKey].draw(ownHidden)})
     });
-  const element = htl.html`<section class="sn-section">${[METRICS_TITLE, LANDINGS_TITLE, E2E_TITLE].map(block)}</section>`;
+  const element = htl.html`<section class="sn-section">${[METRICS_TITLE, E2E_TITLE].map(block)}</section>`;
   syncCharts(element, domain, (from, to) => setRange(d3.utcDay.floor(from), d3.utcDay.floor(new Date(Math.max(+from, +to - 1)))), tooltip);
   return element;
 }
@@ -499,21 +415,6 @@ invalidation.then(() => document.removeEventListener("sn-requester", chooseReque
 ```
 
 ```js
-// What the dots show: how high (a stage) and what colour. Both are kept in the address.
-const urlParams = new URLSearchParams(window.location.search);
-const measureInput = Inputs.select(new Map(MEASURES.map(({key, title}) => [title, key])), {
-  label: "Height of the dots",
-  value: MEASURES.some(({key}) => key === urlParams.get("y")) ? urlParams.get("y") : "total"
-});
-const modeInput = Inputs.select(new Map(COLOR_MODES.map(({key, title}) => [title, key])), {
-  label: "Colour of the dots",
-  value: COLOR_MODES.some(({key}) => key === urlParams.get("color")) ? urlParams.get("color") : "stage"
-});
-const measure = Generators.input(measureInput);
-const modeKey = Generators.input(modeInput);
-```
-
-```js
 // The days the charts show, from the date inputs, the presets or by dragging across a
 // chart, and kept in the address as ?from= and ?to=. Both are days, so the last one
 // is shown whole. The default is the last 7 days of data.
@@ -556,7 +457,7 @@ const domain = (() => {
 resetButton.disabled = +domain[0] === +DEFAULT_FROM && +domain[1] === +dayAfter(DEFAULT_TO);
 ```
 
-<div class="bw-filters"><div>${requesterInput}${measureInput}${modeInput}</div><div>${fromInput}${toInput}${presets}${resetButton}</div></div>
+<div class="bw-filters"><div>${requesterInput}</div><div>${fromInput}${toInput}${presets}${resetButton}</div></div>
 
 ```js
 {
@@ -565,8 +466,6 @@ resetButton.disabled = +domain[0] === +DEFAULT_FROM && +domain[1] === +dayAfter(
   const params = new URLSearchParams(window.location.search);
   const isoDay = (day) => day.toISOString().slice(0, 10);
   params.set("requester", requester);
-  params.set("y", measure);
-  params.set("color", modeKey);
   params.set("from", isoDay(domain[0]));
   params.set("to", isoDay(new Date(+domain[1] - DAY_MS)));
   history.replaceState(null, "", `${window.location.pathname}?${params}${window.location.hash}`);
@@ -593,7 +492,7 @@ const {setHiddenKeys, setHidden} = hiddenKeys;
 ```
 
 <div class="card" id="sn-charts">
-  ${resize((width) => section(width, hidden, requester, domain, measure, modeKey))}
+  ${resize((width) => section(width, hidden, requester, domain))}
 </div>
 
 ## Revisions
