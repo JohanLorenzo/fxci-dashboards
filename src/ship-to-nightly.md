@@ -168,7 +168,6 @@ const HIT_RADIUS = 8;
 // The tooltip is defined in the same cell as what uses it to filter by requester, as a
 // cell may not depend on one that depends on it.
 const tooltip = createTooltip({invalidation});
-const TC_URL = "https://firefox-ci-tc.services.mozilla.com";
 const TREEHERDER_URL = "https://treeherder.mozilla.org";
 const external = (href, text) => htl.html`<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
 
@@ -184,14 +183,9 @@ const journeyLink = ({journey}) =>
 function landingLinks(landing) {
   const {journey} = landing;
   return htl.html`${journeyLink(landing)}
-    ${external(`https://phabricator.services.mozilla.com/D${journey.revision}`, "→ Phabricator")}
     ${external(`https://lando.moz.tools/D${journey.revision}/`, "→ Lando")}
-    ${journey.bug ? external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${journey.bug}`, `→ Bug ${journey.bug}`) : ""}
     ${journey.autolandRev ? external(`${TREEHERDER_URL}/jobs?repo=autoland&revision=${journey.autolandRev}`, "→ Treeherder, its push on autoland") : ""}
-    ${journey.centralRev ? external(`${TREEHERDER_URL}/jobs?repo=mozilla-central&revision=${journey.centralRev}`, "→ Treeherder, the merge to main") : ""}
-    ${journey.centralRev ? external(`https://hg.mozilla.org/mozilla-central/rev/${journey.centralRev}`, "→ hg, the merge to main") : ""}
-    ${journey.decisionId ? external(`${TC_URL}/tasks/${journey.decisionId}`, "→ TC Task of its Nightly") : ""}
-    <a href="?revision=D${journey.revision}">→ Link to this landing</a>`;
+    ${journey.centralRev ? external(`${TREEHERDER_URL}/jobs?repo=mozilla-central&revision=${journey.centralRev}`, "→ Treeherder, the merge to main") : ""}`;
 }
 
 function requesterLink(name) {
@@ -217,7 +211,7 @@ function outcomeLine({durations, status}) {
 
 function landingLines(landing, linkRequester = true) {
   const {journey, durations, status} = landing;
-  return htl.html`<span><b>D${journey.revision}</b>${journey.bug ? ` · bug ${journey.bug}` : ""}</span>
+  return htl.html`<span><b>${external(`https://phabricator.services.mozilla.com/D${journey.revision}`, `D${journey.revision}`)}</b>${journey.bug ? htl.html` · bug ${external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${journey.bug}`, journey.bug)}` : ""}</span>
     <span>land requested ${formatTime(landing.time)}</span>
     <div class="bw-tt-links">by ${linkRequester ? requesterLink(journey.requester) : journey.requester}${journey.stack.size > 1 ? `, revision ${journey.stack.index + 1} of a stack of ${journey.stack.size}` : ""}</div>
     ${status === "backed out" ? backoutLine(landing) : outcomeLine(landing)}
