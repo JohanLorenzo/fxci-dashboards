@@ -2,13 +2,20 @@ import assert from "node:assert/strict";
 import {describe, test} from "node:test";
 import {
   currentStage,
+  dominantStage,
   durationsOf,
   inCohort,
   journeyOf,
+  matchesQuery,
+  MEASURES,
   mergesOf,
+  parseRevision,
   PUBLISH_HORIZON_S,
   quantile,
+  stackBucket,
+  STAGE_INFO,
   statusOf,
+  topNames,
   UNMATCHED_AFTER_S,
   uptakeByBuild,
   UPTAKE_HORIZON_S,
@@ -248,5 +255,105 @@ describe("uptakeByBuild", () => {
     assert.equal(builds.size, 2);
     assert.equal(builds.get("20261127000000").share24, null);
     assert.equal(builds.get("20261127000000").t50, null);
+  });
+});
+
+describe("dominantStage", () => {
+  const durations = (overrides) => ({queue: 300, lando: 120, autoland: 6 * HOUR, waiting: 2 * HOUR, build: 2 * HOUR, uptake: 24 * HOUR, ...overrides});
+
+  test("is the stage that took longest from Land to published, not counting uptake", () => {
+    assert.equal(dominantStage(durations({})), "autoland");
+    assert.equal(dominantStage(durations({autoland: 100, waiting: 5 * HOUR})), "waiting");
+  });
+
+  test("looks only at the stages that ended", () => {
+    assert.equal(dominantStage(durations({autoland: null, waiting: null, build: null})), "queue");
+  });
+
+  test("is nothing when no stage ended", () => {
+    assert.equal(dominantStage({queue: null, lando: null, autoland: null, waiting: null, build: null, uptake: null}), null);
+  });
+
+  test("takes the earlier stage when two took the same time", () => {
+    assert.equal(dominantStage(durations({autoland: 2 * HOUR, waiting: 2 * HOUR, build: 2 * HOUR})), "autoland");
+  });
+});
+
+describe("the stages", () => {
+  test("have a title and a colour each, in the order of the journey, uptake last", () => {
+    assert.deepEqual(STAGE_INFO.map(({key}) => key), ["queue", "lando", "autoland", "waiting", "build", "uptake"]);
+    assert.ok(STAGE_INFO.every(({title, color}) => title && /^#[0-9a-f]{6}$/i.test(color)));
+    assert.equal(new Set(STAGE_INFO.map(({color}) => color)).size, STAGE_INFO.length);
+  });
+
+  test("are what a chart can measure, after the total", () => {
+    assert.deepEqual(MEASURES.map(({key}) => key), ["total", "queue", "lando", "autoland", "waiting", "build", "uptake"]);
+  });
+});
+
+describe("parseRevision", () => {
+  test("reads a D number, with or without the D", () => {
+    assert.equal(parseRevision("D343744"), 343744);
+    assert.equal(parseRevision("d343744"), 343744);
+    assert.equal(parseRevision("343744"), 343744);
+    assert.equal(parseRevision(" D343744 "), 343744);
+  });
+
+  test("reads nothing else", () => {
+    for (const text of [null, undefined, "", "D", "Dabc", "12ab", "D1 D2", "-5", "D99999999999"]) assert.equal(parseRevision(text), null, String(text));
+  });
+});
+
+describe("matchesQuery", () => {
+  const journey = journeyOf(row({revision_id: 343744, bug_id: 2022026, requested_by: "Alice", autoland_rev: "31dcede4f177", central_rev: "c64776bf9a03"}), new Map());
+
+  test("finds a landing by its D number, with or without the D", () => {
+    assert.equal(matchesQuery(journey, "D343744"), true);
+    assert.equal(matchesQuery(journey, "343744"), true);
+    assert.equal(matchesQuery(journey, "d3437"), true);
+    assert.equal(matchesQuery(journey, "D343745"), false);
+  });
+
+  test("finds a landing by its bug, its requester or the start of a revision", () => {
+    assert.equal(matchesQuery(journey, "2022026"), true);
+    assert.equal(matchesQuery(journey, "ali"), true);
+    assert.equal(matchesQuery(journey, "31dcede"), true);
+    assert.equal(matchesQuery(journey, "c64776"), true);
+    assert.equal(matchesQuery(journey, "dcede"), false);
+  });
+
+  test("wants every word to match", () => {
+    assert.equal(matchesQuery(journey, "alice 2022026"), true);
+    assert.equal(matchesQuery(journey, "alice 1"), false);
+    assert.equal(matchesQuery(journey, "alice bob"), false);
+  });
+
+  test("matches everything for an empty query, and copes with what is missing", () => {
+    assert.equal(matchesQuery(journey, ""), true);
+    assert.equal(matchesQuery(journey, "   "), true);
+    const bare = journeyOf(row({bug_id: null, autoland_rev: null, central_rev: null}), new Map());
+    assert.equal(matchesQuery(bare, "zzz"), false);
+    assert.equal(matchesQuery(bare, "345001"), true);
+  });
+});
+
+describe("topNames", () => {
+  test("lists the most frequent names first, as many as asked", () => {
+    assert.deepEqual(topNames(["b", "a", "b", "c", "b", "a"], 2), ["b", "a"]);
+  });
+
+  test("breaks a tie by name", () => {
+    assert.deepEqual(topNames(["z", "y", "x"], 2), ["x", "y"]);
+  });
+
+  test("lists all there are when fewer than asked", () => {
+    assert.deepEqual(topNames(["a"], 5), ["a"]);
+    assert.deepEqual(topNames([], 5), []);
+  });
+});
+
+describe("stackBucket", () => {
+  test("groups the sizes of stacks", () => {
+    assert.deepEqual([1, 2, 3, 5, 6, 40].map(stackBucket), ["1", "2", "3 to 5", "3 to 5", "6 or more", "6 or more"]);
   });
 });

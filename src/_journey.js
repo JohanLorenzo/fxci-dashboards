@@ -18,6 +18,17 @@ const STAGES = [
   ["build", "published"]
 ];
 
+export const STAGE_INFO = [
+  {key: "queue", title: "Lando queue", color: "#6fbf8e"},
+  {key: "lando", title: "Lando landing", color: "#237a4b"},
+  {key: "autoland", title: "On autoland until merged to main", color: "#e0902c"},
+  {key: "waiting", title: "Merged to main until the Nightly starts", color: "#cf5b82"},
+  {key: "build", title: "Nightly build and publish", color: "#5b6abf"},
+  {key: "uptake", title: "Until half of the clients run it", color: "#8a4fb5"}
+];
+
+export const MEASURES = [{key: "total", title: "Land to published in a Nightly"}, ...STAGE_INFO.map(({key, title}) => ({key, title}))];
+
 const between = (later, earlier) => (later == null || earlier == null ? null : later - earlier);
 
 export function quantile(values, share) {
@@ -104,6 +115,46 @@ export function currentStage(journey) {
 }
 
 export const inCohort = (journey, untilS, horizonS) => journey.requested <= untilS - horizonS;
+
+export function dominantStage(durations) {
+  let longest = null;
+  for (const [stage] of STAGES) {
+    if (durations[stage] !== null && (longest === null || durations[stage] > durations[longest])) longest = stage;
+  }
+  return longest;
+}
+
+export function parseRevision(text) {
+  const match = /^\s*D?(\d{1,9})\s*$/i.exec(text ?? "");
+  return match ? Number(match[1]) : null;
+}
+
+export function matchesQuery(journey, query) {
+  const label = `d${journey.revision}`;
+  return query
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .every(
+      (term) =>
+        label.includes(term) ||
+        String(journey.bug ?? "").includes(term) ||
+        journey.requester.toLowerCase().includes(term) ||
+        (journey.autolandRev ?? "").startsWith(term) ||
+        (journey.centralRev ?? "").startsWith(term)
+    );
+}
+
+export function topNames(names, count) {
+  const counts = new Map();
+  for (const name of names) counts.set(name, (counts.get(name) ?? 0) + 1);
+  return [...counts]
+    .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))
+    .slice(0, count)
+    .map(([name]) => name);
+}
+
+export const stackBucket = (size) => (size <= 2 ? String(size) : size <= 5 ? "3 to 5" : "6 or more");
 
 export function watermarksOf(rows, uptakeRows) {
   const [first] = rows;

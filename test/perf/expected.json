@@ -508,16 +508,16 @@
             "0"
           ]
         ],
-        "svgs": 16,
-        "circles": 0,
-        "lines": 32,
-        "paths": 33,
+        "svgs": 22,
+        "circles": 1285,
+        "lines": 45,
+        "paths": 51,
         "anchors": 0,
-        "nodes": 310,
-        "bodyNodes": 431,
+        "nodes": 1680,
+        "bodyNodes": 2244,
         "inlineErrors": 0,
-        "html": "27029d994ce08cc1",
-        "styles": "42fe50d5e28f69fb"
+        "html": "1da08b0b8b576e0f",
+        "styles": "548a301b85e7f937"
       },
       "hover": {
         "end to end": {
@@ -525,10 +525,136 @@
         },
         "stages": {
           "tooltips": 5
+        },
+        "landings": {
+          "tooltips": 6
         }
       },
-      "pin": null,
-      "legend": null,
+      "pin": {
+        "found": true,
+        "stays": true,
+        "releasedByEscape": true,
+        "releasedByClick": true,
+        "tooltip": {
+          "position": "fixed",
+          "zIndex": "1000",
+          "maxWidth": "520px",
+          "paddingTop": "8px",
+          "paddingLeft": "12px",
+          "borderTopLeftRadius": "4px",
+          "backgroundColor": "rgb(42, 42, 42)",
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+          "fontSize": "13px",
+          "lineHeight": "22.1px",
+          "display": "block"
+        },
+        "ring": {
+          "position": "fixed",
+          "zIndex": "999",
+          "width": "14px",
+          "height": "14px",
+          "borderTopWidth": "1px",
+          "borderTopColor": "rgb(27, 30, 35)",
+          "borderTopLeftRadius": "50%",
+          "transform": "matrix(1, 0, 0, 1, -8, -8)",
+          "pointerEvents": "none",
+          "display": "block"
+        },
+        "content": "d5720884483ea3fa"
+      },
+      "legend": {
+        "hidden": {
+          "pressed": [
+            "true",
+            "false",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 1285,
+          "lines": 45,
+          "nodes": 1680,
+          "html": "987f163ce2b4654a",
+          "styles": "dab6899e538a8f9e"
+        },
+        "shown": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 1285,
+          "lines": 45,
+          "nodes": 1680,
+          "html": "f8e55c0fc45588fb",
+          "styles": "acb0c38139728ba1"
+        },
+        "alone": {
+          "pressed": [
+            "true",
+            "false",
+            "true",
+            "false",
+            "false",
+            "false"
+          ],
+          "charts": 1,
+          "circles": 5,
+          "lines": 45,
+          "nodes": 399,
+          "html": "a9ef7ab2f9378981",
+          "styles": "a678f145dacfd799"
+        },
+        "all": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 1285,
+          "lines": 45,
+          "nodes": 1680,
+          "html": "f8e55c0fc45588fb",
+          "styles": "acb0c38139728ba1"
+        },
+        "collapsed": {
+          "pressed": [],
+          "charts": 0,
+          "circles": 0,
+          "lines": 32,
+          "nodes": 315,
+          "html": "419d45dcdd9cd3df",
+          "styles": "f396c594c8fd23a2"
+        },
+        "expanded": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 1285,
+          "lines": 45,
+          "nodes": 1680,
+          "html": "f8e55c0fc45588fb",
+          "styles": "acb0c38139728ba1"
+        },
+        "restored": true
+      },
       "zoom": {
         "range": [
           "2026-11-20",
@@ -600,16 +726,16 @@
             "0"
           ]
         ],
-        "svgs": 16,
-        "circles": 0,
-        "lines": 16,
-        "paths": 31,
+        "svgs": 22,
+        "circles": 487,
+        "lines": 28,
+        "paths": 45,
         "anchors": 0,
-        "nodes": 276,
-        "bodyNodes": 409,
+        "nodes": 837,
+        "bodyNodes": 1413,
         "inlineErrors": 0,
-        "html": "0b143cac958c0bfa",
-        "styles": "42fe50d5e28f69fb"
+        "html": "008993e5aabe350b",
+        "styles": "dd98ea9f120ebdcf"
       },
       "errors": []
     },
@@ -681,16 +807,16 @@
             "0"
           ]
         ],
-        "svgs": 16,
-        "circles": 0,
-        "lines": 32,
-        "paths": 33,
+        "svgs": 22,
+        "circles": 5005,
+        "lines": 43,
+        "paths": 49,
         "anchors": 0,
-        "nodes": 310,
-        "bodyNodes": 431,
+        "nodes": 5394,
+        "bodyNodes": 5958,
         "inlineErrors": 0,
-        "html": "7410f3b6fa0358d0",
-        "styles": "42fe50d5e28f69fb"
+        "html": "6f2b2a87bd0887b5",
+        "styles": "548a301b85e7f937"
       },
       "hover": {
         "end to end": {
@@ -698,10 +824,136 @@
         },
         "stages": {
           "tooltips": 46
+        },
+        "landings": {
+          "tooltips": 5
         }
       },
-      "pin": null,
-      "legend": null,
+      "pin": {
+        "found": true,
+        "stays": true,
+        "releasedByEscape": true,
+        "releasedByClick": true,
+        "tooltip": {
+          "position": "fixed",
+          "zIndex": "1000",
+          "maxWidth": "520px",
+          "paddingTop": "8px",
+          "paddingLeft": "12px",
+          "borderTopLeftRadius": "4px",
+          "backgroundColor": "rgb(42, 42, 42)",
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+          "fontSize": "13px",
+          "lineHeight": "22.1px",
+          "display": "block"
+        },
+        "ring": {
+          "position": "fixed",
+          "zIndex": "999",
+          "width": "14px",
+          "height": "14px",
+          "borderTopWidth": "1px",
+          "borderTopColor": "rgb(27, 30, 35)",
+          "borderTopLeftRadius": "50%",
+          "transform": "matrix(1, 0, 0, 1, -8, -8)",
+          "pointerEvents": "none",
+          "display": "block"
+        },
+        "content": "839806057c3d1ac1"
+      },
+      "legend": {
+        "hidden": {
+          "pressed": [
+            "true",
+            "false",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 5005,
+          "lines": 43,
+          "nodes": 5394,
+          "html": "61ca77964f1d06ba",
+          "styles": "dab6899e538a8f9e"
+        },
+        "shown": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 5005,
+          "lines": 43,
+          "nodes": 5394,
+          "html": "953a99ffe53ad429",
+          "styles": "acb0c38139728ba1"
+        },
+        "alone": {
+          "pressed": [
+            "true",
+            "false",
+            "true",
+            "false",
+            "false",
+            "false"
+          ],
+          "charts": 1,
+          "circles": 5,
+          "lines": 43,
+          "nodes": 393,
+          "html": "b6575fdfc1bc4b7f",
+          "styles": "a678f145dacfd799"
+        },
+        "all": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 5005,
+          "lines": 43,
+          "nodes": 5394,
+          "html": "953a99ffe53ad429",
+          "styles": "acb0c38139728ba1"
+        },
+        "collapsed": {
+          "pressed": [],
+          "charts": 0,
+          "circles": 0,
+          "lines": 32,
+          "nodes": 315,
+          "html": "ebe386096c6d9fe2",
+          "styles": "f396c594c8fd23a2"
+        },
+        "expanded": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 5005,
+          "lines": 43,
+          "nodes": 5394,
+          "html": "953a99ffe53ad429",
+          "styles": "acb0c38139728ba1"
+        },
+        "restored": true
+      },
       "zoom": {
         "range": [
           "2026-09-06",
@@ -773,16 +1025,355 @@
             "0"
           ]
         ],
-        "svgs": 16,
-        "circles": 0,
-        "lines": 16,
-        "paths": 31,
+        "svgs": 22,
+        "circles": 5005,
+        "lines": 26,
+        "paths": 44,
         "anchors": 0,
-        "nodes": 276,
-        "bodyNodes": 409,
+        "nodes": 5352,
+        "bodyNodes": 5928,
         "inlineErrors": 0,
-        "html": "0aa08bc8cba0185a",
-        "styles": "42fe50d5e28f69fb"
+        "html": "f14e49fbbf37d4e8",
+        "styles": "548a301b85e7f937"
+      },
+      "errors": []
+    },
+    "ship-to-nightly, a landing by its D number, coloured by requester": {
+      "load": {
+        "tiles": [
+          [
+            "Land to published in a Nightly",
+            "p50 13 h 42 min p90 30 h 39 min p99 61 h 0 min"
+          ],
+          [
+            "Land to half of the Nightly clients on the fix",
+            "p50 63 h 35 min p95 91 h 53 min"
+          ],
+          [
+            "Nightly clients on the fix 24 h after it is published",
+            "28.6%"
+          ],
+          [
+            "Landings that took over 24 h to publish",
+            "17.3%"
+          ],
+          [
+            "Revisions landed",
+            "1,752"
+          ],
+          [
+            "Waiting in the Lando queue",
+            "p50 5 min p95 1 h 28 min"
+          ],
+          [
+            "On autoland until merged to main",
+            "p50 3 h 2 min p95 19 h 35 min"
+          ],
+          [
+            "Merged to main until its Nightly starts",
+            "p50 6 h 58 min p95 20 h 36 min"
+          ],
+          [
+            "Nightly build and publish",
+            "p50 2 h 35 min p95 2 h 52 min"
+          ],
+          [
+            "Merges to main",
+            "25"
+          ],
+          [
+            "Autoland tree closed",
+            "56 h 14 min"
+          ],
+          [
+            "Landings backed out",
+            "5.7%"
+          ],
+          [
+            "Backed out after a Nightly had published them",
+            "1"
+          ],
+          [
+            "In flight",
+            "0"
+          ],
+          [
+            "Oldest in flight",
+            "–"
+          ],
+          [
+            "Unmatched after 7 days",
+            "0"
+          ]
+        ],
+        "svgs": 30,
+        "circles": 1766,
+        "lines": 26,
+        "paths": 47,
+        "anchors": 0,
+        "nodes": 2135,
+        "bodyNodes": 2738,
+        "inlineErrors": 0,
+        "html": "14b09a540e216fbf",
+        "styles": "b307fe33460d8ce3"
+      },
+      "hover": {
+        "end to end": {
+          "tooltips": 5
+        },
+        "stages": {
+          "tooltips": 5
+        },
+        "landings": {
+          "tooltips": 4
+        }
+      },
+      "pin": {
+        "found": true,
+        "stays": true,
+        "releasedByEscape": true,
+        "releasedByClick": true,
+        "tooltip": {
+          "position": "fixed",
+          "zIndex": "1000",
+          "maxWidth": "520px",
+          "paddingTop": "8px",
+          "paddingLeft": "12px",
+          "borderTopLeftRadius": "4px",
+          "backgroundColor": "rgb(42, 42, 42)",
+          "color": "rgb(255, 255, 255)",
+          "fontFamily": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, sans-serif",
+          "fontSize": "13px",
+          "lineHeight": "22.1px",
+          "display": "block"
+        },
+        "ring": {
+          "position": "fixed",
+          "zIndex": "999",
+          "width": "14px",
+          "height": "14px",
+          "borderTopWidth": "1px",
+          "borderTopColor": "rgb(27, 30, 35)",
+          "borderTopLeftRadius": "50%",
+          "transform": "matrix(1, 0, 0, 1, -8, -8)",
+          "pointerEvents": "none",
+          "display": "block"
+        },
+        "content": "07ba1edc34599222"
+      },
+      "legend": {
+        "hidden": {
+          "pressed": [
+            "true",
+            "false",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 1663,
+          "lines": 26,
+          "nodes": 2032,
+          "html": "bca4ba670e4902f4",
+          "styles": "3947713e36dfa0ce"
+        },
+        "shown": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 1766,
+          "lines": 26,
+          "nodes": 2135,
+          "html": "44e18deb87e5c884",
+          "styles": "2c42748b21c14dc6"
+        },
+        "alone": {
+          "pressed": [
+            "true",
+            "false",
+            "true",
+            "false",
+            "false",
+            "false",
+            "false",
+            "false",
+            "false",
+            "false",
+            "false",
+            "false",
+            "false",
+            "false"
+          ],
+          "charts": 1,
+          "circles": 115,
+          "lines": 26,
+          "nodes": 484,
+          "html": "3ce93c8dc1516f77",
+          "styles": "56d8af64b37c2f21"
+        },
+        "all": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 1766,
+          "lines": 26,
+          "nodes": 2135,
+          "html": "44e18deb87e5c884",
+          "styles": "2c42748b21c14dc6"
+        },
+        "collapsed": {
+          "pressed": [],
+          "charts": 0,
+          "circles": 0,
+          "lines": 16,
+          "nodes": 281,
+          "html": "f5b0e65c4855b76b",
+          "styles": "f396c594c8fd23a2"
+        },
+        "expanded": {
+          "pressed": [
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true",
+            "true"
+          ],
+          "charts": 1,
+          "circles": 1766,
+          "lines": 26,
+          "nodes": 2135,
+          "html": "44e18deb87e5c884",
+          "styles": "2c42748b21c14dc6"
+        },
+        "restored": true
+      },
+      "zoom": {
+        "range": [
+          "2026-10-05",
+          "2026-10-07"
+        ],
+        "tiles": [
+          [
+            "Land to published in a Nightly",
+            "p50 13 h 46 min p90 27 h 3 min p99 39 h 54 min"
+          ],
+          [
+            "Land to half of the Nightly clients on the fix",
+            "p50 71 h 19 min p95 90 h 53 min"
+          ],
+          [
+            "Nightly clients on the fix 24 h after it is published",
+            "28.6%"
+          ],
+          [
+            "Landings that took over 24 h to publish",
+            "14.5%"
+          ],
+          [
+            "Revisions landed",
+            "992"
+          ],
+          [
+            "Waiting in the Lando queue",
+            "p50 5 min p95 1 h 37 min"
+          ],
+          [
+            "On autoland until merged to main",
+            "p50 2 h 58 min p95 9 h 25 min"
+          ],
+          [
+            "Merged to main until its Nightly starts",
+            "p50 2 h 34 min p95 29 h 43 min"
+          ],
+          [
+            "Nightly build and publish",
+            "p50 2 h 35 min p95 2 h 52 min"
+          ],
+          [
+            "Merges to main",
+            "14"
+          ],
+          [
+            "Autoland tree closed",
+            "22 h 51 min"
+          ],
+          [
+            "Landings backed out",
+            "5.2%"
+          ],
+          [
+            "Backed out after a Nightly had published them",
+            "1"
+          ],
+          [
+            "In flight",
+            "0"
+          ],
+          [
+            "Oldest in flight",
+            "–"
+          ],
+          [
+            "Unmatched after 7 days",
+            "0"
+          ]
+        ],
+        "svgs": 30,
+        "circles": 1005,
+        "lines": 23,
+        "paths": 40,
+        "anchors": 0,
+        "nodes": 1356,
+        "bodyNodes": 1971,
+        "inlineErrors": 0,
+        "html": "b5b0ef5fb1fbb435",
+        "styles": "b307fe33460d8ce3"
       },
       "errors": []
     }
