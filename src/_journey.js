@@ -24,14 +24,13 @@ export const STAGE_INFO = [
   {key: "build", title: "Nightly build and publish", color: "#5b6abf"}
 ];
 
-// The Lando queue and the time on autoland are told apart by whether the tree was
-// closed, which is what held up most of a long wait.
+// The Lando queue is told apart by whether the tree was closed, which is what held up
+// most of a long wait.
 export const CANDLE_SEGMENTS = [
   {key: "queueOpen", title: "Lando queue", color: "#6fbf8e"},
   {key: "queueClosed", title: "Lando queue, while autoland was closed", color: "#e07b7b"},
   {key: "lando", title: "Lando landing", color: "#237a4b"},
-  {key: "autolandOpen", title: "On autoland until merged to main", color: "#e0902c"},
-  {key: "autolandClosed", title: "On autoland, while it was closed", color: "#b3202a"},
+  {key: "autoland", title: "On autoland until merged to main", color: "#e0902c"},
   {key: "waiting", title: "Merged to main until the Nightly starts", color: "#cf5b82"},
   {key: "build", title: "Nightly build and publish", color: "#5b6abf"}
 ];
@@ -146,8 +145,8 @@ export function spansOf(journey, marks) {
   return {spans, end, kind};
 }
 
-// What a landing's bar is made of, in seconds. The Lando queue and the time on autoland
-// are each told apart by whether the tree was closed.
+// What a landing's bar is made of, in seconds. The Lando queue is told apart by whether
+// the tree was closed.
 export function candleOf(journey, marks) {
   const {spans, end, kind} = spansOf(journey, marks);
   const seconds = (stage) => {
@@ -155,14 +154,12 @@ export function candleOf(journey, marks) {
     return span ? span.end - span.start : 0;
   };
   const queueClosed = Math.min(journey.queueClosed ?? 0, seconds("queue"));
-  const autolandClosed = Math.min(journey.autolandClosed ?? 0, seconds("autoland"));
   return {
     segments: {
       queueOpen: seconds("queue") - queueClosed,
       queueClosed,
       lando: seconds("lando"),
-      autolandOpen: seconds("autoland") - autolandClosed,
-      autolandClosed,
+      autoland: seconds("autoland"),
       waiting: seconds("waiting"),
       build: seconds("build")
     },

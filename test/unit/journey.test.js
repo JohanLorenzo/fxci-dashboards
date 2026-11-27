@@ -206,7 +206,7 @@ describe("matchesQuery", () => {
 
 describe("the candle segments", () => {
   test("go from what happens first to what happens last", () => {
-    assert.deepEqual(CANDLE_SEGMENTS.map(({key}) => key), ["queueOpen", "queueClosed", "lando", "autolandOpen", "autolandClosed", "waiting", "build"]);
+    assert.deepEqual(CANDLE_SEGMENTS.map(({key}) => key), ["queueOpen", "queueClosed", "lando", "autoland", "waiting", "build"]);
     assert.ok(CANDLE_SEGMENTS.every(({title, color}) => title && /^#[0-9a-f]{6}$/i.test(color)));
     assert.equal(new Set(CANDLE_SEGMENTS.map(({color}) => color)).size, CANDLE_SEGMENTS.length);
   });
@@ -219,7 +219,7 @@ describe("candleOf", () => {
 
   test("stacks every stage up to the publication for a landing that shipped", () => {
     const {segments, total, end, kind} = candle();
-    assert.deepEqual(segments, {queueOpen: 300, queueClosed: 0, lando: 120, autolandOpen: 6 * HOUR - 420 - 1800, autolandClosed: 1800, waiting: 2 * HOUR, build: 2 * HOUR});
+    assert.deepEqual(segments, {queueOpen: 300, queueClosed: 0, lando: 120, autoland: 6 * HOUR - 420, waiting: 2 * HOUR, build: 2 * HOUR});
     assert.equal(kind, "shipped");
     assert.equal(end, T0 + 10 * HOUR);
     assert.equal(total, 10 * HOUR);
@@ -232,12 +232,10 @@ describe("candleOf", () => {
     assert.equal(segments.queueClosed, 200);
   });
 
-  test("does not count more closed time than the stage lasted", () => {
-    const {segments, total} = candle({queue_closed_s: 99999, autoland_closed_s: 99 * HOUR});
+  test("does not count more closed time than the Lando queue lasted", () => {
+    const {segments, total} = candle({queue_closed_s: 99999});
     assert.equal(segments.queueClosed, 300);
     assert.equal(segments.queueOpen, 0);
-    assert.equal(segments.autolandClosed, 6 * HOUR - 420);
-    assert.equal(segments.autolandOpen, 0);
     assert.equal(sum(segments), total);
   });
 
@@ -247,7 +245,7 @@ describe("candleOf", () => {
     assert.equal(end, T0 + 5 * HOUR);
     assert.equal(segments.waiting, 0);
     assert.equal(segments.build, 0);
-    assert.equal(segments.autolandOpen + segments.autolandClosed, 5 * HOUR - 420);
+    assert.equal(segments.autoland, 5 * HOUR - 420);
     assert.equal(sum(segments), total);
   });
 
