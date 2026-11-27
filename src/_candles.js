@@ -10,6 +10,8 @@ import {attachPlotHover, nearestBar} from "./_tooltip.js";
 // chart. Segments hidden by the legend are left out and the others close ranks, so
 // the dot is at the top of what is left. The bars of a segment are one path, because
 // the time the page takes to react to the pointer grows with the number of elements.
+// `extraHit` finds what is under the pointer when no bar is, for what the chart draws
+// besides the bars.
 export function candleChart({
   items,
   segments,
@@ -23,6 +25,7 @@ export function candleChart({
   hitRadius = 8,
   tooltip,
   show,
+  extraHit = null,
   before = [],
   after = null,
   drawnHours = (item, topHours) => topHours(item)
@@ -63,7 +66,7 @@ export function candleChart({
   const x = plot.scale("x");
   const y = plot.scale("y");
   const points = ends.map((item) => ({item, x: x.apply(item.time), y: y.apply(drawnHours(item, topHours)), baseline: y.apply(0)}));
-  attachPlotHover(tooltip, plot, (px, py) => nearestBar(points, px, py, {barWidth, hitRadius}), show);
+  attachPlotHover(tooltip, plot, (px, py) => nearestBar(points, px, py, {barWidth, hitRadius}) ?? extraHit?.(px, py) ?? null, show);
   return plot;
 }
 

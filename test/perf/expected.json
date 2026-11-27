@@ -507,7 +507,7 @@
           "tooltips": 16
         },
         "candles": {
-          "tooltips": 21
+          "tooltips": 74
         }
       },
       "pin": {
@@ -537,11 +537,11 @@
           "borderTopWidth": "1px",
           "borderTopColor": "rgb(27, 30, 35)",
           "borderTopLeftRadius": "50%",
-          "transform": "matrix(1, 0, 0, 1, -7, -7)",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
           "pointerEvents": "none",
-          "display": "block"
+          "display": "none"
         },
-        "content": "7709c83ae91dcdc3"
+        "content": "08e892aff00f550f"
       },
       "legend": {
         "hidden": {
@@ -559,7 +559,7 @@
           "circles": 7175,
           "lines": 32,
           "nodes": 8316,
-          "html": "a934dc5c5589ac4a",
+          "html": "552c8e57530830ec",
           "styles": "7cd6f012dd15c246"
         },
         "shown": {
@@ -577,7 +577,7 @@
           "circles": 7175,
           "lines": 32,
           "nodes": 8317,
-          "html": "49b36fe1a5206ded",
+          "html": "f9060a29d23e1466",
           "styles": "36cadebea8b32894"
         },
         "alone": {
@@ -595,7 +595,7 @@
           "circles": 7175,
           "lines": 32,
           "nodes": 8311,
-          "html": "684e040261e2779d",
+          "html": "670b21b3e311793e",
           "styles": "ffede6c08e673b5f"
         },
         "all": {
@@ -613,7 +613,7 @@
           "circles": 7175,
           "lines": 32,
           "nodes": 8317,
-          "html": "49b36fe1a5206ded",
+          "html": "f9060a29d23e1466",
           "styles": "36cadebea8b32894"
         },
         "collapsed": {
@@ -622,7 +622,7 @@
           "circles": 0,
           "lines": 22,
           "nodes": 224,
-          "html": "072fd4e4c1504b5c",
+          "html": "2b119d1d73cbf6c3",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -640,7 +640,7 @@
           "circles": 7175,
           "lines": 32,
           "nodes": 8317,
-          "html": "49b36fe1a5206ded",
+          "html": "f9060a29d23e1466",
           "styles": "36cadebea8b32894"
         },
         "restored": true
@@ -776,7 +776,7 @@
           "tooltips": 46
         },
         "candles": {
-          "tooltips": 8
+          "tooltips": 66
         }
       },
       "pin": {
@@ -806,11 +806,11 @@
           "borderTopWidth": "1px",
           "borderTopColor": "rgb(27, 30, 35)",
           "borderTopLeftRadius": "50%",
-          "transform": "matrix(1, 0, 0, 1, -7, -7)",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
           "pointerEvents": "none",
-          "display": "block"
+          "display": "none"
         },
-        "content": "2bc2b9a447729ddd"
+        "content": "b797bfcaaf08bf25"
       },
       "legend": {
         "hidden": {
@@ -828,7 +828,7 @@
           "circles": 7444,
           "lines": 33,
           "nodes": 9210,
-          "html": "adf006386152f883",
+          "html": "605f8975cbef0b48",
           "styles": "df9694860ea521c7"
         },
         "shown": {
@@ -846,7 +846,7 @@
           "circles": 7444,
           "lines": 33,
           "nodes": 9211,
-          "html": "8190a2bb906c95b6",
+          "html": "5cd3a79d7746a49b",
           "styles": "2b3dea2cbfdf9590"
         },
         "alone": {
@@ -864,7 +864,7 @@
           "circles": 7444,
           "lines": 33,
           "nodes": 9205,
-          "html": "6cbb62dcc75d11c8",
+          "html": "802842e13e9c93d5",
           "styles": "c924056a78f79a2e"
         },
         "all": {
@@ -882,7 +882,7 @@
           "circles": 7444,
           "lines": 33,
           "nodes": 9211,
-          "html": "8190a2bb906c95b6",
+          "html": "5cd3a79d7746a49b",
           "styles": "2b3dea2cbfdf9590"
         },
         "collapsed": {
@@ -891,7 +891,7 @@
           "circles": 0,
           "lines": 22,
           "nodes": 224,
-          "html": "811ca885b07f8018",
+          "html": "5ef946b9c97e9375",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -909,7 +909,7 @@
           "circles": 7444,
           "lines": 33,
           "nodes": 9211,
-          "html": "8190a2bb906c95b6",
+          "html": "5cd3a79d7746a49b",
           "styles": "2b3dea2cbfdf9590"
         },
         "restored": true
@@ -1045,7 +1045,7 @@
           "tooltips": 5
         },
         "candles": {
-          "tooltips": 23
+          "tooltips": 65
         }
       },
       "pin": {
@@ -1075,11 +1075,11 @@
           "borderTopWidth": "1px",
           "borderTopColor": "rgb(27, 30, 35)",
           "borderTopLeftRadius": "50%",
-          "transform": "matrix(1, 0, 0, 1, -7, -7)",
+          "transform": "matrix(1, 0, 0, 1, 0, 0)",
           "pointerEvents": "none",
-          "display": "block"
+          "display": "none"
         },
-        "content": "8c0d79c55b0b52e3"
+        "content": "e5d2ce27abc24cd9"
       },
       "legend": {
         "hidden": {
@@ -1097,7 +1097,7 @@
           "circles": 1655,
           "lines": 19,
           "nodes": 2130,
-          "html": "70b422a46d848cda",
+          "html": "748f90f726242cb6",
           "styles": "7cd6f012dd15c246"
         },
         "shown": {
@@ -1115,7 +1115,7 @@
           "circles": 1655,
           "lines": 19,
           "nodes": 2131,
-          "html": "7fc12b61c7db6163",
+          "html": "519aa5333dbe60eb",
           "styles": "36cadebea8b32894"
         },
         "alone": {
@@ -1133,7 +1133,7 @@
           "circles": 1655,
           "lines": 19,
           "nodes": 2125,
-          "html": "9259bb56ff802cb8",
+          "html": "603219cfc0c480b7",
           "styles": "ffede6c08e673b5f"
         },
         "all": {
@@ -1151,7 +1151,7 @@
           "circles": 1655,
           "lines": 19,
           "nodes": 2131,
-          "html": "7fc12b61c7db6163",
+          "html": "519aa5333dbe60eb",
           "styles": "36cadebea8b32894"
         },
         "collapsed": {
@@ -1160,7 +1160,7 @@
           "circles": 0,
           "lines": 11,
           "nodes": 202,
-          "html": "dde1aa5620bf8458",
+          "html": "cc08003ebde59844",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -1178,7 +1178,7 @@
           "circles": 1655,
           "lines": 19,
           "nodes": 2131,
-          "html": "7fc12b61c7db6163",
+          "html": "519aa5333dbe60eb",
           "styles": "36cadebea8b32894"
         },
         "restored": true

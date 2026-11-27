@@ -3,6 +3,7 @@ import {describe, test} from "node:test";
 import {
   candleOf,
   CANDLE_SEGMENTS,
+  closureSummary,
   durationsOf,
   formatDuration,
   inCohort,
@@ -324,5 +325,47 @@ describe("spansOf", () => {
 describe("formatDuration", () => {
   test("says seconds, minutes, or hours and minutes", () => {
     assert.deepEqual([0, 59, 60, 90, 3599, 3600, 11940, 70 * 3600 + 300].map(formatDuration), ["0 s", "59 s", "1 min", "2 min", "1 h 0 min", "1 h 0 min", "3 h 19 min", "70 h 5 min"]);
+  });
+});
+
+describe("closureSummary", () => {
+  const at = (overrides) => journeyOf(row(overrides));
+  const journeys = [
+    at({revision_id: 1, land_requested_s: T0 - 1800, lando_started_s: T0 - 1800 + 60, autoland_pushed_s: T0 - 1800 + 120, autoland_rev: "before"}),
+    at({revision_id: 2, land_requested_s: T0 + HOUR, lando_started_s: T0 + 3 * HOUR, autoland_pushed_s: T0 + 2 * HOUR + 1800, autoland_rev: "during-a"}),
+    at({revision_id: 3, land_requested_s: T0 + 2 * HOUR, lando_started_s: T0 + 3 * HOUR, autoland_pushed_s: T0 + 2 * HOUR + 2400, autoland_rev: "during-b"}),
+    at({revision_id: 4, land_requested_s: T0 - 5 * HOUR, lando_started_s: T0 - 5 * HOUR + 60, autoland_pushed_s: T0 - 5 * HOUR + 120, autoland_rev: "long-before", backed_out: true, backout_by: "sheriff-a", backout_s: T0 + 2 * HOUR}),
+    at({revision_id: 5, land_requested_s: T0 + 9 * HOUR, lando_started_s: T0 + 9 * HOUR + 60, autoland_pushed_s: T0 + 9 * HOUR + 120, autoland_rev: "after"})
+  ];
+  const closed = [T0, T0 + 3 * HOUR];
+
+  test("counts the revisions that asked to land during it, and the longest wait of them", () => {
+    const summary = closureSummary(journeys, ...closed);
+    assert.equal(summary.requested, 2);
+    assert.equal(summary.longestWait, 2 * HOUR);
+  });
+
+  test("lists the revisions that were backed out during it, once each", () => {
+    const stack = [...journeys, at({revision_id: 4, backed_out: true, backout_by: "sheriff-a", backout_s: T0 + 2 * HOUR})];
+    assert.deepEqual(closureSummary(stack, ...closed).backedOut, [4]);
+  });
+
+  test("gives the first and the last push to autoland from an hour before it began until it ended", () => {
+    const summary = closureSummary(journeys, ...closed);
+    assert.equal(summary.firstPush, "before");
+    assert.equal(summary.lastPush, "during-b");
+    assert.equal(closureSummary(journeys, ...closed, {leadS: 0}).firstPush, "during-a");
+  });
+
+  test("has nothing to say about a closure that nothing happened in", () => {
+    assert.deepEqual(closureSummary(journeys, T0 + 20 * HOUR, T0 + 21 * HOUR, {leadS: 0}), {requested: 0, longestWait: null, backedOut: [], firstPush: null, lastPush: null});
+  });
+
+  test("leaves out the pushes that are not matched to a revision of autoland yet", () => {
+    const unpushed = [at({autoland_rev: null, autoland_pushed_s: null, land_requested_s: T0 + HOUR, lando_started_s: null})];
+    const summary = closureSummary(unpushed, ...closed);
+    assert.equal(summary.requested, 1);
+    assert.equal(summary.longestWait, null);
+    assert.equal(summary.firstPush, null);
   });
 });

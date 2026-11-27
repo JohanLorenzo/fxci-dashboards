@@ -8,7 +8,7 @@ toc: false
 How long a patch takes from "Land" in Phabricator to a Nightly that people run.
 
 ```js
-import {candleOf, CANDLE_SEGMENTS, durationsOf, inCohort, journeyOf, matchesQuery, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, STAGE_INFO, statusOf, UNMATCHED_AFTER_S, watermarksOf} from "./_journey.js";
+import {candleOf, CANDLE_SEGMENTS, closureSummary, durationsOf, inCohort, journeyOf, matchesQuery, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, STAGE_INFO, statusOf, UNMATCHED_AFTER_S, watermarksOf} from "./_journey.js";
 import {journeyProfile} from "./_journey-profile.js";
 import {openProfile} from "./_profiler.js";
 import {createTooltip, timelineLink} from "./_tooltip.js";
@@ -52,7 +52,10 @@ const closures = closureRows
   .map((row) => ({kind: "closure", time: secondsToDate(row.start_s), hours: (row.end_s - row.start_s) / 3600}));
 const closedPeriods = closureRows
   .filter((row) => row.status === "closed")
-  .map((row) => ({start: secondsToDate(row.start_s), end: secondsToDate(row.end_s ?? marks.landoUntil)}));
+  .map((row) => {
+    const endS = row.end_s ?? marks.landoUntil;
+    return {start: secondsToDate(row.start_s), end: secondsToDate(endS), startS: row.start_s, endS, tag: row.reason_tag};
+  });
 
 const DATA_FIRST_DAY = d3.utcDay.floor(secondsToDate(d3.min(journeys, (journey) => journey.requested)));
 const DATA_LAST_DAY = d3.utcDay.floor(secondsToDate(marks.landoUntil));
@@ -226,6 +229,19 @@ function landingLines(landing, linkRequester = true) {
     <div class="bw-tt-sep"></div>
     <div class="bw-tt-links">${landingLinks(landing)}</div>`;
 }
+
+const revisionLink = (revision) => htl.html`<a href="?revision=D${revision}">D${revision}</a>`;
+const MAX_LISTED = 6;
+
+function closureLines({startS, endS, start, tag}) {
+  const {requested, longestWait, backedOut, firstPush, lastPush} = closureSummary(journeys, startS, endS);
+  const range = firstPush === lastPush ? `revision=${firstPush}` : `fromchange=${firstPush}&tochange=${lastPush}`;
+  return htl.html`<span><b>Autoland closed</b>${tag ? `, ${tag.replaceAll("_", " ")}` : ""}</span>
+    <span>${formatTime(start)}, for ${hoursText(endS - startS)}</span>
+    ${requested ? htl.html`<span class="bw-tt-pool">${countOf(requested, "revision")} asked to land during it${longestWait ? `, the longest waited ${hoursText(longestWait)} in the Lando queue` : ""}</span>` : ""}
+    ${backedOut.length ? htl.html`<div class="bw-tt-links">backed out during it: ${backedOut.slice(0, MAX_LISTED).map(revisionLink)}${backedOut.length > MAX_LISTED ? ` and ${backedOut.length - MAX_LISTED} more` : ""}</div>` : ""}
+    ${firstPush ? htl.html`<div class="bw-tt-sep"></div><div class="bw-tt-links">${external(`${TREEHERDER_URL}/jobs?repo=autoland&${range}`, "→ Treeherder, the pushes from an hour before it")}</div>` : ""}`;
+}
 ```
 
 ```js
@@ -272,8 +288,22 @@ const candleGroups = () => [
 ];
 
 function showCandle(event, point, chartRect) {
+  if (point.band) {
+    if (tooltip.open(event, point.band, closureLines(point.band))) tooltip.hideRing();
+    return;
+  }
   if (!tooltip.open(event, point.item, landingLines(point.item))) return;
   tooltip.showRing(chartRect, point, 12);
+}
+
+// The closure under the pointer, if the pointer is within the plot and a closure was
+// going on at the time it points to.
+function closureAt(px, py, {width, domain}) {
+  const inside = px >= MARGINS.left && px <= width - MARGINS.right && py >= MARGINS.top && py <= CANDLES_HEIGHT - MARGINS.bottom;
+  if (!inside) return null;
+  const time = +domain[0] + ((px - MARGINS.left) / (width - MARGINS.left - MARGINS.right)) * (+domain[1] - +domain[0]);
+  const band = closedPeriods.find(({start, end}) => +start <= time && time < +end);
+  return band ? {band, x: px, y: py} : null;
 }
 
 // A bar for each landing at the moment it was requested, stacked from what happened
@@ -299,6 +329,7 @@ function candlesChart({shown, width, hidden, domain}) {
     hitRadius: HIT_RADIUS,
     tooltip,
     show: showCandle,
+    extraHit: hidden.has(CLOSURES_KEY) ? null : (px, py) => closureAt(px, py, {width, domain}),
     before: [
       eventRule(domain, new Set(), {key: CUTOFF_KEY, date: publishCutoff}),
       ...(hidden.has(CLOSURES_KEY) ? [] : [Plot.rectX(closuresIn(domain), {x1: "start", x2: "end", fill: BACKOUT_COLOR, fillOpacity: 0.15})])
