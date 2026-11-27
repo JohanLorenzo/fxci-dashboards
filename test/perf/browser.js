@@ -127,8 +127,12 @@ export async function pageFacts(page, {root, tiles}) {
           const style = getComputedStyle(element);
           return `${element.tagName}.${element.getAttribute("class") ?? ""}|${properties.map((property) => style[property]).join("|")}`;
         });
+      // A crosshair keeps the inline style that the last pointer move gave it, and the browser
+      // decides when a chart that was redrawn under the pointer gets that move.
+      const clone = box.cloneNode(true);
+      for (const crosshair of clone.querySelectorAll(".bw-crosshair")) crosshair.removeAttribute("style");
       return {
-        html: box.outerHTML,
+        html: clone.outerHTML,
         styles: styled.join("\n"),
         tiles: tiles ? [...box.querySelectorAll(tiles.item)].map((tile) => [text(tile.querySelector(tiles.title)), text(tile.querySelector(tiles.value))]) : [],
         svgs: box.querySelectorAll("svg").length,
