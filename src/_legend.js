@@ -90,6 +90,7 @@ export const LEGEND_MARKERS = {
   diamond: (color) => svg`<svg width="10" height="10" aria-hidden="true"><path d="M5 0.8L9.2 5L5 9.2L0.8 5Z" fill="none" stroke="${color}" stroke-width="1.6"></path></svg>`,
   triangle: (color) => svg`<svg width="10" height="10" aria-hidden="true"><path d="M5 0.9L9.3 9H0.7Z" fill="none" stroke="${color}" stroke-width="1.6" stroke-linejoin="round"></path></svg>`,
   square: (color) => svg`<svg width="10" height="10" aria-hidden="true"><rect x="1" y="1" width="8" height="8" fill="none" stroke="${color}" stroke-width="1.6"></rect></svg>`,
+  rule: (color, alpha) => svg`<svg width="10" height="10" aria-hidden="true"><path d="M5 0V10" stroke="${color}" stroke-opacity="${Math.min(1, alpha + 0.2)}" stroke-width="1.6"></path></svg>`,
   swatch: (color, alpha) => svg`<svg width="10" height="10" aria-hidden="true"><rect width="10" height="10" rx="2" fill="${color}" fill-opacity="${Math.min(1, alpha + 0.2)}"></rect></svg>`,
   event: () => svg`<svg width="18" height="10" aria-hidden="true"><path d="M0 5H18" stroke="currentColor" stroke-opacity="0.6" stroke-width="1.4" stroke-dasharray="2 3"></path></svg>`
 };

@@ -10,6 +10,7 @@ import {
   journeyOf,
   matchesQuery,
   mergesOf,
+  nightliesOf,
   parseRevision,
   PUBLISH_HORIZON_S,
   quantile,
@@ -145,8 +146,36 @@ describe("mergesOf", () => {
     assert.deepEqual(mergesOf(journeys).map(({rev, merged}) => [rev, merged]), [["x", T0 + 6 * HOUR], ["y", T0 + 9 * HOUR]]);
   });
 
+  test("counts the revisions each merge carried", () => {
+    const journeys = [
+      journeyOf(row({revision_id: 1, central_rev: "x"})),
+      journeyOf(row({revision_id: 2, central_rev: "x"})),
+      journeyOf(row({revision_id: 3, central_rev: "y", merged_s: T0 + 9 * HOUR}))
+    ];
+    assert.deepEqual(mergesOf(journeys).map(({rev, landed}) => [rev, landed]), [["x", 2], ["y", 1]]);
+  });
+
   test("leaves out the landings that are not merged yet", () => {
     assert.deepEqual(mergesOf([journeyOf(row({central_rev: null, merged_s: null}))]), []);
+  });
+});
+
+describe("nightliesOf", () => {
+  test("lists each Nightly once, when it started, with the revisions it published", () => {
+    const journeys = [
+      journeyOf(row({revision_id: 1, nightly_decision_id: "late", nightly_started_s: T0 + 9 * HOUR})),
+      journeyOf(row({revision_id: 2, nightly_decision_id: "early"})),
+      journeyOf(row({revision_id: 3, nightly_decision_id: "early"})),
+      journeyOf(row({revision_id: 4, nightly_decision_id: "late", nightly_started_s: T0 + 9 * HOUR, nightly_published_s: null}))
+    ];
+    assert.deepEqual(nightliesOf(journeys).map(({decisionId, started, landed}) => [decisionId, started, landed]), [
+      ["early", T0 + 8 * HOUR, 2],
+      ["late", T0 + 9 * HOUR, 1]
+    ]);
+  });
+
+  test("leaves out the landings that no Nightly has started on", () => {
+    assert.deepEqual(nightliesOf([journeyOf(row({nightly_decision_id: null, nightly_started_s: null, nightly_published_s: null}))]), []);
   });
 });
 

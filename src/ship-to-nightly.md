@@ -8,7 +8,7 @@ toc: false
 How long a patch takes from "Land" in Phabricator to a Nightly that people run.
 
 ```js
-import {candleOf, CANDLE_SEGMENTS, closureSummary, durationsOf, inCohort, journeyOf, matchesQuery, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, STAGE_INFO, statusOf, UNMATCHED_AFTER_S, watermarksOf} from "./_journey.js";
+import {candleOf, CANDLE_SEGMENTS, closureSummary, durationsOf, inCohort, journeyOf, matchesQuery, mergesOf, nightliesOf, parseRevision, PUBLISH_HORIZON_S, quantile, STAGE_INFO, statusOf, UNMATCHED_AFTER_S, watermarksOf} from "./_journey.js";
 import {journeyProfile} from "./_journey-profile.js";
 import {openProfile} from "./_profiler.js";
 import {createTooltip, timelineLink} from "./_tooltip.js";
@@ -46,7 +46,8 @@ const landings = journeys
     };
   })
   .sort((a, b) => a.time - b.time);
-const merges = mergesOf(journeys).map((merge) => ({kind: "merge", time: secondsToDate(merge.merged)}));
+const merges = mergesOf(journeys).map(({merged, ...merge}) => ({kind: "merge", time: secondsToDate(merged), ...merge}));
+const nightlies = nightliesOf(journeys).map((nightly) => ({kind: "nightly", time: secondsToDate(nightly.started), ...nightly}));
 const closures = closureRows
   .filter((row) => row.status === "closed" && row.end_s !== null)
   .map((row) => ({kind: "closure", time: secondsToDate(row.start_s), days: (row.end_s - row.start_s) / 86400}));
@@ -159,7 +160,7 @@ const METRICS = [
 const CUTOFF_KEY = "cohort";
 const publishCutoff = secondsToDate(publishUntil - PUBLISH_HORIZON_S);
 const METRICS_TITLE = {chartKey: "chart-metrics", title: "Top line metrics"};
-const E2E_TITLE = {chartKey: "chart-endtoend", title: "From Land to a Nightly that people run"};
+const E2E_TITLE = {chartKey: "chart-endtoend", title: "From Land to a shipped Nightly"};
 const CANDLES_HEIGHT = 300;
 const MAX_CANDLES = 8000;
 const HIT_RADIUS = 8;
@@ -169,6 +170,7 @@ const HIT_RADIUS = 8;
 // The tooltip is defined in the same cell as what uses it to filter by requester, as a
 // cell may not depend on one that depends on it.
 const tooltip = createTooltip({invalidation});
+const TC_URL = "https://firefox-ci-tc.services.mozilla.com";
 const TREEHERDER_URL = "https://treeherder.mozilla.org";
 const external = (href, text) => htl.html`<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
 
@@ -225,6 +227,23 @@ function landingLines(landing, linkRequester = true) {
     <div class="bw-tt-links">${landingLinks(landing)}</div>`;
 }
 
+function nightlyLines({decisionId, time, started, published, landed}) {
+  return htl.html`<span><b>Nightly started</b></span>
+    <span>${formatTime(time)}</span>
+    ${published !== null ? htl.html`<span class="bw-tt-pool">published ${hoursText(published - started)} later</span>` : ""}
+    ${landed ? htl.html`<span class="bw-tt-pool">${countOf(landed, "revision")} published in it</span>` : ""}
+    <div class="bw-tt-sep"></div>
+    <div class="bw-tt-links">${external(`${TC_URL}/tasks/${decisionId}`, "→ Taskcluster, its decision task")}</div>`;
+}
+
+function mergeLines({rev, time, by, landed}) {
+  return htl.html`<span><b>Merged to main</b></span>
+    <span>${formatTime(time)}</span>
+    <span class="bw-tt-pool">${by ? `by ${by}, ` : ""}${countOf(landed, "revision")} from autoland</span>
+    <div class="bw-tt-sep"></div>
+    <div class="bw-tt-links">${external(`${TREEHERDER_URL}/jobs?repo=mozilla-central&revision=${rev}`, "→ Treeherder, its push")}</div>`;
+}
+
 const revisionLink = (revision) => htl.html`<a href="?revision=D${revision}">D${revision}</a>`;
 const MAX_LISTED = 6;
 
@@ -272,6 +291,12 @@ const END_KINDS = [
 const endKeyOf = (kind) => END_KINDS.find((end) => end.kind === kind).key;
 const swatch = ({key, title, color}) => ({key, title, marker: () => LEGEND_MARKERS.swatch(color, 0.8)});
 const CLOSURES_KEY = "closures";
+const NIGHTLY_KEY = "nightly-starts";
+const MERGE_KEY = "merges-to-main";
+const MARKS = {
+  nightly: {key: NIGHTLY_KEY, color: "#1b8a9e", opacity: 0.6, width: 1.5},
+  merge: {key: MERGE_KEY, color: "#8a4fb5", opacity: 0.4, width: 1}
+};
 const closuresIn = ([from, to]) =>
   closedPeriods
     .filter(({start, end}) => start < to && end > from)
@@ -279,10 +304,22 @@ const closuresIn = ([from, to]) =>
 const candleGroups = () => [
   {title: "Stage", entries: CANDLE_SEGMENTS.map(swatch)},
   {title: "Autoland", entries: [{key: CLOSURES_KEY, title: "was closed", marker: () => LEGEND_MARKERS.swatch(BACKOUT_COLOR, 0)}]},
+  {
+    title: "Time markers",
+    entries: [
+      {key: NIGHTLY_KEY, title: "a Nightly started", marker: () => LEGEND_MARKERS.rule(MARKS.nightly.color, MARKS.nightly.opacity)},
+      {key: MERGE_KEY, title: "a merge to main", marker: () => LEGEND_MARKERS.rule(MARKS.merge.color, MARKS.merge.opacity)}
+    ]
+  },
   {title: "A candle ends when it", entries: END_KINDS.map(({key, title, marker}) => ({key, title, marker}))}
 ];
 
 function showCandle(event, point, chartRect) {
+  if (point.marker) {
+    const lines = point.marker.kind === "nightly" ? nightlyLines(point.marker) : mergeLines(point.marker);
+    if (tooltip.open(event, point.marker, lines)) tooltip.hideRing();
+    return;
+  }
   if (point.band) {
     if (tooltip.open(event, point.band, closureLines(point.band))) tooltip.hideRing();
     return;
@@ -291,14 +328,35 @@ function showCandle(event, point, chartRect) {
   tooltip.showRing(chartRect, point, 12);
 }
 
-// The closure under the pointer, if the pointer is within the plot and a closure was
-// going on at the time it points to.
-function closureAt(px, py, {width, domain}) {
+const MARKER_REACH = 4;
+
+// The time the pointer points to, if it is within the plot.
+function timeAt(px, py, {width, domain}) {
   const inside = px >= MARGINS.left && px <= width - MARGINS.right && py >= MARGINS.top && py <= CANDLES_HEIGHT - MARGINS.bottom;
-  if (!inside) return null;
-  const time = +domain[0] + ((px - MARGINS.left) / (width - MARGINS.left - MARGINS.right)) * (+domain[1] - +domain[0]);
-  const band = closedPeriods.find(({start, end}) => +start <= time && time < +end);
+  return inside ? +domain[0] + ((px - MARGINS.left) / (width - MARGINS.left - MARGINS.right)) * (+domain[1] - +domain[0]) : null;
+}
+
+// The closure going on at the time the pointer points to.
+function closureAt(px, py, frame) {
+  const time = timeAt(px, py, frame);
+  const band = time === null ? null : closedPeriods.find(({start, end}) => +start <= time && time < +end);
   return band ? {band, x: px, y: py} : null;
+}
+
+// The time marker within reach of the pointer, the nearest if there are several.
+function markerAt(px, py, frame, markers) {
+  const time = timeAt(px, py, frame);
+  if (time === null) return null;
+  const reach = (MARKER_REACH * (+frame.domain[1] - +frame.domain[0])) / (frame.width - MARGINS.left - MARGINS.right);
+  const near = markers.filter((marker) => Math.abs(+marker.time - time) <= reach);
+  const nearest = near.reduce((best, marker) => (!best || Math.abs(+marker.time - time) < Math.abs(+best.time - time) ? marker : best), null);
+  return nearest ? {marker: nearest, x: px, y: py} : null;
+}
+
+// A thin line from the bottom to the top of the plot at each time, as one path.
+function markerLines(times, {color, opacity, width}, maxHours) {
+  const points = times.flatMap((time) => [{time, hours: 0}, {time, hours: maxHours * 1.05}, {time, hours: null}]);
+  return Plot.line(points, {x: "time", y: "hours", stroke: color, strokeOpacity: opacity, strokeWidth: width});
 }
 
 // A bar for each landing at the moment it was requested, stacked from what happened
@@ -311,6 +369,14 @@ function candlesChart({shown, width, hidden, domain}) {
   const maxHours = Math.max(1, d3.max(shown, (landing) => landing.candle.total) / 3600);
   const barWidth = Math.min(5, Math.max(1, (width - MARGINS.left - MARGINS.right) / Math.max(1, items.length)));
   const chosen = new Set(selectedLandings);
+  const frame = {width, domain};
+  const marked = [
+    {items: nightlies, ...MARKS.nightly},
+    {items: merges, ...MARKS.merge}
+  ]
+    .filter(({key}) => !hidden.has(key))
+    .map((mark) => ({...mark, items: mark.items.filter(({time}) => inDomain(domain, time))}));
+  const markers = marked.flatMap(({items}) => items);
   const plot = candleChart({
     items,
     segments: CANDLE_SEGMENTS,
@@ -324,10 +390,11 @@ function candlesChart({shown, width, hidden, domain}) {
     hitRadius: HIT_RADIUS,
     tooltip,
     show: showCandle,
-    extraHit: hidden.has(CLOSURES_KEY) ? null : (px, py) => closureAt(px, py, {width, domain}),
+    extraHit: (px, py) => markerAt(px, py, frame, markers) ?? (hidden.has(CLOSURES_KEY) ? null : closureAt(px, py, frame)),
     before: [
       eventRule(domain, new Set(), {key: CUTOFF_KEY, date: publishCutoff}),
-      ...(hidden.has(CLOSURES_KEY) ? [] : [Plot.rectX(closuresIn(domain), {x1: "start", x2: "end", fill: BACKOUT_COLOR, fillOpacity: 0.15})])
+      ...(hidden.has(CLOSURES_KEY) ? [] : [Plot.rectX(closuresIn(domain), {x1: "start", x2: "end", fill: BACKOUT_COLOR, fillOpacity: 0.15})]),
+      ...marked.map(({items, ...style}) => markerLines(items.map(({time}) => time), style, maxHours))
     ],
     after: ({topHours, ends}) => {
       const ended = (kind) => ends.filter((landing) => landing.candle.kind === kind);

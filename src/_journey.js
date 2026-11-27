@@ -189,9 +189,23 @@ export function watermarksOf(rows) {
 export function mergesOf(journeys) {
   const merges = new Map();
   for (const {centralRev, merged, mergedBy} of journeys) {
-    if (centralRev !== null && merged !== null && !merges.has(centralRev)) merges.set(centralRev, {rev: centralRev, merged, by: mergedBy});
+    if (centralRev === null || merged === null) continue;
+    const merge = merges.get(centralRev) ?? {rev: centralRev, merged, by: mergedBy, landed: 0};
+    merge.landed += 1;
+    merges.set(centralRev, merge);
   }
   return [...merges.values()].sort((a, b) => a.merged - b.merged);
+}
+
+export function nightliesOf(journeys) {
+  const nightlies = new Map();
+  for (const {decisionId, nightlyStarted, published} of journeys) {
+    if (decisionId === null || nightlyStarted === null) continue;
+    const nightly = nightlies.get(decisionId) ?? {decisionId, started: nightlyStarted, published, landed: 0};
+    if (published !== null) nightly.landed += 1;
+    nightlies.set(decisionId, nightly);
+  }
+  return [...nightlies.values()].sort((a, b) => a.started - b.started);
 }
 
 // What went on while the tree was closed from startS to endS: the revisions that asked to

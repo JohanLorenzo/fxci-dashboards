@@ -488,16 +488,16 @@
             "68.2"
           ]
         ],
-        "svgs": 22,
+        "svgs": 24,
         "circles": 7175,
         "lines": 32,
-        "paths": 571,
+        "paths": 575,
         "anchors": 0,
-        "nodes": 8313,
-        "bodyNodes": 8831,
+        "nodes": 8325,
+        "bodyNodes": 8843,
         "inlineErrors": 0,
-        "html": "d1af05cac83067fb",
-        "styles": "d5702e42f525cfab"
+        "html": "da1f520e751ecaf5",
+        "styles": "815a46bbd6103f0c"
       },
       "hover": {
         "end to end": {
@@ -507,7 +507,7 @@
           "tooltips": 16
         },
         "candles": {
-          "tooltips": 74
+          "tooltips": 150
         }
       },
       "pin": {
@@ -541,7 +541,7 @@
           "pointerEvents": "none",
           "display": "none"
         },
-        "content": "08e892aff00f550f"
+        "content": "86685af3f6af02d3"
       },
       "legend": {
         "hidden": {
@@ -557,9 +557,9 @@
           "charts": 1,
           "circles": 7175,
           "lines": 32,
-          "nodes": 8312,
-          "html": "e018af3f5b3f66ad",
-          "styles": "8799302324e03e9d"
+          "nodes": 8324,
+          "html": "64f86f79d9db7319",
+          "styles": "091aac0923a1c4e1"
         },
         "shown": {
           "pressed": [
@@ -574,9 +574,9 @@
           "charts": 1,
           "circles": 7175,
           "lines": 32,
-          "nodes": 8313,
-          "html": "ed072313dbea1fbb",
-          "styles": "e8456ba7489d9b07"
+          "nodes": 8325,
+          "html": "b2e98ced283b3745",
+          "styles": "c877011e5bd3e301"
         },
         "alone": {
           "pressed": [
@@ -591,9 +591,9 @@
           "charts": 1,
           "circles": 7175,
           "lines": 32,
-          "nodes": 8308,
-          "html": "beabe1e15f2eead0",
-          "styles": "7fca88ba37a947bf"
+          "nodes": 8320,
+          "html": "7a7de7fd0cc06cbd",
+          "styles": "bb806c9a31686c9b"
         },
         "all": {
           "pressed": [
@@ -608,9 +608,9 @@
           "charts": 1,
           "circles": 7175,
           "lines": 32,
-          "nodes": 8313,
-          "html": "ed072313dbea1fbb",
-          "styles": "e8456ba7489d9b07"
+          "nodes": 8325,
+          "html": "b2e98ced283b3745",
+          "styles": "c877011e5bd3e301"
         },
         "collapsed": {
           "pressed": [],
@@ -618,7 +618,7 @@
           "circles": 0,
           "lines": 22,
           "nodes": 224,
-          "html": "ffd2da0aa172b61d",
+          "html": "eebc9477673ced88",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -634,9 +634,9 @@
           "charts": 1,
           "circles": 7175,
           "lines": 32,
-          "nodes": 8313,
-          "html": "ed072313dbea1fbb",
-          "styles": "e8456ba7489d9b07"
+          "nodes": 8325,
+          "html": "b2e98ced283b3745",
+          "styles": "c877011e5bd3e301"
         },
         "restored": true
       },
@@ -691,16 +691,16 @@
             "62.4"
           ]
         ],
-        "svgs": 22,
+        "svgs": 24,
         "circles": 1971,
         "lines": 21,
-        "paths": 198,
+        "paths": 202,
         "anchors": 0,
-        "nodes": 2515,
-        "bodyNodes": 3045,
+        "nodes": 2527,
+        "bodyNodes": 3057,
         "inlineErrors": 0,
-        "html": "a1c72b6ec00dc026",
-        "styles": "d5702e42f525cfab"
+        "html": "7e36f7f706567a76",
+        "styles": "815a46bbd6103f0c"
       },
       "errors": []
     },
@@ -752,16 +752,16 @@
             "69.4"
           ]
         ],
-        "svgs": 22,
+        "svgs": 24,
         "circles": 7444,
         "lines": 33,
-        "paths": 604,
+        "paths": 608,
         "anchors": 0,
-        "nodes": 9207,
-        "bodyNodes": 9725,
+        "nodes": 9219,
+        "bodyNodes": 9737,
         "inlineErrors": 0,
-        "html": "c0e76dcc9d3bda98",
-        "styles": "54700acd0326ed25"
+        "html": "72b2ea1429a8db63",
+        "styles": "a46f4cf21b176bf2"
       },
       "hover": {
         "end to end": {
@@ -771,7 +771,7 @@
           "tooltips": 46
         },
         "candles": {
-          "tooltips": 66
+          "tooltips": 184
         }
       },
       "pin": {
@@ -805,7 +805,7 @@
           "pointerEvents": "none",
           "display": "none"
         },
-        "content": "b797bfcaaf08bf25"
+        "content": "c77b35bec69c5e9a"
       },
       "legend": {
         "hidden": {
@@ -821,9 +821,9 @@
           "charts": 1,
           "circles": 7444,
           "lines": 33,
-          "nodes": 9206,
-          "html": "dbed1c13a3a69f35",
-          "styles": "a576ef840587004e"
+          "nodes": 9218,
+          "html": "c6a3a755f180e431",
+          "styles": "55a7d2bc64133999"
         },
         "shown": {
           "pressed": [
@@ -838,9 +838,9 @@
           "charts": 1,
           "circles": 7444,
           "lines": 33,
-          "nodes": 9207,
-          "html": "01a7c46d7cfbb9a1",
-          "styles": "c5d31c961e4d144e"
+          "nodes": 9219,
+          "html": "05fb6491a1eba686",
+          "styles": "a447f261c1c93bba"
         },
         "alone": {
           "pressed": [
@@ -855,9 +855,9 @@
           "charts": 1,
           "circles": 7444,
           "lines": 33,
-          "nodes": 9202,
-          "html": "09b52da1f71c709b",
-          "styles": "991648d7428894ae"
+          "nodes": 9214,
+          "html": "d56411a49ecb6d47",
+          "styles": "0837680d068617ac"
         },
         "all": {
           "pressed": [
@@ -872,9 +872,9 @@
           "charts": 1,
           "circles": 7444,
           "lines": 33,
-          "nodes": 9207,
-          "html": "01a7c46d7cfbb9a1",
-          "styles": "c5d31c961e4d144e"
+          "nodes": 9219,
+          "html": "05fb6491a1eba686",
+          "styles": "a447f261c1c93bba"
         },
         "collapsed": {
           "pressed": [],
@@ -882,7 +882,7 @@
           "circles": 0,
           "lines": 22,
           "nodes": 224,
-          "html": "4fc61409c9dcf6bf",
+          "html": "0ec0572ec6fb7821",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -898,9 +898,9 @@
           "charts": 1,
           "circles": 7444,
           "lines": 33,
-          "nodes": 9207,
-          "html": "01a7c46d7cfbb9a1",
-          "styles": "c5d31c961e4d144e"
+          "nodes": 9219,
+          "html": "05fb6491a1eba686",
+          "styles": "a447f261c1c93bba"
         },
         "restored": true
       },
@@ -955,16 +955,16 @@
             "69.7"
           ]
         ],
-        "svgs": 22,
+        "svgs": 24,
         "circles": 5581,
         "lines": 21,
-        "paths": 462,
+        "paths": 466,
         "anchors": 0,
-        "nodes": 6526,
-        "bodyNodes": 7056,
+        "nodes": 6538,
+        "bodyNodes": 7068,
         "inlineErrors": 0,
-        "html": "7ec203f0ff7dee01",
-        "styles": "d5702e42f525cfab"
+        "html": "fc8fc10f9e349521",
+        "styles": "815a46bbd6103f0c"
       },
       "errors": []
     },
@@ -1016,16 +1016,16 @@
             "70.1"
           ]
         ],
-        "svgs": 22,
+        "svgs": 24,
         "circles": 1655,
         "lines": 19,
-        "paths": 144,
+        "paths": 148,
         "anchors": 0,
-        "nodes": 2127,
-        "bodyNodes": 2680,
+        "nodes": 2139,
+        "bodyNodes": 2692,
         "inlineErrors": 0,
-        "html": "935fb904d2b491af",
-        "styles": "d5702e42f525cfab"
+        "html": "65a2f67150f238c3",
+        "styles": "815a46bbd6103f0c"
       },
       "hover": {
         "end to end": {
@@ -1035,7 +1035,7 @@
           "tooltips": 5
         },
         "candles": {
-          "tooltips": 65
+          "tooltips": 86
         }
       },
       "pin": {
@@ -1069,7 +1069,7 @@
           "pointerEvents": "none",
           "display": "none"
         },
-        "content": "e5d2ce27abc24cd9"
+        "content": "9c4aaba0aff73bb7"
       },
       "legend": {
         "hidden": {
@@ -1085,9 +1085,9 @@
           "charts": 1,
           "circles": 1655,
           "lines": 19,
-          "nodes": 2126,
-          "html": "254dbeee46d82c96",
-          "styles": "8799302324e03e9d"
+          "nodes": 2138,
+          "html": "878f85ba52be4613",
+          "styles": "091aac0923a1c4e1"
         },
         "shown": {
           "pressed": [
@@ -1102,9 +1102,9 @@
           "charts": 1,
           "circles": 1655,
           "lines": 19,
-          "nodes": 2127,
-          "html": "94d49633848057d7",
-          "styles": "e8456ba7489d9b07"
+          "nodes": 2139,
+          "html": "9062c370a00b6b6f",
+          "styles": "c877011e5bd3e301"
         },
         "alone": {
           "pressed": [
@@ -1119,9 +1119,9 @@
           "charts": 1,
           "circles": 1655,
           "lines": 19,
-          "nodes": 2122,
-          "html": "d3d8197a9a0c2e04",
-          "styles": "7fca88ba37a947bf"
+          "nodes": 2134,
+          "html": "6eddc2165318f05f",
+          "styles": "bb806c9a31686c9b"
         },
         "all": {
           "pressed": [
@@ -1136,9 +1136,9 @@
           "charts": 1,
           "circles": 1655,
           "lines": 19,
-          "nodes": 2127,
-          "html": "94d49633848057d7",
-          "styles": "e8456ba7489d9b07"
+          "nodes": 2139,
+          "html": "9062c370a00b6b6f",
+          "styles": "c877011e5bd3e301"
         },
         "collapsed": {
           "pressed": [],
@@ -1146,7 +1146,7 @@
           "circles": 0,
           "lines": 11,
           "nodes": 202,
-          "html": "97593940b7821ce1",
+          "html": "997c662cb456de44",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -1162,9 +1162,9 @@
           "charts": 1,
           "circles": 1655,
           "lines": 19,
-          "nodes": 2127,
-          "html": "94d49633848057d7",
-          "styles": "e8456ba7489d9b07"
+          "nodes": 2139,
+          "html": "9062c370a00b6b6f",
+          "styles": "c877011e5bd3e301"
         },
         "restored": true
       },
@@ -1219,16 +1219,16 @@
             "70.9"
           ]
         ],
-        "svgs": 22,
+        "svgs": 24,
         "circles": 942,
         "lines": 21,
-        "paths": 94,
+        "paths": 98,
         "anchors": 0,
-        "nodes": 1320,
-        "bodyNodes": 1885,
+        "nodes": 1332,
+        "bodyNodes": 1897,
         "inlineErrors": 0,
-        "html": "b98a614e9116a546",
-        "styles": "d5702e42f525cfab"
+        "html": "39707baa461f0883",
+        "styles": "815a46bbd6103f0c"
       },
       "errors": []
     }
