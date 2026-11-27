@@ -66,11 +66,17 @@ const inDomain = (domain, time) => time >= domain[0] && time < domain[1];
 // ?revision=D343744 picks a landing. The days around it are shown, unless the address
 // says which days to show.
 const urlRevision = parseRevision(new URLSearchParams(window.location.search).get("revision"));
-const selectedLandings = landings.filter((landing) => landing.journey.revision === urlRevision);
-const focusDay = selectedLandings.length ? d3.utcDay.floor(selectedLandings[0].time) : null;
+const pickedRevision = Mutable(urlRevision);
+const pickRevision = (revision) => (pickedRevision.value = revision);
+const focusLanding = landings.find((landing) => landing.journey.revision === urlRevision);
+const focusDay = focusLanding ? d3.utcDay.floor(focusLanding.time) : null;
 const clampDay = (day) => new Date(Math.min(+DATA_LAST_DAY, Math.max(+DATA_FIRST_DAY, +day)));
 const DEFAULT_FROM = focusDay ? clampDay(new Date(+focusDay - 3 * DAY_MS)) : new Date(Math.max(+DATA_FIRST_DAY, +DATA_LAST_DAY - 29 * DAY_MS));
 const DEFAULT_TO = focusDay ? clampDay(new Date(+focusDay + 3 * DAY_MS)) : DATA_LAST_DAY;
+```
+
+```js
+const selectedLandings = landings.filter((landing) => landing.journey.revision === pickedRevision);
 ```
 
 ```js
@@ -431,7 +437,7 @@ function section(width, hidden, requester, domain) {
       hidden,
       state: {setHidden, setHiddenKeys},
       width,
-      context: [width, +domain[0], +domain[1], requester, ...(item.chartKey === E2E_TITLE.chartKey ? [search] : [])],
+      context: [width, +domain[0], +domain[1], requester, ...(item.chartKey === E2E_TITLE.chartKey ? [search, pickedRevision] : [])],
       cache: blockCache,
       body: ({chartKey}, ownHidden) => ({groups: bodies[chartKey].groups(), content: bodies[chartKey].draw(ownHidden)})
     });
@@ -464,7 +470,20 @@ function section(width, hidden, requester, domain) {
   display: inline-flex;
   gap: 0.4rem;
 }
+.sn-banner-close {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.4rem;
+  padding: 0 0.3rem;
+  border: 0;
+  background: none;
+  font-size: 1.3rem;
+  line-height: 1.2;
+  color: var(--theme-foreground-muted, #888);
+  cursor: pointer;
+}
 .sn-banner {
+  position: relative;
   margin: 0.75rem 0;
   padding: 0.6rem 0.9rem;
   border: 1px solid var(--theme-foreground-faintest, #ddd);
@@ -617,13 +636,24 @@ resetButton.disabled = +domain[0] === +DEFAULT_FROM && +domain[1] === +dayAfter(
 ```
 
 ```js
-// The landing that ?revision= picks, with what a tooltip says about it.
+// The landing that ?revision= picks, with what a tooltip says about it, until it is closed.
 {
-  if (selectedLandings.length) {
-    display(htl.html`<div class="sn-banner">${selectedLandings.map((landing, index) => htl.html`${index ? htl.html`<div class="bw-tt-sep"></div>` : ""}${landingLines(landing, false)}`)}</div>`);
-  } else if (urlRevision !== null) {
-    display(htl.html`<div class="sn-banner">D${urlRevision} is not among the revisions landed since ${DATA_FIRST_DAY.toISOString().slice(0, 10)}.</div>`);
-  }
+  const close = htl.html`<button type="button" class="sn-banner-close" title="Close" aria-label="Close">×</button>`;
+  close.onclick = () => {
+    const params = new URLSearchParams(window.location.search);
+    params.delete("revision");
+    history.replaceState(null, "", `${window.location.pathname}?${params}${window.location.hash}`);
+    pickRevision(null);
+  };
+  const card = (content) => htl.html`<div class="sn-banner">${close}${content}</div>`;
+  // Something is always displayed, as what a cell showed before stays if it shows nothing.
+  display(
+    selectedLandings.length
+      ? card(selectedLandings.map((landing, index) => htl.html`${index ? htl.html`<div class="bw-tt-sep"></div>` : ""}${landingLines(landing, false)}`))
+      : pickedRevision !== null
+        ? card(`D${pickedRevision} is not among the revisions landed since ${DATA_FIRST_DAY.toISOString().slice(0, 10)}.`)
+        : htl.html`<div></div>`
+  );
 }
 ```
 
