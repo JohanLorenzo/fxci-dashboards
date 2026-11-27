@@ -41,13 +41,13 @@
         ],
         "svgs": 52,
         "circles": 485,
-        "lines": 3337,
-        "paths": 136,
+        "lines": 48,
+        "paths": 149,
         "anchors": 0,
-        "nodes": 4378,
-        "bodyNodes": 4487,
+        "nodes": 1102,
+        "bodyNodes": 1211,
         "inlineErrors": 0,
-        "html": "0a2861d04988de78",
+        "html": "e5945a3d85b143db",
         "styles": "72563aab821af694"
       },
       "hover": {
@@ -102,9 +102,9 @@
           ],
           "charts": 1,
           "circles": 329,
-          "lines": 3337,
-          "nodes": 4222,
-          "html": "90b8eaa1fb820933",
+          "lines": 48,
+          "nodes": 946,
+          "html": "786f6918e246ae35",
           "styles": "090b7e5024098452"
         },
         "shown": {
@@ -117,9 +117,9 @@
           ],
           "charts": 1,
           "circles": 485,
-          "lines": 3337,
-          "nodes": 4378,
-          "html": "c03cca1801cde5ec",
+          "lines": 48,
+          "nodes": 1102,
+          "html": "b5eb763058a2da89",
           "styles": "18c2a496999101f5"
         },
         "alone": {
@@ -132,9 +132,9 @@
           ],
           "charts": 1,
           "circles": 263,
-          "lines": 3337,
-          "nodes": 4156,
-          "html": "241728ad5e023546",
+          "lines": 48,
+          "nodes": 880,
+          "html": "4f6937cb96ee6ae1",
           "styles": "e0741548072529dd"
         },
         "all": {
@@ -147,18 +147,18 @@
           ],
           "charts": 1,
           "circles": 485,
-          "lines": 3337,
-          "nodes": 4378,
-          "html": "c03cca1801cde5ec",
+          "lines": 48,
+          "nodes": 1102,
+          "html": "b5eb763058a2da89",
           "styles": "18c2a496999101f5"
         },
         "collapsed": {
           "pressed": [],
           "charts": 0,
           "circles": 218,
-          "lines": 3330,
-          "nodes": 4042,
-          "html": "3970b1146ac572d1",
+          "lines": 41,
+          "nodes": 766,
+          "html": "150177bf201ee133",
           "styles": "3e3b03c9ec4f5f5b"
         },
         "expanded": {
@@ -171,9 +171,9 @@
           ],
           "charts": 1,
           "circles": 485,
-          "lines": 3337,
-          "nodes": 4378,
-          "html": "c03cca1801cde5ec",
+          "lines": 48,
+          "nodes": 1102,
+          "html": "b5eb763058a2da89",
           "styles": "18c2a496999101f5"
         },
         "restored": true
@@ -215,13 +215,13 @@
         ],
         "svgs": 52,
         "circles": 163,
-        "lines": 1076,
-        "paths": 114,
+        "lines": 36,
+        "paths": 127,
         "anchors": 0,
-        "nodes": 1766,
-        "bodyNodes": 1890,
+        "nodes": 739,
+        "bodyNodes": 863,
         "inlineErrors": 0,
-        "html": "36329cfb593783a5",
+        "html": "912d1e4659a4c339",
         "styles": "72563aab821af694"
       },
       "errors": []
@@ -260,13 +260,13 @@
         ],
         "svgs": 52,
         "circles": 30,
-        "lines": 220,
-        "paths": 129,
+        "lines": 51,
+        "paths": 142,
         "anchors": 0,
-        "nodes": 826,
-        "bodyNodes": 935,
+        "nodes": 670,
+        "bodyNodes": 779,
         "inlineErrors": 0,
-        "html": "0ecdf834a644cde6",
+        "html": "43d952c197607bcf",
         "styles": "7b9b1c2ebf662504"
       },
       "hover": {
@@ -320,9 +320,9 @@
           ],
           "charts": 1,
           "circles": 22,
-          "lines": 220,
-          "nodes": 818,
-          "html": "73160ab73ad2d0e4",
+          "lines": 51,
+          "nodes": 662,
+          "html": "d9ccc9f300a98689",
           "styles": "59598c9ec4c78823"
         },
         "shown": {
@@ -334,9 +334,9 @@
           ],
           "charts": 1,
           "circles": 30,
-          "lines": 220,
-          "nodes": 826,
-          "html": "24dc687f4fa19874",
+          "lines": 51,
+          "nodes": 670,
+          "html": "7f72ca6eace40baf",
           "styles": "7b9b1c2ebf662504"
         },
         "alone": {
@@ -348,9 +348,9 @@
           ],
           "charts": 1,
           "circles": 21,
-          "lines": 220,
-          "nodes": 817,
-          "html": "53e4e0764abfa9f7",
+          "lines": 51,
+          "nodes": 661,
+          "html": "188fbda6a1cc3b5e",
           "styles": "23f91f98223be932"
         },
         "all": {
@@ -362,18 +362,18 @@
           ],
           "charts": 1,
           "circles": 30,
-          "lines": 220,
-          "nodes": 826,
-          "html": "24dc687f4fa19874",
+          "lines": 51,
+          "nodes": 670,
+          "html": "7f72ca6eace40baf",
           "styles": "7b9b1c2ebf662504"
         },
         "collapsed": {
           "pressed": [],
           "charts": 0,
           "circles": 11,
-          "lines": 214,
-          "nodes": 741,
-          "html": "fecde329fae02f15",
+          "lines": 45,
+          "nodes": 585,
+          "html": "6ba80f3cd55f855a",
           "styles": "629c943484c1d7d1"
         },
         "expanded": {
@@ -385,9 +385,9 @@
           ],
           "charts": 1,
           "circles": 30,
-          "lines": 220,
-          "nodes": 826,
-          "html": "24dc687f4fa19874",
+          "lines": 51,
+          "nodes": 670,
+          "html": "7f72ca6eace40baf",
           "styles": "7b9b1c2ebf662504"
         },
         "restored": true
@@ -429,13 +429,13 @@
         ],
         "svgs": 49,
         "circles": 12,
-        "lines": 98,
-        "paths": 94,
+        "lines": 46,
+        "paths": 107,
         "anchors": 0,
-        "nodes": 606,
-        "bodyNodes": 730,
+        "nodes": 567,
+        "bodyNodes": 691,
         "inlineErrors": 0,
-        "html": "0cbe040fc941f474",
+        "html": "8644ed9a650e5983",
         "styles": "25d1e9cb09a46e50"
       },
       "errors": []
@@ -490,13 +490,13 @@
         ],
         "svgs": 23,
         "circles": 1482,
-        "lines": 11053,
-        "paths": 136,
+        "lines": 35,
+        "paths": 143,
         "anchors": 0,
-        "nodes": 12986,
-        "bodyNodes": 13504,
+        "nodes": 1975,
+        "bodyNodes": 2493,
         "inlineErrors": 0,
-        "html": "4c857ddaba31e8b2",
+        "html": "88fb1a09f1a30aa5",
         "styles": "a341697320c958f9"
       },
       "hover": {
@@ -557,9 +557,9 @@
           ],
           "charts": 1,
           "circles": 1482,
-          "lines": 9479,
-          "nodes": 11412,
-          "html": "a6bab74821842742",
+          "lines": 35,
+          "nodes": 1974,
+          "html": "5e614b2763f9c114",
           "styles": "7cd6f012dd15c246"
         },
         "shown": {
@@ -575,9 +575,9 @@
           ],
           "charts": 1,
           "circles": 1482,
-          "lines": 11053,
-          "nodes": 12986,
-          "html": "1e351969a4edac2a",
+          "lines": 35,
+          "nodes": 1975,
+          "html": "3160fc31a14e3487",
           "styles": "36cadebea8b32894"
         },
         "alone": {
@@ -593,9 +593,9 @@
           ],
           "charts": 1,
           "circles": 1482,
-          "lines": 1609,
-          "nodes": 3542,
-          "html": "74681c5e6745b360",
+          "lines": 35,
+          "nodes": 1969,
+          "html": "362b1047587e0a0c",
           "styles": "ffede6c08e673b5f"
         },
         "all": {
@@ -611,9 +611,9 @@
           ],
           "charts": 1,
           "circles": 1482,
-          "lines": 11053,
-          "nodes": 12986,
-          "html": "1e351969a4edac2a",
+          "lines": 35,
+          "nodes": 1975,
+          "html": "3160fc31a14e3487",
           "styles": "36cadebea8b32894"
         },
         "collapsed": {
@@ -638,9 +638,9 @@
           ],
           "charts": 1,
           "circles": 1482,
-          "lines": 11053,
-          "nodes": 12986,
-          "html": "1e351969a4edac2a",
+          "lines": 35,
+          "nodes": 1975,
+          "html": "3160fc31a14e3487",
           "styles": "36cadebea8b32894"
         },
         "restored": true
@@ -698,13 +698,13 @@
         ],
         "svgs": 23,
         "circles": 465,
-        "lines": 3397,
-        "paths": 57,
+        "lines": 23,
+        "paths": 64,
         "anchors": 0,
-        "nodes": 4184,
-        "bodyNodes": 4714,
+        "nodes": 817,
+        "bodyNodes": 1347,
         "inlineErrors": 0,
-        "html": "c7aff71c3c4c2349",
+        "html": "d69e5f42c1eceb25",
         "styles": "a341697320c958f9"
       },
       "errors": []
@@ -759,13 +759,13 @@
         ],
         "svgs": 23,
         "circles": 1876,
-        "lines": 14033,
-        "paths": 166,
+        "lines": 33,
+        "paths": 173,
         "anchors": 0,
-        "nodes": 17204,
-        "bodyNodes": 17722,
+        "nodes": 3211,
+        "bodyNodes": 3729,
         "inlineErrors": 0,
-        "html": "cc1d30a2abb7b64d",
+        "html": "b44997208652084b",
         "styles": "1d6f5192f257f2e0"
       },
       "hover": {
@@ -826,9 +826,9 @@
           ],
           "charts": 1,
           "circles": 1876,
-          "lines": 12033,
-          "nodes": 15204,
-          "html": "417d66494c5f3777",
+          "lines": 33,
+          "nodes": 3210,
+          "html": "a9cd061098b4c2f5",
           "styles": "df9694860ea521c7"
         },
         "shown": {
@@ -844,9 +844,9 @@
           ],
           "charts": 1,
           "circles": 1876,
-          "lines": 14033,
-          "nodes": 17204,
-          "html": "11a997138cdc47fd",
+          "lines": 33,
+          "nodes": 3211,
+          "html": "9ce5aee2068f256f",
           "styles": "2b3dea2cbfdf9590"
         },
         "alone": {
@@ -862,9 +862,9 @@
           ],
           "charts": 1,
           "circles": 1876,
-          "lines": 2033,
-          "nodes": 5204,
-          "html": "2f408d202f913ede",
+          "lines": 33,
+          "nodes": 3205,
+          "html": "70237940cbdc8d2e",
           "styles": "c924056a78f79a2e"
         },
         "all": {
@@ -880,9 +880,9 @@
           ],
           "charts": 1,
           "circles": 1876,
-          "lines": 14033,
-          "nodes": 17204,
-          "html": "11a997138cdc47fd",
+          "lines": 33,
+          "nodes": 3211,
+          "html": "9ce5aee2068f256f",
           "styles": "2b3dea2cbfdf9590"
         },
         "collapsed": {
@@ -907,9 +907,9 @@
           ],
           "charts": 1,
           "circles": 1876,
-          "lines": 14033,
-          "nodes": 17204,
-          "html": "11a997138cdc47fd",
+          "lines": 33,
+          "nodes": 3211,
+          "html": "9ce5aee2068f256f",
           "styles": "2b3dea2cbfdf9590"
         },
         "restored": true
@@ -967,13 +967,13 @@
         ],
         "svgs": 23,
         "circles": 1907,
-        "lines": 14021,
-        "paths": 132,
+        "lines": 21,
+        "paths": 139,
         "anchors": 0,
-        "nodes": 16526,
-        "bodyNodes": 17056,
+        "nodes": 2533,
+        "bodyNodes": 3063,
         "inlineErrors": 0,
-        "html": "d8fa3491a6623a05",
+        "html": "2a62677832aca0d5",
         "styles": "1d6f5192f257f2e0"
       },
       "errors": []
@@ -1028,13 +1028,13 @@
         ],
         "svgs": 23,
         "circles": 1655,
-        "lines": 12283,
-        "paths": 138,
+        "lines": 19,
+        "paths": 145,
         "anchors": 0,
-        "nodes": 14388,
-        "bodyNodes": 14943,
+        "nodes": 2131,
+        "bodyNodes": 2686,
         "inlineErrors": 0,
-        "html": "c0f6c3c659db34da",
+        "html": "2a2c594af0fdd433",
         "styles": "a341697320c958f9"
       },
       "hover": {
@@ -1095,9 +1095,9 @@
           ],
           "charts": 1,
           "circles": 1655,
-          "lines": 10531,
-          "nodes": 12636,
-          "html": "3138e929d6ba3c65",
+          "lines": 19,
+          "nodes": 2130,
+          "html": "70b422a46d848cda",
           "styles": "7cd6f012dd15c246"
         },
         "shown": {
@@ -1113,9 +1113,9 @@
           ],
           "charts": 1,
           "circles": 1655,
-          "lines": 12283,
-          "nodes": 14388,
-          "html": "8f4395eb86c6aef8",
+          "lines": 19,
+          "nodes": 2131,
+          "html": "7fc12b61c7db6163",
           "styles": "36cadebea8b32894"
         },
         "alone": {
@@ -1131,9 +1131,9 @@
           ],
           "charts": 1,
           "circles": 1655,
-          "lines": 1771,
-          "nodes": 3876,
-          "html": "a5f834ad7c3a05f0",
+          "lines": 19,
+          "nodes": 2125,
+          "html": "9259bb56ff802cb8",
           "styles": "ffede6c08e673b5f"
         },
         "all": {
@@ -1149,9 +1149,9 @@
           ],
           "charts": 1,
           "circles": 1655,
-          "lines": 12283,
-          "nodes": 14388,
-          "html": "8f4395eb86c6aef8",
+          "lines": 19,
+          "nodes": 2131,
+          "html": "7fc12b61c7db6163",
           "styles": "36cadebea8b32894"
         },
         "collapsed": {
@@ -1176,9 +1176,9 @@
           ],
           "charts": 1,
           "circles": 1655,
-          "lines": 12283,
-          "nodes": 14388,
-          "html": "8f4395eb86c6aef8",
+          "lines": 19,
+          "nodes": 2131,
+          "html": "7fc12b61c7db6163",
           "styles": "36cadebea8b32894"
         },
         "restored": true
@@ -1236,13 +1236,13 @@
         ],
         "svgs": 23,
         "circles": 942,
-        "lines": 6965,
-        "paths": 88,
+        "lines": 21,
+        "paths": 95,
         "anchors": 0,
-        "nodes": 8261,
-        "bodyNodes": 8828,
+        "nodes": 1324,
+        "bodyNodes": 1891,
         "inlineErrors": 0,
-        "html": "0ad7bdd91815733e",
+        "html": "db3294b5d6976a34",
         "styles": "a341697320c958f9"
       },
       "errors": []

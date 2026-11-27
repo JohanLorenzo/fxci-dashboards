@@ -8,7 +8,8 @@ import {attachPlotHover, nearestBar} from "./_tooltip.js";
 
 // The scales come from `maxHours`, so that filtering the items does not rescale the
 // chart. Segments hidden by the legend are left out and the others close ranks, so
-// the dot is at the top of what is left.
+// the dot is at the top of what is left. The bars of a segment are one path, because
+// the time the page takes to react to the pointer grows with the number of elements.
 export function candleChart({
   items,
   segments,
@@ -31,9 +32,13 @@ export function candleChart({
   const ends = visible.length ? items : [];
   const bars = items.flatMap((item) => {
     let from = 0;
-    return visible.map(({key}) => {
+    return visible.flatMap(({key}) => {
       const to = from + durationsOf(item)[key] / 3600;
-      const bar = {time: item.time, key, from, to};
+      const bar = [
+        {time: item.time, key, hours: from},
+        {time: item.time, key, hours: to},
+        {time: item.time, key, hours: null}
+      ];
       from = to;
       return bar;
     });
@@ -51,7 +56,7 @@ export function candleChart({
     marks: [
       Plot.ruleY([0], {strokeOpacity: 0.3}),
       ...before,
-      Plot.ruleX(bars, {x: "time", y1: "from", y2: "to", stroke: "key", strokeWidth: barWidth}),
+      Plot.line(bars, {x: "time", y: "hours", z: "key", stroke: "key", strokeWidth: barWidth, strokeLinecap: "butt"}),
       ...(after ? after({topHours, ends}) : [Plot.dot(ends, {x: "time", y: topHours, r: 3, fill: "currentColor"})])
     ]
   });
