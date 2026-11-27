@@ -18,7 +18,24 @@ const PERF_BACKFILL_WAITS = {
   zoom: {chart: 7, from: 0.1, to: 0.35}
 };
 
+// A page without a `pin` or a `legend` is not checked for them.
+const SHIP_TO_NIGHTLY = {
+  root: "#sn-charts",
+  tiles: {item: ".bw-metric", title: ".bw-metric-title", value: ".bw-metric-value"},
+  charts: "#sn-charts .bw-chart",
+  tooltip: "#bw-tooltip",
+  ring: "#bw-ring",
+  stubs: {},
+  hover: [
+    {name: "end to end", chart: 0},
+    {name: "stages", chart: 5}
+  ],
+  zoom: {chart: 0, from: 0.1, to: 0.35}
+};
+
 export const SCENARIOS = [
   {name: "perf-backfill-waits, Linux talos, all days", path: "/perf-backfill-waits.html", ...PERF_BACKFILL_WAITS},
-  {name: "perf-backfill-waits, mac M4, two weeks", path: "/perf-backfill-waits.html?platform=mac+M4&from=2026-09-01&to=2026-09-14", ...PERF_BACKFILL_WAITS}
+  {name: "perf-backfill-waits, mac M4, two weeks", path: "/perf-backfill-waits.html?platform=mac+M4&from=2026-09-01&to=2026-09-14", ...PERF_BACKFILL_WAITS},
+  {name: "ship-to-nightly, the last 7 days", path: "/ship-to-nightly.html", ...SHIP_TO_NIGHTLY},
+  {name: "ship-to-nightly, 90 days", path: "/ship-to-nightly.html?from=2026-08-29&to=2026-11-26", ...SHIP_TO_NIGHTLY}
 ];

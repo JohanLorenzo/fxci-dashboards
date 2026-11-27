@@ -45,7 +45,7 @@
         "paths": 136,
         "anchors": 0,
         "nodes": 4378,
-        "bodyNodes": 4482,
+        "bodyNodes": 4487,
         "inlineErrors": 0,
         "html": "0a2861d04988de78",
         "styles": "72563aab821af694"
@@ -219,7 +219,7 @@
         "paths": 114,
         "anchors": 0,
         "nodes": 1766,
-        "bodyNodes": 1885,
+        "bodyNodes": 1890,
         "inlineErrors": 0,
         "html": "36329cfb593783a5",
         "styles": "72563aab821af694"
@@ -264,7 +264,7 @@
         "paths": 129,
         "anchors": 0,
         "nodes": 826,
-        "bodyNodes": 930,
+        "bodyNodes": 935,
         "inlineErrors": 0,
         "html": "0ecdf834a644cde6",
         "styles": "7b9b1c2ebf662504"
@@ -433,10 +433,356 @@
         "paths": 94,
         "anchors": 0,
         "nodes": 606,
-        "bodyNodes": 725,
+        "bodyNodes": 730,
         "inlineErrors": 0,
         "html": "0cbe040fc941f474",
         "styles": "25d1e9cb09a46e50"
+      },
+      "errors": []
+    },
+    "ship-to-nightly, the last 7 days": {
+      "load": {
+        "tiles": [
+          [
+            "Land to published in a Nightly",
+            "p50 13 h 41 min p90 27 h 21 min p99 38 h 36 min"
+          ],
+          [
+            "Land to half of the Nightly clients on the fix",
+            "p50 34 h 59 min p95 53 h 7 min"
+          ],
+          [
+            "Nightly clients on the fix 24 h after it is published",
+            "51.9%"
+          ],
+          [
+            "Landings that took over 24 h to publish",
+            "17.4%"
+          ],
+          [
+            "Revisions landed",
+            "1,574"
+          ],
+          [
+            "Waiting in the Lando queue",
+            "p50 4 min p95 28 min"
+          ],
+          [
+            "On autoland until merged to main",
+            "p50 3 h 34 min p95 17 h 21 min"
+          ],
+          [
+            "Merged to main until its Nightly starts",
+            "p50 7 h 45 min p95 10 h 29 min"
+          ],
+          [
+            "Nightly build and publish",
+            "p50 2 h 27 min p95 2 h 54 min"
+          ],
+          [
+            "Merges to main",
+            "23"
+          ],
+          [
+            "Autoland tree closed",
+            "45 h 6 min"
+          ],
+          [
+            "Landings backed out",
+            "5.7%"
+          ],
+          [
+            "Backed out after a Nightly had published them",
+            "0"
+          ],
+          [
+            "In flight",
+            "262"
+          ],
+          [
+            "Oldest in flight",
+            "26 h 29 min"
+          ],
+          [
+            "Unmatched after 7 days",
+            "0"
+          ]
+        ],
+        "svgs": 16,
+        "circles": 0,
+        "lines": 32,
+        "paths": 33,
+        "anchors": 0,
+        "nodes": 310,
+        "bodyNodes": 431,
+        "inlineErrors": 0,
+        "html": "27029d994ce08cc1",
+        "styles": "42fe50d5e28f69fb"
+      },
+      "hover": {
+        "end to end": {
+          "tooltips": 5
+        },
+        "stages": {
+          "tooltips": 5
+        }
+      },
+      "pin": null,
+      "legend": null,
+      "zoom": {
+        "range": [
+          "2026-11-20",
+          "2026-11-22"
+        ],
+        "tiles": [
+          [
+            "Land to published in a Nightly",
+            "p50 15 h 54 min p90 30 h 37 min p99 39 h 26 min"
+          ],
+          [
+            "Land to half of the Nightly clients on the fix",
+            "p50 34 h 59 min p95 53 h 7 min"
+          ],
+          [
+            "Nightly clients on the fix 24 h after it is published",
+            "51.9%"
+          ],
+          [
+            "Landings that took over 24 h to publish",
+            "36.1%"
+          ],
+          [
+            "Revisions landed",
+            "482"
+          ],
+          [
+            "Waiting in the Lando queue",
+            "p50 5 min p95 40 min"
+          ],
+          [
+            "On autoland until merged to main",
+            "p50 4 h 8 min p95 18 h 51 min"
+          ],
+          [
+            "Merged to main until its Nightly starts",
+            "p50 8 h 38 min p95 10 h 29 min"
+          ],
+          [
+            "Nightly build and publish",
+            "p50 2 h 54 min p95 2 h 56 min"
+          ],
+          [
+            "Merges to main",
+            "7"
+          ],
+          [
+            "Autoland tree closed",
+            "20 h 12 min"
+          ],
+          [
+            "Landings backed out",
+            "3.9%"
+          ],
+          [
+            "Backed out after a Nightly had published them",
+            "0"
+          ],
+          [
+            "In flight",
+            "0"
+          ],
+          [
+            "Oldest in flight",
+            "–"
+          ],
+          [
+            "Unmatched after 7 days",
+            "0"
+          ]
+        ],
+        "svgs": 16,
+        "circles": 0,
+        "lines": 16,
+        "paths": 31,
+        "anchors": 0,
+        "nodes": 276,
+        "bodyNodes": 409,
+        "inlineErrors": 0,
+        "html": "0b143cac958c0bfa",
+        "styles": "42fe50d5e28f69fb"
+      },
+      "errors": []
+    },
+    "ship-to-nightly, 90 days": {
+      "load": {
+        "tiles": [
+          [
+            "Land to published in a Nightly",
+            "p50 13 h 43 min p90 25 h 26 min p99 64 h 47 min"
+          ],
+          [
+            "Land to half of the Nightly clients on the fix",
+            "p50 53 h 36 min p95 88 h 3 min"
+          ],
+          [
+            "Nightly clients on the fix 24 h after it is published",
+            "35.3%"
+          ],
+          [
+            "Landings that took over 24 h to publish",
+            "11.7%"
+          ],
+          [
+            "Revisions landed",
+            "22,485"
+          ],
+          [
+            "Waiting in the Lando queue",
+            "p50 5 min p95 1 h 30 min"
+          ],
+          [
+            "On autoland until merged to main",
+            "p50 3 h 8 min p95 21 h 25 min"
+          ],
+          [
+            "Merged to main until its Nightly starts",
+            "p50 5 h 40 min p95 15 h 31 min"
+          ],
+          [
+            "Nightly build and publish",
+            "p50 2 h 23 min p95 3 h 7 min"
+          ],
+          [
+            "Merges to main",
+            "324"
+          ],
+          [
+            "Autoland tree closed",
+            "709 h 46 min"
+          ],
+          [
+            "Landings backed out",
+            "6.9%"
+          ],
+          [
+            "Backed out after a Nightly had published them",
+            "11"
+          ],
+          [
+            "In flight",
+            "262"
+          ],
+          [
+            "Oldest in flight",
+            "26 h 29 min"
+          ],
+          [
+            "Unmatched after 7 days",
+            "0"
+          ]
+        ],
+        "svgs": 16,
+        "circles": 0,
+        "lines": 32,
+        "paths": 33,
+        "anchors": 0,
+        "nodes": 310,
+        "bodyNodes": 431,
+        "inlineErrors": 0,
+        "html": "7410f3b6fa0358d0",
+        "styles": "42fe50d5e28f69fb"
+      },
+      "hover": {
+        "end to end": {
+          "tooltips": 62
+        },
+        "stages": {
+          "tooltips": 46
+        }
+      },
+      "pin": null,
+      "legend": null,
+      "zoom": {
+        "range": [
+          "2026-09-06",
+          "2026-09-29"
+        ],
+        "tiles": [
+          [
+            "Land to published in a Nightly",
+            "p50 13 h 19 min p90 27 h 31 min p99 74 h 55 min"
+          ],
+          [
+            "Land to half of the Nightly clients on the fix",
+            "p50 63 h 48 min p95 94 h 54 min"
+          ],
+          [
+            "Nightly clients on the fix 24 h after it is published",
+            "33.8%"
+          ],
+          [
+            "Landings that took over 24 h to publish",
+            "12.9%"
+          ],
+          [
+            "Revisions landed",
+            "5,998"
+          ],
+          [
+            "Waiting in the Lando queue",
+            "p50 5 min p95 1 h 23 min"
+          ],
+          [
+            "On autoland until merged to main",
+            "p50 3 h 0 min p95 18 h 14 min"
+          ],
+          [
+            "Merged to main until its Nightly starts",
+            "p50 5 h 14 min p95 21 h 57 min"
+          ],
+          [
+            "Nightly build and publish",
+            "p50 2 h 18 min p95 3 h 9 min"
+          ],
+          [
+            "Merges to main",
+            "86"
+          ],
+          [
+            "Autoland tree closed",
+            "188 h 40 min"
+          ],
+          [
+            "Landings backed out",
+            "7%"
+          ],
+          [
+            "Backed out after a Nightly had published them",
+            "2"
+          ],
+          [
+            "In flight",
+            "0"
+          ],
+          [
+            "Oldest in flight",
+            "–"
+          ],
+          [
+            "Unmatched after 7 days",
+            "0"
+          ]
+        ],
+        "svgs": 16,
+        "circles": 0,
+        "lines": 16,
+        "paths": 31,
+        "anchors": 0,
+        "nodes": 276,
+        "bodyNodes": 409,
+        "inlineErrors": 0,
+        "html": "0aa08bc8cba0185a",
+        "styles": "42fe50d5e28f69fb"
       },
       "errors": []
     }
