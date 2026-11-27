@@ -69,6 +69,7 @@ const DEFAULT_TO = focusDay ? clampDay(new Date(+focusDay + 3 * DAY_MS)) : DATA_
 ```js
 const formatCount = (n) => Math.round(n).toLocaleString("en-US");
 const formatPercent = (share) => `${Math.round(share * 1000) / 10}%`;
+const formatRatio = (n) => (Math.round(n * 10) / 10).toLocaleString("en-US");
 function formatWait(hours) {
   const seconds = Math.round(hours * 3600);
   if (seconds < 60) return `${seconds} s`;
@@ -80,12 +81,7 @@ const landingsOf = (items) => items.filter((item) => item.kind === "landing");
 const shippedIn = (cohort) => (items) => landingsOf(items).filter((landing) => landing[cohort] && landing.status === "shipped");
 const hoursOf = (seconds) => (seconds === undefined ? undefined : seconds / 3600);
 const percentile = (cohort, key, share) => (items) => hoursOf(quantile(shippedIn(cohort)(items).map((landing) => landing.durations[key]), share));
-const shareOf = (isIt) => (items) => {
-  const done = shippedIn("publishCohort")(items);
-  return done.length ? done.filter(isIt).length / done.length : undefined;
-};
 const settled = (items) => landingsOf(items).filter((landing) => landing.publishCohort && (landing.status === "shipped" || landing.status === "backed out"));
-const countOfStatus = (status) => (items) => landingsOf(items).filter((landing) => landing.status === status).length;
 const stagePair = (key, color) => [
   {key: "p50", title: "p50", value: percentile("publishCohort", key, 0.5), color: color[0]},
   {key: "p95", title: "p95", value: percentile("publishCohort", key, 0.95), color: color[1]}
@@ -106,13 +102,6 @@ const METRICS = [
       {key: "p90", title: "p90", value: percentile("publishCohort", "total", 0.9), color: BLUES[1]},
       {key: "p99", title: "p99", value: percentile("publishCohort", "total", 0.99), color: BLUES[2]}
     ]
-  },
-  {
-    key: "over24",
-    title: "Revisions that took over 24 h to publish",
-    countless: true,
-    format: formatPercent,
-    series: [{key: "over24", title: "share", value: shareOf((landing) => landing.durations.total > 24 * 3600), color: "#c2476f"}]
   },
   {key: "landed", title: "Revisions landed", countless: true, format: formatCount, series: [{key: "landed", title: "revisions", value: (items) => landingsOf(items).length, color: "#8a4fb5"}]},
   {key: "queue", title: "Waiting in the Lando queue", span: 2, countless: true, format: formatWait, series: stagePair("queue", ["#9bd0b0", "#237a4b"])},
@@ -141,25 +130,23 @@ const METRICS = [
     format: formatCount,
     series: [{key: "afternightly", title: "revisions", value: (items) => landingsOf(items).filter(({journey}) => journey.backedOut && journey.published !== null && journey.published < journey.backout).length, color: "#7a1f26"}]
   },
-  {key: "inflight", title: "Revisions in flight", countless: true, format: formatCount, series: [{key: "inflight", title: "revisions", value: countOfStatus("in flight"), color: "#d99a00"}]},
   {
-    key: "oldest",
-    title: "Oldest revision in flight",
+    key: "permerge",
+    title: "Revisions per merge to main",
     countless: true,
-    format: formatWait,
+    format: formatRatio,
     series: [
       {
-        key: "oldest",
-        title: "age",
+        key: "permerge",
+        title: "revisions",
         value: (items) => {
-          const ages = landingsOf(items).filter((landing) => landing.status === "in flight").map((landing) => (marks.landoUntil - landing.journey.requested) / 3600);
-          return ages.length ? d3.max(ages) : undefined;
+          const merged = items.filter((item) => item.kind === "merge").length;
+          return merged ? landingsOf(items).length / merged : undefined;
         },
         color: "#d99a00"
       }
     ]
-  },
-  {key: "unmatched", title: `Revisions unmatched after ${UNMATCHED_AFTER_S / 86400} days`, countless: true, format: formatCount, series: [{key: "unmatched", title: "revisions", value: countOfStatus("unmatched"), color: "#888"}]}
+  }
 ];
 
 const CUTOFF_KEY = "cohort";

@@ -448,10 +448,6 @@
             "p50 13 h 41 min p90 27 h 21 min p99 38 h 36 min"
           ],
           [
-            "Revisions that took over 24 h to publish",
-            "17.4%"
-          ],
-          [
             "Revisions landed",
             "1,574"
           ],
@@ -488,28 +484,20 @@
             "0"
           ],
           [
-            "Revisions in flight",
-            "262"
-          ],
-          [
-            "Oldest revision in flight",
-            "26 h 29 min"
-          ],
-          [
-            "Revisions unmatched after 7 days",
-            "0"
+            "Revisions per merge to main",
+            "68.4"
           ]
         ],
-        "svgs": 25,
+        "svgs": 22,
         "circles": 1482,
-        "lines": 11059,
-        "paths": 142,
+        "lines": 11053,
+        "paths": 136,
         "anchors": 0,
-        "nodes": 12971,
-        "bodyNodes": 13489,
+        "nodes": 12920,
+        "bodyNodes": 13438,
         "inlineErrors": 0,
-        "html": "969485226ae74621",
-        "styles": "eef517b313cfc684"
+        "html": "e7fb44a135db9cb9",
+        "styles": "68ae45b95ffa165e"
       },
       "hover": {
         "end to end": {
@@ -569,10 +557,10 @@
           ],
           "charts": 1,
           "circles": 1482,
-          "lines": 9485,
-          "nodes": 11397,
-          "html": "76b414c1f5a78a4b",
-          "styles": "065254d83dbbafc6"
+          "lines": 9479,
+          "nodes": 11346,
+          "html": "db4b5b1c719a388e",
+          "styles": "1a01534faf00400e"
         },
         "shown": {
           "pressed": [
@@ -587,10 +575,10 @@
           ],
           "charts": 1,
           "circles": 1482,
-          "lines": 11059,
-          "nodes": 12971,
-          "html": "d4ffc71c452dda36",
-          "styles": "120ae37b44fb8b09"
+          "lines": 11053,
+          "nodes": 12920,
+          "html": "2aac653ab22cf7d6",
+          "styles": "24581bc7bb180291"
         },
         "alone": {
           "pressed": [
@@ -605,10 +593,10 @@
           ],
           "charts": 1,
           "circles": 1482,
-          "lines": 1615,
-          "nodes": 3527,
-          "html": "bc32f367006d91dd",
-          "styles": "14502466103f4226"
+          "lines": 1609,
+          "nodes": 3476,
+          "html": "bc394aa938b53f2a",
+          "styles": "f2aa54482f558e43"
         },
         "all": {
           "pressed": [
@@ -623,19 +611,19 @@
           ],
           "charts": 1,
           "circles": 1482,
-          "lines": 11059,
-          "nodes": 12971,
-          "html": "d4ffc71c452dda36",
-          "styles": "120ae37b44fb8b09"
+          "lines": 11053,
+          "nodes": 12920,
+          "html": "2aac653ab22cf7d6",
+          "styles": "24581bc7bb180291"
         },
         "collapsed": {
           "pressed": [],
           "charts": 0,
           "circles": 0,
-          "lines": 28,
-          "nodes": 275,
-          "html": "e0d50520e4dd16a3",
-          "styles": "469e83ba81c166a6"
+          "lines": 22,
+          "nodes": 224,
+          "html": "cb9e0a828a64be2e",
+          "styles": "10d741139ccb98c8"
         },
         "expanded": {
           "pressed": [
@@ -650,10 +638,10 @@
           ],
           "charts": 1,
           "circles": 1482,
-          "lines": 11059,
-          "nodes": 12971,
-          "html": "d4ffc71c452dda36",
-          "styles": "120ae37b44fb8b09"
+          "lines": 11053,
+          "nodes": 12920,
+          "html": "2aac653ab22cf7d6",
+          "styles": "24581bc7bb180291"
         },
         "restored": true
       },
@@ -666,10 +654,6 @@
           [
             "Land to published in a Nightly",
             "p50 15 h 54 min p90 30 h 37 min p99 39 h 26 min"
-          ],
-          [
-            "Revisions that took over 24 h to publish",
-            "36.1%"
           ],
           [
             "Revisions landed",
@@ -708,28 +692,20 @@
             "0"
           ],
           [
-            "Revisions in flight",
-            "0"
-          ],
-          [
-            "Oldest revision in flight",
-            "–"
-          ],
-          [
-            "Revisions unmatched after 7 days",
-            "0"
+            "Revisions per merge to main",
+            "68.9"
           ]
         ],
-        "svgs": 25,
+        "svgs": 22,
         "circles": 465,
-        "lines": 3400,
-        "paths": 61,
+        "lines": 3397,
+        "paths": 57,
         "anchors": 0,
-        "nodes": 4194,
-        "bodyNodes": 4724,
+        "nodes": 4151,
+        "bodyNodes": 4681,
         "inlineErrors": 0,
-        "html": "354a5c5d46965847",
-        "styles": "eef517b313cfc684"
+        "html": "c39e0da33da83385",
+        "styles": "68ae45b95ffa165e"
       },
       "errors": []
     },
@@ -739,10 +715,6 @@
           [
             "Land to published in a Nightly",
             "p50 13 h 43 min p90 25 h 26 min p99 64 h 47 min"
-          ],
-          [
-            "Revisions that took over 24 h to publish",
-            "11.7%"
           ],
           [
             "Revisions landed",
@@ -781,28 +753,20 @@
             "11"
           ],
           [
-            "Revisions in flight",
-            "262"
-          ],
-          [
-            "Oldest revision in flight",
-            "26 h 29 min"
-          ],
-          [
-            "Revisions unmatched after 7 days",
-            "0"
+            "Revisions per merge to main",
+            "69.4"
           ]
         ],
-        "svgs": 25,
+        "svgs": 22,
         "circles": 1876,
-        "lines": 14039,
-        "paths": 172,
+        "lines": 14033,
+        "paths": 166,
         "anchors": 0,
-        "nodes": 16374,
-        "bodyNodes": 16892,
+        "nodes": 16323,
+        "bodyNodes": 16841,
         "inlineErrors": 0,
-        "html": "a15842623d56994b",
-        "styles": "94534e039f2f2436"
+        "html": "61e44aec2c62197b",
+        "styles": "894daa770b16cf67"
       },
       "hover": {
         "end to end": {
@@ -862,10 +826,10 @@
           ],
           "charts": 1,
           "circles": 1876,
-          "lines": 12039,
-          "nodes": 14374,
-          "html": "add0be66439bfa77",
-          "styles": "45c0a0cd1e2b81ef"
+          "lines": 12033,
+          "nodes": 14323,
+          "html": "ce63b460d00f8f97",
+          "styles": "00070f6d0a59a048"
         },
         "shown": {
           "pressed": [
@@ -880,10 +844,10 @@
           ],
           "charts": 1,
           "circles": 1876,
-          "lines": 14039,
-          "nodes": 16374,
-          "html": "0461294439136da4",
-          "styles": "1f13a3ef2404eb1a"
+          "lines": 14033,
+          "nodes": 16323,
+          "html": "65fbc0d3ca07d03a",
+          "styles": "ed2b64e674d76e29"
         },
         "alone": {
           "pressed": [
@@ -898,10 +862,10 @@
           ],
           "charts": 1,
           "circles": 1876,
-          "lines": 2039,
-          "nodes": 4374,
-          "html": "fd1622446bdf30bb",
-          "styles": "432a8684884d9432"
+          "lines": 2033,
+          "nodes": 4323,
+          "html": "cc0d4c2ac97e454a",
+          "styles": "c11b1fc1b023be0d"
         },
         "all": {
           "pressed": [
@@ -916,19 +880,19 @@
           ],
           "charts": 1,
           "circles": 1876,
-          "lines": 14039,
-          "nodes": 16374,
-          "html": "0461294439136da4",
-          "styles": "1f13a3ef2404eb1a"
+          "lines": 14033,
+          "nodes": 16323,
+          "html": "65fbc0d3ca07d03a",
+          "styles": "ed2b64e674d76e29"
         },
         "collapsed": {
           "pressed": [],
           "charts": 0,
           "circles": 0,
-          "lines": 28,
-          "nodes": 275,
-          "html": "28559f823a532987",
-          "styles": "469e83ba81c166a6"
+          "lines": 22,
+          "nodes": 224,
+          "html": "ddf8abe77ff8f2ad",
+          "styles": "10d741139ccb98c8"
         },
         "expanded": {
           "pressed": [
@@ -943,10 +907,10 @@
           ],
           "charts": 1,
           "circles": 1876,
-          "lines": 14039,
-          "nodes": 16374,
-          "html": "0461294439136da4",
-          "styles": "1f13a3ef2404eb1a"
+          "lines": 14033,
+          "nodes": 16323,
+          "html": "65fbc0d3ca07d03a",
+          "styles": "ed2b64e674d76e29"
         },
         "restored": true
       },
@@ -959,10 +923,6 @@
           [
             "Land to published in a Nightly",
             "p50 13 h 19 min p90 27 h 31 min p99 74 h 55 min"
-          ],
-          [
-            "Revisions that took over 24 h to publish",
-            "12.9%"
           ],
           [
             "Revisions landed",
@@ -1001,28 +961,20 @@
             "2"
           ],
           [
-            "Revisions in flight",
-            "0"
-          ],
-          [
-            "Oldest revision in flight",
-            "–"
-          ],
-          [
-            "Revisions unmatched after 7 days",
-            "0"
+            "Revisions per merge to main",
+            "69.7"
           ]
         ],
-        "svgs": 25,
+        "svgs": 22,
         "circles": 1907,
-        "lines": 14024,
-        "paths": 136,
+        "lines": 14021,
+        "paths": 132,
         "anchors": 0,
-        "nodes": 16335,
-        "bodyNodes": 16865,
+        "nodes": 16292,
+        "bodyNodes": 16822,
         "inlineErrors": 0,
-        "html": "6b0bf216778549fe",
-        "styles": "94534e039f2f2436"
+        "html": "17fb9d66be51410a",
+        "styles": "894daa770b16cf67"
       },
       "errors": []
     },
@@ -1032,10 +984,6 @@
           [
             "Land to published in a Nightly",
             "p50 13 h 42 min p90 30 h 39 min p99 61 h 0 min"
-          ],
-          [
-            "Revisions that took over 24 h to publish",
-            "17.3%"
           ],
           [
             "Revisions landed",
@@ -1074,28 +1022,20 @@
             "1"
           ],
           [
-            "Revisions in flight",
-            "0"
-          ],
-          [
-            "Oldest revision in flight",
-            "–"
-          ],
-          [
-            "Revisions unmatched after 7 days",
-            "0"
+            "Revisions per merge to main",
+            "70.1"
           ]
         ],
-        "svgs": 25,
+        "svgs": 22,
         "circles": 1655,
-        "lines": 12286,
-        "paths": 142,
+        "lines": 12283,
+        "paths": 138,
         "anchors": 0,
-        "nodes": 14352,
-        "bodyNodes": 14907,
+        "nodes": 14309,
+        "bodyNodes": 14864,
         "inlineErrors": 0,
-        "html": "aef77309629cb407",
-        "styles": "eef517b313cfc684"
+        "html": "1795b37124067384",
+        "styles": "68ae45b95ffa165e"
       },
       "hover": {
         "end to end": {
@@ -1155,10 +1095,10 @@
           ],
           "charts": 1,
           "circles": 1655,
-          "lines": 10534,
-          "nodes": 12600,
-          "html": "4a20a55087cd7446",
-          "styles": "065254d83dbbafc6"
+          "lines": 10531,
+          "nodes": 12557,
+          "html": "14dd7aa2be26c01b",
+          "styles": "1a01534faf00400e"
         },
         "shown": {
           "pressed": [
@@ -1173,10 +1113,10 @@
           ],
           "charts": 1,
           "circles": 1655,
-          "lines": 12286,
-          "nodes": 14352,
-          "html": "2d12d46cc2be1964",
-          "styles": "120ae37b44fb8b09"
+          "lines": 12283,
+          "nodes": 14309,
+          "html": "f8f77c0fc629f5af",
+          "styles": "24581bc7bb180291"
         },
         "alone": {
           "pressed": [
@@ -1191,10 +1131,10 @@
           ],
           "charts": 1,
           "circles": 1655,
-          "lines": 1774,
-          "nodes": 3840,
-          "html": "cb8d2ccc00c7c73a",
-          "styles": "14502466103f4226"
+          "lines": 1771,
+          "nodes": 3797,
+          "html": "a0bc6f328a537f5a",
+          "styles": "f2aa54482f558e43"
         },
         "all": {
           "pressed": [
@@ -1209,19 +1149,19 @@
           ],
           "charts": 1,
           "circles": 1655,
-          "lines": 12286,
-          "nodes": 14352,
-          "html": "2d12d46cc2be1964",
-          "styles": "120ae37b44fb8b09"
+          "lines": 12283,
+          "nodes": 14309,
+          "html": "f8f77c0fc629f5af",
+          "styles": "24581bc7bb180291"
         },
         "collapsed": {
           "pressed": [],
           "charts": 0,
           "circles": 0,
-          "lines": 14,
-          "nodes": 245,
-          "html": "7956783644461e76",
-          "styles": "469e83ba81c166a6"
+          "lines": 11,
+          "nodes": 202,
+          "html": "dde1aa5620bf8458",
+          "styles": "10d741139ccb98c8"
         },
         "expanded": {
           "pressed": [
@@ -1236,10 +1176,10 @@
           ],
           "charts": 1,
           "circles": 1655,
-          "lines": 12286,
-          "nodes": 14352,
-          "html": "2d12d46cc2be1964",
-          "styles": "120ae37b44fb8b09"
+          "lines": 12283,
+          "nodes": 14309,
+          "html": "f8f77c0fc629f5af",
+          "styles": "24581bc7bb180291"
         },
         "restored": true
       },
@@ -1252,10 +1192,6 @@
           [
             "Land to published in a Nightly",
             "p50 13 h 46 min p90 27 h 3 min p99 39 h 54 min"
-          ],
-          [
-            "Revisions that took over 24 h to publish",
-            "14.5%"
           ],
           [
             "Revisions landed",
@@ -1294,28 +1230,20 @@
             "1"
           ],
           [
-            "Revisions in flight",
-            "0"
-          ],
-          [
-            "Oldest revision in flight",
-            "–"
-          ],
-          [
-            "Revisions unmatched after 7 days",
-            "0"
+            "Revisions per merge to main",
+            "70.9"
           ]
         ],
-        "svgs": 25,
+        "svgs": 22,
         "circles": 942,
-        "lines": 6968,
-        "paths": 92,
+        "lines": 6965,
+        "paths": 88,
         "anchors": 0,
-        "nodes": 8268,
-        "bodyNodes": 8835,
+        "nodes": 8225,
+        "bodyNodes": 8792,
         "inlineErrors": 0,
-        "html": "66d68915fa834be4",
-        "styles": "eef517b313cfc684"
+        "html": "001630dc45664bd1",
+        "styles": "68ae45b95ffa165e"
       },
       "errors": []
     }
