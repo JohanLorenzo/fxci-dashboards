@@ -77,7 +77,6 @@ async function runOnce(browser, origin, scenario, screenshot) {
     if (screenshot) await page.screenshot({path: screenshot, fullPage: true});
     const loadFrames = await framesSince(page, 0);
 
-    const interactionStart = await frameCount(page);
     const hovered = {};
     let hover_p95_ms = 0;
     for (const target of scenario.hover) {
@@ -85,6 +84,9 @@ async function runOnce(browser, origin, scenario, screenshot) {
       hovered[target.name] = {tooltips};
       hover_p95_ms = Math.max(hover_p95_ms, percentile(times, 0.95));
     }
+    // A sweep of the pointer runs in one task, so a gap over it is the sum of its moves.
+    // The cost of a move is hover_p95_ms, and the gaps are those of what follows.
+    const interactionStart = await frameCount(page);
     const pinned = scenario.pin ? await pin(page, {selector: scenario.charts, index: scenario.pin.chart, tooltip: scenario.tooltip, ring: scenario.ring}) : null;
     const legendUse = scenario.legend ? await legend(page, {root: scenario.root, ...scenario.legend}) : null;
     const zoomed = await zoom(page, {selector: scenario.charts, index: scenario.zoom.chart, from: scenario.zoom.from, to: scenario.zoom.to, root: scenario.root});
