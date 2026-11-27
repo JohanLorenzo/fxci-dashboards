@@ -86,6 +86,7 @@ function ensureStyles() {
 export const LEGEND_MARKERS = {
   dot: (color) => svg`<svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="4" fill="${color}"></circle></svg>`,
   cross: (color) => svg`<svg width="10" height="10" aria-hidden="true"><path d="M1 1L9 9M1 9L9 1" stroke="${color}" stroke-width="1.6"></path></svg>`,
+  ring: (color) => svg`<svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="3.6" fill="none" stroke="${color}" stroke-width="1.6"></circle></svg>`,
   diamond: (color) => svg`<svg width="10" height="10" aria-hidden="true"><path d="M5 0.8L9.2 5L5 9.2L0.8 5Z" fill="none" stroke="${color}" stroke-width="1.6"></path></svg>`,
   triangle: (color) => svg`<svg width="10" height="10" aria-hidden="true"><path d="M5 0.9L9.3 9H0.7Z" fill="none" stroke="${color}" stroke-width="1.6" stroke-linejoin="round"></path></svg>`,
   square: (color) => svg`<svg width="10" height="10" aria-hidden="true"><rect x="1" y="1" width="8" height="8" fill="none" stroke="${color}" stroke-width="1.6"></rect></svg>`,

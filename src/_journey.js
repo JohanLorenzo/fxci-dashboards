@@ -27,6 +27,19 @@ export const STAGE_INFO = [
   {key: "uptake", title: "Until half of the clients run it", color: "#8a4fb5"}
 ];
 
+// The Lando queue and the time on autoland are told apart by whether the tree was
+// closed, which is what held up most of a long wait.
+export const CANDLE_SEGMENTS = [
+  {key: "queueOpen", title: "Lando queue", color: "#6fbf8e"},
+  {key: "queueClosed", title: "Lando queue, while autoland was closed", color: "#e07b7b"},
+  {key: "lando", title: "Lando landing", color: "#237a4b"},
+  {key: "autolandOpen", title: "On autoland until merged to main", color: "#e0902c"},
+  {key: "autolandClosed", title: "On autoland, while it was closed", color: "#b3202a"},
+  {key: "waiting", title: "Merged to main until the Nightly starts", color: "#cf5b82"},
+  {key: "build", title: "Nightly build and publish", color: "#5b6abf"},
+  {key: "uptake", title: "Until half of the clients run it", color: "#8a4fb5"}
+];
+
 export const MEASURES = [{key: "total", title: "Land to published in a Nightly"}, ...STAGE_INFO.map(({key, title}) => ({key, title}))];
 
 const between = (later, earlier) => (later == null || earlier == null ? null : later - earlier);
@@ -152,6 +165,43 @@ export function topNames(names, count) {
     .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))
     .slice(0, count)
     .map(([name]) => name);
+}
+
+const STAGE_ORDER = [...STAGES.map(([stage]) => stage), "uptake"];
+const OPEN_ENDS = {queue: "landoUntil", lando: "commitMapsUntil", autoland: "treeherderUntil", waiting: "treeherderUntil", build: "fxciUntil"};
+
+// What a landing's bar is made of, in seconds, and where it ends: at half of the clients
+// on the build, at its backout, or, for a landing still on its way, at what the source
+// of its next event has recorded, which is not the present.
+export function candleOf(journey, marks) {
+  const bounds = [journey.requested, journey.landoStarted, journey.pushed, journey.merged, journey.nightlyStarted, journey.published, journey.uptake?.t50 ?? null];
+  const openAt = bounds.indexOf(null);
+  let end;
+  let kind = "open";
+  if (journey.backedOut) {
+    end = journey.backout;
+    kind = "backed out";
+  } else if (openAt === -1) {
+    end = bounds[6];
+    kind = "shipped";
+  } else {
+    const stage = STAGE_ORDER[openAt - 1];
+    const watermark = stage === "uptake" ? (journey.uptake?.observedUntil ?? marks.uptakeUntil) : marks[OPEN_ENDS[stage]];
+    end = Math.max(watermark ?? bounds[openAt - 1], bounds[openAt - 1]);
+  }
+  const [queue, lando, autoland, waiting, build, uptake] = STAGE_ORDER.map((_, index) => {
+    const start = bounds[index];
+    if (start === null) return 0;
+    return Math.max(0, Math.min(bounds[index + 1] ?? end, end) - Math.min(start, end));
+  });
+  const queueClosed = Math.min(journey.queueClosed ?? 0, queue);
+  const autolandClosed = Math.min(journey.autolandClosed ?? 0, autoland);
+  return {
+    segments: {queueOpen: queue - queueClosed, queueClosed, lando, autolandOpen: autoland - autolandClosed, autolandClosed, waiting, build, uptake},
+    total: end - journey.requested,
+    end,
+    kind
+  };
 }
 
 export const stackBucket = (size) => (size <= 2 ? String(size) : size <= 5 ? "3 to 5" : "6 or more");

@@ -10,12 +10,12 @@ landing is followed through Lando, autoland, the merge to main, the Nightly buil
 and, last, how soon the Nightly population runs the build.
 
 ```js
-import {dominantStage, durationsOf, inCohort, journeyOf, matchesQuery, MEASURES, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, stackBucket, STAGE_INFO, statusOf, topNames, UPTAKE_HORIZON_S, uptakeByBuild, watermarksOf} from "./_journey.js";
+import {candleOf, CANDLE_SEGMENTS, dominantStage, durationsOf, inCohort, journeyOf, matchesQuery, MEASURES, mergesOf, parseRevision, PUBLISH_HORIZON_S, quantile, stackBucket, STAGE_INFO, statusOf, topNames, UPTAKE_HORIZON_S, uptakeByBuild, watermarksOf} from "./_journey.js";
 import {attachPlotHover, createTooltip, nearestDot} from "./_tooltip.js";
 import {chartBox, dateAxis, DAY_MS, eventRule, formatTime, MARGINS, syncCharts} from "./_time-charts.js";
 import {collapsibleBlock, hiddenKeysState, LEGEND_MARKERS} from "./_legend.js";
 import {countOf, metricsRow} from "./_metrics.js";
-import {segmentLines} from "./_candles.js";
+import {candleChart, segmentLines} from "./_candles.js";
 ```
 
 ```js
@@ -34,19 +34,23 @@ const uptake = uptakeByBuild(uptakeRows);
 const journeys = journeyRows.map((row) => journeyOf(row, uptake));
 const secondsToDate = (seconds) => new Date(seconds * 1000);
 
-const landings = journeys.map((journey) => {
-  const durations = durationsOf(journey);
-  return {
-    kind: "landing",
-    time: secondsToDate(journey.requested),
-    journey,
-    durations,
-    stage: dominantStage(durations),
-    status: statusOf(journey, marks),
-    publishCohort: inCohort(journey, publishUntil, PUBLISH_HORIZON_S),
-    uptakeCohort: inCohort(journey, uptakeUntil, UPTAKE_HORIZON_S)
-  };
-});
+// The charts keep the newest when there are too many to draw, so the order is by request.
+const landings = journeys
+  .map((journey) => {
+    const durations = durationsOf(journey);
+    return {
+      kind: "landing",
+      time: secondsToDate(journey.requested),
+      journey,
+      durations,
+      stage: dominantStage(durations),
+      candle: candleOf(journey, marks),
+      status: statusOf(journey, marks),
+      publishCohort: inCohort(journey, publishUntil, PUBLISH_HORIZON_S),
+      uptakeCohort: inCohort(journey, uptakeUntil, UPTAKE_HORIZON_S)
+    };
+  })
+  .sort((a, b) => a.time - b.time);
 const merges = mergesOf(journeys).map((merge) => ({kind: "merge", time: secondsToDate(merge.merged)}));
 const closures = closureRows
   .filter((row) => row.status === "closed" && row.end_s !== null)
@@ -192,7 +196,10 @@ const CUTOFF_KEY = "cohort";
 const publishCutoff = secondsToDate(publishUntil - PUBLISH_HORIZON_S);
 const METRICS_TITLE = {chartKey: "chart-metrics", title: "Top line metrics"};
 const LANDINGS_TITLE = {chartKey: "chart-landings", title: "Landed revisions"};
+const E2E_TITLE = {chartKey: "chart-endtoend", title: "From Land to a Nightly that people run"};
 const LANDINGS_HEIGHT = 300;
+const CANDLES_HEIGHT = 300;
+const MAX_CANDLES = 2000;
 const MAX_DOTS = 5000;
 const HIT_RADIUS = 8;
 const DOT_RADIUS = 3;
@@ -356,16 +363,79 @@ function landingsChart({shown, width, hidden, domain, measure, scheme, modeKey})
   return htl.html`${chartBox(plot, LANDINGS_HEIGHT)}${notes.length ? htl.html`<p class="bw-note">${notes.join(" ")}</p>` : ""}`;
 }
 
+// How a candle ends is part of what it says: half of the clients on the build, a backout,
+// or the last thing recorded for a landing that is still on its way.
+const END_KINDS = [
+  {key: "end-shipped", kind: "shipped", title: "reached half of the Nightly clients", marker: () => LEGEND_MARKERS.dot("currentColor")},
+  {key: "end-backed-out", kind: "backed out", title: "was backed out", marker: () => LEGEND_MARKERS.cross(BACKOUT_COLOR)},
+  {key: "end-open", kind: "open", title: "still on its way, drawn up to what is recorded", marker: () => LEGEND_MARKERS.ring("currentColor")}
+];
+const endKeyOf = (kind) => END_KINDS.find((end) => end.kind === kind).key;
+const swatch = ({key, title, color}) => ({key, title, marker: () => LEGEND_MARKERS.swatch(color, 0.8)});
+const candleGroups = () => [
+  {title: "Stage", entries: CANDLE_SEGMENTS.slice(0, -1).map(swatch)},
+  {title: "Then", entries: CANDLE_SEGMENTS.slice(-1).map(swatch)},
+  {title: "A candle ends when it", entries: END_KINDS.map(({key, title, marker}) => ({key, title, marker}))}
+];
+
+function showCandle(event, point, chartRect) {
+  if (!tooltip.open(event, point.item, landingLines(point.item))) return;
+  tooltip.showRing(chartRect, point, 12);
+}
+
+// A bar for each landing at the moment it was requested, stacked from what happened
+// first to what happened last, with a mark at its top that says how it ended. The
+// height scale comes from all the landings of the days shown, so that hiding some does
+// not rescale it. A bar is a line for each stage, so only the most recent are drawn.
+function candlesChart({shown, width, hidden, domain}) {
+  const wanted = shown.filter((landing) => !hidden.has(endKeyOf(landing.candle.kind)));
+  const items = wanted.slice(-MAX_CANDLES);
+  const maxHours = Math.max(1, d3.max(shown, (landing) => landing.candle.total) / 3600);
+  const barWidth = Math.min(5, Math.max(1, (width - MARGINS.left - MARGINS.right) / Math.max(1, items.length)));
+  const chosen = new Set(selectedLandings);
+  const plot = candleChart({
+    items,
+    segments: CANDLE_SEGMENTS,
+    hidden,
+    domain,
+    width,
+    height: CANDLES_HEIGHT,
+    maxHours,
+    durationsOf: (landing) => landing.candle.segments,
+    barWidth,
+    hitRadius: HIT_RADIUS,
+    tooltip,
+    show: showCandle,
+    before: [eventRule(domain, new Set(), {key: CUTOFF_KEY, date: publishCutoff})],
+    after: ({topHours, ends}) => {
+      const ended = (kind) => ends.filter((landing) => landing.candle.kind === kind);
+      return [
+        Plot.dot(ended("shipped"), {x: "time", y: topHours, r: 3, fill: "currentColor"}),
+        Plot.dot(ended("backed out"), {x: "time", y: topHours, r: 5, symbol: "cross", stroke: BACKOUT_COLOR, strokeWidth: 2}),
+        Plot.dot(ended("open"), {x: "time", y: topHours, r: 3, fill: "white", stroke: "currentColor"}),
+        Plot.dot(ends.filter((landing) => chosen.has(landing)), {x: "time", y: topHours, r: 9, stroke: BACKOUT_COLOR, strokeWidth: 2, fill: "none"})
+      ];
+    }
+  });
+  const cut = wanted.length - items.length;
+  return htl.html`${chartBox(plot, CANDLES_HEIGHT)}${cut ? htl.html`<p class="bw-note">Only the ${formatCount(MAX_CANDLES)} most recent are drawn, of ${formatCount(wanted.length)}.</p>` : ""}`;
+}
+
 function section(width, hidden, requester, domain, measure, modeKey) {
   const items = itemsIn(domain, requester);
   const shown = landingsOf(items);
   const scheme = colorScheme(modeKey, shown);
   const modeTitle = COLOR_MODES.find(({key}) => key === modeKey).title;
+  const none = () => htl.html`<p class="bw-note">No revisions in this range.</p>`;
   const bodies = {
+    "chart-endtoend": {
+      groups: () => (shown.length ? candleGroups() : null),
+      draw: (ownHidden) => (shown.length ? candlesChart({shown, width, hidden: ownHidden, domain}) : none())
+    },
     "chart-metrics": {groups: () => null, draw: () => metricsBlock(items, width, domain)},
     "chart-landings": {
       groups: () => [{title: modeTitle, entries: scheme.entries.map(({key, title, color}) => ({key: `${modeKey}-${key}`, title, marker: () => LEGEND_MARKERS.dot(color)}))}],
-      draw: (ownHidden) => (shown.length ? landingsChart({shown, width, hidden: ownHidden, domain, measure, scheme, modeKey}) : htl.html`<p class="bw-note">No revisions in this range.</p>`)
+      draw: (ownHidden) => (shown.length ? landingsChart({shown, width, hidden: ownHidden, domain, measure, scheme, modeKey}) : none())
     }
   };
   const block = (item) =>
@@ -377,7 +447,7 @@ function section(width, hidden, requester, domain, measure, modeKey) {
       cache: blockCache,
       body: ({chartKey}, ownHidden) => ({groups: bodies[chartKey].groups(), content: bodies[chartKey].draw(ownHidden)})
     });
-  const element = htl.html`<section class="sn-section">${[METRICS_TITLE, LANDINGS_TITLE].map(block)}</section>`;
+  const element = htl.html`<section class="sn-section">${[METRICS_TITLE, LANDINGS_TITLE, E2E_TITLE].map(block)}</section>`;
   syncCharts(element, domain, (from, to) => setRange(d3.utcDay.floor(from), d3.utcDay.floor(new Date(Math.max(+from, +to - 1)))), tooltip);
   return element;
 }

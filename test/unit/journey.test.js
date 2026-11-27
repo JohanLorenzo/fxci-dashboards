@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import {describe, test} from "node:test";
 import {
+  candleOf,
+  CANDLE_SEGMENTS,
   currentStage,
   dominantStage,
   durationsOf,
@@ -355,5 +357,102 @@ describe("topNames", () => {
 describe("stackBucket", () => {
   test("groups the sizes of stacks", () => {
     assert.deepEqual([1, 2, 3, 5, 6, 40].map(stackBucket), ["1", "2", "3 to 5", "3 to 5", "6 or more", "6 or more"]);
+  });
+});
+
+describe("the candle segments", () => {
+  test("go from what happens first to what happens last, with uptake on top", () => {
+    assert.deepEqual(CANDLE_SEGMENTS.map(({key}) => key), ["queueOpen", "queueClosed", "lando", "autolandOpen", "autolandClosed", "waiting", "build", "uptake"]);
+    assert.ok(CANDLE_SEGMENTS.every(({title, color}) => title && /^#[0-9a-f]{6}$/i.test(color)));
+    assert.equal(new Set(CANDLE_SEGMENTS.map(({color}) => color)).size, CANDLE_SEGMENTS.length);
+  });
+});
+
+describe("candleOf", () => {
+  const marks = {landoUntil: T0 + 30 * 86400, treeherderUntil: T0 + 30 * 86400 - 5 * HOUR, fxciUntil: T0 + 30 * 86400 - 11 * HOUR, commitMapsUntil: T0 + 30 * 86400 - HOUR};
+  const candle = (overrides = {}, uptake = [uptakeRow()]) => candleOf(journeyOf(row(overrides), uptakeByBuild(uptake)), marks);
+  const sum = (segments) => Object.values(segments).reduce((total, seconds) => total + seconds, 0);
+
+  test("stacks every stage up to half of the clients for a landing that shipped", () => {
+    const {segments, total, end, kind} = candle();
+    assert.deepEqual(segments, {queueOpen: 300, queueClosed: 0, lando: 120, autolandOpen: 6 * HOUR - 420 - 1800, autolandClosed: 1800, waiting: 2 * HOUR, build: 2 * HOUR, uptake: 24 * HOUR});
+    assert.equal(kind, "shipped");
+    assert.equal(end, T0 + 34 * HOUR);
+    assert.equal(total, 34 * HOUR);
+    assert.equal(sum(segments), total);
+  });
+
+  test("splits the Lando queue into what waited for the tree to open and the rest", () => {
+    const {segments} = candle({queue_closed_s: 200});
+    assert.equal(segments.queueOpen, 100);
+    assert.equal(segments.queueClosed, 200);
+  });
+
+  test("does not count more closed time than the stage lasted", () => {
+    const {segments, total} = candle({queue_closed_s: 99999, autoland_closed_s: 99 * HOUR});
+    assert.equal(segments.queueClosed, 300);
+    assert.equal(segments.queueOpen, 0);
+    assert.equal(segments.autolandClosed, 6 * HOUR - 420);
+    assert.equal(segments.autolandOpen, 0);
+    assert.equal(sum(segments), total);
+  });
+
+  test("ends a backed out landing at its backout, and drops what came after", () => {
+    const {segments, kind, end, total} = candle({backed_out: true, backout_by: "sheriff-b", backout_s: T0 + 5 * HOUR});
+    assert.equal(kind, "backed out");
+    assert.equal(end, T0 + 5 * HOUR);
+    assert.equal(segments.waiting, 0);
+    assert.equal(segments.build, 0);
+    assert.equal(segments.uptake, 0);
+    assert.equal(segments.autolandOpen + segments.autolandClosed, 5 * HOUR - 420);
+    assert.equal(sum(segments), total);
+  });
+
+  test("cuts the stage that a backout interrupted", () => {
+    const {segments, total} = candle({backed_out: true, backout_by: "sheriff-b", backout_s: T0 + 9 * HOUR});
+    assert.equal(segments.waiting, 2 * HOUR);
+    assert.equal(segments.build, HOUR);
+    assert.equal(segments.uptake, 0);
+    assert.equal(sum(segments), total);
+  });
+
+  test("runs a landing in flight up to what its next event's source has recorded", () => {
+    const waiting = candle({nightly_started_s: null, nightly_published_s: null, nightly_decision_id: null, nightly_build_id: null});
+    assert.equal(waiting.kind, "open");
+    assert.equal(waiting.end, marks.treeherderUntil);
+    assert.equal(waiting.segments.waiting, marks.treeherderUntil - (T0 + 6 * HOUR));
+    assert.equal(waiting.segments.build, 0);
+    assert.equal(sum(waiting.segments), waiting.total);
+
+    const queued = candle({lando_started_s: null, autoland_pushed_s: null, merged_s: null, nightly_started_s: null, nightly_published_s: null, nightly_build_id: null});
+    assert.equal(queued.end, marks.landoUntil);
+    assert.equal(queued.segments.queueOpen + queued.segments.queueClosed, marks.landoUntil - T0);
+    assert.equal(sum(queued.segments), queued.total);
+
+    const building = candle({nightly_published_s: null, nightly_build_id: null});
+    assert.equal(building.end, marks.fxciUntil);
+    assert.equal(building.segments.build, marks.fxciUntil - (T0 + 8 * HOUR));
+  });
+
+  test("never ends before the stage began, when its source is behind", () => {
+    const behind = candleOf(journeyOf(row({lando_started_s: T0 + 300, autoland_pushed_s: null, merged_s: null, nightly_started_s: null, nightly_published_s: null, nightly_build_id: null}), new Map()), {...marks, commitMapsUntil: T0 + 100});
+    assert.equal(behind.end, T0 + 300);
+    assert.equal(behind.segments.lando, 0);
+    assert.equal(sum(behind.segments), behind.total);
+  });
+
+  test("is open after publication until half of the clients run the build", () => {
+    const {segments, kind, end, total} = candle({}, [uptakeRow({t50_s: null, observed_until_s: T0 + 20 * HOUR})]);
+    assert.equal(kind, "open");
+    assert.equal(end, T0 + 20 * HOUR);
+    assert.equal(segments.uptake, 10 * HOUR);
+    assert.equal(sum(segments), total);
+  });
+
+  test("has no uptake for a build that nobody was seen on yet", () => {
+    const {segments, kind, end} = candle({}, []);
+    assert.equal(kind, "open");
+    assert.equal(segments.uptake, 0);
+    assert.equal(end, T0 + 10 * HOUR);
   });
 });
