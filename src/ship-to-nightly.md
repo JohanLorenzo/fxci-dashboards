@@ -313,10 +313,10 @@ const closuresIn = ([from, to]) =>
     .map(({start, end}) => ({start: new Date(Math.max(+start, +from)), end: new Date(Math.min(+end, +to))}));
 const candleGroups = () => [
   {title: "Stage", entries: CANDLE_SEGMENTS.map(swatch)},
-  {title: "Autoland", entries: [{key: CLOSURES_KEY, title: "was closed", marker: () => LEGEND_MARKERS.swatch(BACKOUT_COLOR, 0)}]},
   {
     title: "Time markers",
     entries: [
+      {key: CLOSURES_KEY, title: "autoland was closed", marker: () => LEGEND_MARKERS.swatch(BACKOUT_COLOR, 0)},
       {key: NIGHTLY_KEY, title: "a Nightly started", marker: () => LEGEND_MARKERS.rule(MARKS.nightly.color, MARKS.nightly.opacity)},
       {key: MERGE_KEY, title: "a merge to main", marker: () => LEGEND_MARKERS.rule(MARKS.merge.color, MARKS.merge.opacity)}
     ]
