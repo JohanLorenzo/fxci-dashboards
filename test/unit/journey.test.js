@@ -283,12 +283,21 @@ describe("candleOf", () => {
 
   test("ends a backed out landing at its backout, and drops what came after", () => {
     const {segments, kind, end, total} = candle({backed_out: true, backout_by: "sheriff-b", backout_s: T0 + 5 * HOUR});
-    assert.equal(kind, "backed out");
+    assert.equal(kind, "backed out on autoland");
     assert.equal(end, T0 + 5 * HOUR);
     assert.equal(segments.waiting, 0);
     assert.equal(segments.build, 0);
     assert.equal(segments.autoland, 5 * HOUR - 420);
     assert.equal(sum(segments), total);
+  });
+
+  test("tells a backout after the merge to main from one before it", () => {
+    const backout = (at) => candle({backed_out: true, backout_by: "sheriff-b", backout_s: at}).kind;
+    assert.equal(backout(T0 + 6 * HOUR - 1), "backed out on autoland");
+    assert.equal(backout(T0 + 6 * HOUR), "backed out on main");
+    assert.equal(backout(T0 + 9 * HOUR), "backed out on main");
+    const unmerged = candle({backed_out: true, backout_by: "sheriff-b", backout_s: T0 + 5 * HOUR, merged_s: null, nightly_started_s: null, nightly_published_s: null});
+    assert.equal(unmerged.kind, "backed out on autoland");
   });
 
   test("cuts the stage that a backout interrupted", () => {

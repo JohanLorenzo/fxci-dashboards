@@ -1,5 +1,6 @@
 // Legends whose entries hide and show the series of a chart, the state of what is
 // hidden, and the charts that collapse under their title.
+import * as d3 from "npm:d3";
 import {html, svg} from "npm:htl";
 import {MARGINS} from "./_time-charts.js";
 
@@ -83,7 +84,13 @@ function ensureStyles() {
   document.head.append(style);
 }
 
+// The shapes that Plot names, drawn the way it draws a dot of that radius, so that a legend
+// shows exactly what the chart does.
+const SYMBOL_TYPES = {circle: d3.symbolCircle, cross: d3.symbolCross, times: d3.symbolTimes};
+
 export const LEGEND_MARKERS = {
+  symbol: ({symbol = "circle", r, fill = "none", stroke = "none", strokeWidth = 1}) =>
+    svg`<svg width="14" height="14" aria-hidden="true"><path transform="translate(7,7)" d="${d3.symbol(SYMBOL_TYPES[symbol], r * r * Math.PI)()}" fill="${fill}" stroke="${stroke}" stroke-width="${strokeWidth}"></path></svg>`,
   dot: (color) => svg`<svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="4" fill="${color}"></circle></svg>`,
   cross: (color) => svg`<svg width="10" height="10" aria-hidden="true"><path d="M1 1L9 9M1 9L9 1" stroke="${color}" stroke-width="1.6"></path></svg>`,
   ring: (color) => svg`<svg width="10" height="10" aria-hidden="true"><circle cx="5" cy="5" r="3.6" fill="none" stroke="${color}" stroke-width="1.6"></circle></svg>`,

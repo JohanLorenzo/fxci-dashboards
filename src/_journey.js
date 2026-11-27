@@ -152,10 +152,14 @@ export function spansOf(journey, marks) {
   return {spans, end, kind};
 }
 
-// What a landing's bar is made of, in seconds. The Lando queue is told apart by whether
-// the tree was closed.
+const backoutKindOf = (journey) => (journey.merged !== null && journey.backout >= journey.merged ? "backed out on main" : "backed out on autoland");
+
+// What a landing's bar is made of, in seconds, and how it ends. The Lando queue is told
+// apart by whether the tree was closed, and a backout by whether the landing had been
+// merged to main by then.
 export function candleOf(journey, marks) {
-  const {spans, end, kind} = spansOf(journey, marks);
+  const {spans, end, kind: spansKind} = spansOf(journey, marks);
+  const kind = spansKind === "backed out" ? backoutKindOf(journey) : spansKind;
   const seconds = (stage) => {
     const span = spans.find(({key}) => key === stage);
     return span ? span.end - span.start : 0;

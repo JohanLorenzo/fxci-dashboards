@@ -291,14 +291,16 @@ function metricsBlock(items, width, domain) {
   });
 }
 
-// How a candle ends is part of what it says: a Nightly published it, it was backed out,
-// or it is still on its way and is drawn up to the last thing recorded.
+// How a candle ends is part of what it says: a Nightly published it, it was backed out
+// before or after it was merged to main, or it is still on its way and is drawn up to
+// the last thing recorded. The mark of each is what the chart draws and the legend shows.
+const MAIN_BACKOUT_COLOR = "#7a1f26";
 const END_KINDS = [
-  {key: "end-shipped", kind: "shipped", title: "was published in a Nightly", marker: () => LEGEND_MARKERS.dot("currentColor")},
-  {key: "end-backed-out", kind: "backed out", title: "was backed out", marker: () => LEGEND_MARKERS.cross(BACKOUT_COLOR)},
-  {key: "end-open", kind: "open", title: "still on its way, drawn up to what is recorded", marker: () => LEGEND_MARKERS.ring("currentColor")}
+  {key: "end-shipped", kind: "shipped", title: "was published in a Nightly", mark: {r: 3, fill: "currentColor"}},
+  {key: "end-backed-out-autoland", kind: "backed out on autoland", title: "was backed out while it was on autoland", mark: {symbol: "cross", r: 5, stroke: BACKOUT_COLOR, strokeWidth: 2}},
+  {key: "end-backed-out-main", kind: "backed out on main", title: "was backed out after it was merged to main", mark: {symbol: "times", r: 5, stroke: MAIN_BACKOUT_COLOR, strokeWidth: 2}},
+  {key: "end-open", kind: "open", title: "still on its way, drawn up to what is recorded", mark: {r: 3, fill: "white", stroke: "currentColor"}}
 ];
-const endKeyOf = (kind) => END_KINDS.find((end) => end.kind === kind).key;
 const swatch = ({key, title, color}) => ({key, title, marker: () => LEGEND_MARKERS.swatch(color, 0.8)});
 const CLOSURES_KEY = "closures";
 const NIGHTLY_KEY = "nightly-starts";
@@ -321,7 +323,7 @@ const candleGroups = () => [
       {key: MERGE_KEY, title: "a merge to main", marker: () => LEGEND_MARKERS.rule(MARKS.merge.color, MARKS.merge.opacity)}
     ]
   },
-  {title: "A candle ends when it", entries: END_KINDS.map(({key, title, marker}) => ({key, title, marker}))}
+  {title: "A candle ends when it", entries: END_KINDS.map(({key, title, mark}) => ({key, title, marker: () => LEGEND_MARKERS.symbol(mark)}))}
 ];
 
 function showCandle(event, point, chartRect) {
@@ -374,8 +376,7 @@ function markerLines(times, {color, opacity, width}, maxHours) {
 // height scale comes from all the landings of the days shown, so that hiding some does
 // not rescale it. A bar is a line for each stage, so only the most recent are drawn.
 function candlesChart({shown, width, hidden, domain}) {
-  const wanted = shown.filter((landing) => !hidden.has(endKeyOf(landing.candle.kind)));
-  const items = wanted.slice(-MAX_CANDLES);
+  const items = shown.slice(-MAX_CANDLES);
   const maxHours = Math.max(1, d3.max(shown, (landing) => landing.candle.total) / 3600);
   const barWidth = Math.min(5, Math.max(1, (width - MARGINS.left - MARGINS.right) / Math.max(1, items.length)));
   const chosen = new Set(selectedLandings);
@@ -407,18 +408,21 @@ function candlesChart({shown, width, hidden, domain}) {
       ...marked.map(({items, ...style}) => markerLines(items.map(({time}) => time), style, maxHours))
     ],
     after: ({topHours, ends}) => {
-      const ended = (kind) => ends.filter((landing) => landing.candle.kind === kind);
+      const marks = END_KINDS.filter(({key}) => !hidden.has(key)).map(({kind, mark}) =>
+        Plot.dot(
+          ends.filter((landing) => landing.candle.kind === kind),
+          {x: "time", y: topHours, ...mark}
+        )
+      );
       return [
-        Plot.dot(ended("shipped"), {x: "time", y: topHours, r: 3, fill: "currentColor"}),
-        Plot.dot(ended("backed out"), {x: "time", y: topHours, r: 5, symbol: "cross", stroke: BACKOUT_COLOR, strokeWidth: 2}),
-        Plot.dot(ended("open"), {x: "time", y: topHours, r: 3, fill: "white", stroke: "currentColor"}),
+        ...marks,
         Plot.dot(ends.filter((landing) => chosen.has(landing)), {x: "time", y: topHours, r: 9, stroke: BACKOUT_COLOR, strokeWidth: 2, fill: "none"}),
         Plot.dot(ends.filter((landing) => found.has(landing)).slice(-MAX_MARKED), {x: "time", y: topHours, r: 7, stroke: MATCH_COLOR, strokeWidth: 2, fill: "none"})
       ];
     }
   });
-  const cut = wanted.length - items.length;
-  return htl.html`${chartBox(plot, CANDLES_HEIGHT)}${cut ? htl.html`<p class="bw-note">Only the ${formatCount(MAX_CANDLES)} most recent are drawn, of ${formatCount(wanted.length)}.</p>` : ""}`;
+  const cut = shown.length - items.length;
+  return htl.html`${chartBox(plot, CANDLES_HEIGHT)}${cut ? htl.html`<p class="bw-note">Only the ${formatCount(MAX_CANDLES)} most recent are drawn, of ${formatCount(shown.length)}.</p>` : ""}`;
 }
 
 function section(width, hidden, requester, domain) {
