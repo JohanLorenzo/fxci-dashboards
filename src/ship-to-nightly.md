@@ -174,24 +174,26 @@ const tooltip = createTooltip({invalidation});
 const blockCache = new Map();
 const TC_URL = "https://firefox-ci-tc.services.mozilla.com";
 const TREEHERDER_URL = "https://treeherder.mozilla.org";
+const TREESTATUS_LOG_URL = "https://lando.moz.tools/treestatus/firefox-autoland/logs";
 const external = (href, text) => htl.html`<a href="${href}" target="_blank" rel="noopener">${text}</a>`;
 
 const BACKOUT_COLOR = "#b3202a";
-const STAGE_LINES = STAGE_INFO.map((stage) => ({...stage, applies: (landing) => landing.durations[stage.key] !== null}));
+const STAGE_LINK_TO = {
+  lando: ({journey}) => ["→ Lando", `https://lando.moz.tools/D${journey.revision}/`],
+  autoland: ({journey}) => journey.autolandRev && ["→ Treeherder", `${TREEHERDER_URL}/jobs?repo=autoland&revision=${journey.autolandRev}`],
+  waiting: ({journey}) => journey.centralRev && ["→ Treeherder", `${TREEHERDER_URL}/jobs?repo=mozilla-central&revision=${journey.centralRev}`]
+};
+const stageLink = (key) => (landing) => {
+  const target = STAGE_LINK_TO[key]?.(landing);
+  return target ? external(target[1], target[0]) : null;
+};
+const STAGE_LINES = STAGE_INFO.map((stage) => ({...stage, applies: (landing) => landing.durations[stage.key] !== null, link: stageLink(stage.key)}));
 const hoursText = (seconds) => formatWait(seconds / 3600);
 
 // The profile is built when the link is clicked, and the profiler is opened inside the
 // click, which is the only time a browser lets a page open a window.
 const journeyLink = ({journey}) =>
   timelineLink("→ Journey in the Firefox Profiler", () => openProfile(() => journeyProfile(journey, {marks, closures: closureRows})), `D${journey.revision}-journey.json`);
-
-function landingLinks(landing) {
-  const {journey} = landing;
-  return htl.html`${journeyLink(landing)}
-    ${external(`https://lando.moz.tools/D${journey.revision}/`, "→ Lando")}
-    ${journey.autolandRev ? external(`${TREEHERDER_URL}/jobs?repo=autoland&revision=${journey.autolandRev}`, "→ Treeherder, its push on autoland") : ""}
-    ${journey.centralRev ? external(`${TREEHERDER_URL}/jobs?repo=mozilla-central&revision=${journey.centralRev}`, "→ Treeherder, the merge to main") : ""}`;
-}
 
 function requesterLink(name) {
   const link = htl.html`<a href="#" title="Show only the landings of ${name}">${name}</a>`;
@@ -216,7 +218,7 @@ function outcomeLine({durations, status}) {
 
 function landingLines(landing, linkRequester = true) {
   const {journey, durations, status} = landing;
-  return htl.html`<span><b>${external(`https://phabricator.services.mozilla.com/D${journey.revision}`, `D${journey.revision}`)}</b>${journey.bug ? htl.html` · ${external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${journey.bug}`, `bug ${journey.bug}`)}` : ""}</span>
+  return htl.html`<span class="bw-tt-links"><b>${external(`https://phabricator.services.mozilla.com/D${journey.revision}`, `D${journey.revision}`)}</b>${journey.bug ? [" · ", external(`https://bugzilla.mozilla.org/show_bug.cgi?id=${journey.bug}`, `bug ${journey.bug}`)] : ""}</span>
     <span>land requested ${formatTime(landing.time)}</span>
     <div class="bw-tt-links">by ${linkRequester ? requesterLink(journey.requester) : journey.requester}${journey.stack.size > 1 ? `, revision ${journey.stack.index + 1} of a stack of ${journey.stack.size}` : ""}</div>
     ${status === "backed out" ? backoutLine(landing) : outcomeLine(landing)}
@@ -226,7 +228,7 @@ function landingLines(landing, linkRequester = true) {
     ${journey.autolandClosed ? htl.html`<span class="bw-tt-pool">and for ${hoursText(journey.autolandClosed)} of the time on autoland</span>` : ""}
     ${journey.failedAttempts ? htl.html`<span class="bw-tt-pool">${countOf(journey.failedAttempts, "attempt")} to land it failed before</span>` : ""}
     <div class="bw-tt-sep"></div>
-    <div class="bw-tt-links">${landingLinks(landing)}</div>`;
+    <div class="bw-tt-links">${journeyLink(landing)}</div>`;
 }
 
 function nightlyLines({decisionId, time, started, published, landed}) {
@@ -246,11 +248,22 @@ function mergeLines({rev, time, by, landed}) {
     <div class="bw-tt-links">${external(`${TREEHERDER_URL}/jobs?repo=mozilla-central&revision=${rev}`, "→ Treeherder, its push")}</div>`;
 }
 
-const revisionLink = (revision) => htl.html`<a href="?revision=D${revision}">D${revision}</a>`;
+function revisionLink(revision) {
+  const link = htl.html`<a href="?revision=D${revision}">D${revision}</a>`;
+  link.addEventListener("click", (event) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    event.preventDefault();
+    document.dispatchEvent(new CustomEvent("sn-revision", {detail: revision}));
+    tooltip.hide();
+  });
+  return link;
+}
 const MAX_LISTED = 6;
 
 const autolandPush = (rev) => `${TREEHERDER_URL}/jobs?repo=autoland&revision=${rev}`;
-const backoutLinks = ({broken, fix}) => htl.html`<div class="bw-tt-links">${external(autolandPush(broken), "→ Treeherder, a push that was backed out")} by ${external(autolandPush(fix), "this one")}</div>`;
+const shortRev = (rev) => rev.slice(0, 12);
+const backoutLinks = ({broken, fix}) =>
+  htl.html`<div class="bw-tt-links">${external(autolandPush(broken), shortRev(broken))} backed out${fix ? [" by ", external(autolandPush(fix), shortRev(fix))] : ""}</div>`;
 
 function closureLines({startS, endS, start, tag, backouts}) {
   const {requested, longestWait, backedOut} = closureSummary(journeys, startS, endS);
@@ -258,7 +271,9 @@ function closureLines({startS, endS, start, tag, backouts}) {
     <span>${formatTime(start)}, for ${hoursText(endS - startS)}</span>
     ${requested ? htl.html`<span class="bw-tt-pool">${countOf(requested, "revision")} asked to land during it${longestWait ? `, the longest waited ${hoursText(longestWait)} in the Lando queue` : ""}</span>` : ""}
     ${backedOut.length ? htl.html`<div class="bw-tt-links">backed out during it: ${backedOut.slice(0, MAX_LISTED).map(revisionLink)}${backedOut.length > MAX_LISTED ? ` and ${backedOut.length - MAX_LISTED} more` : ""}</div>` : ""}
-    ${backouts.length ? htl.html`<div class="bw-tt-sep"></div>${backouts.map(backoutLinks)}` : ""}`;
+    ${backouts.length ? htl.html`<div class="bw-tt-sep"></div><span class="bw-tt-pool">On Treeherder</span>${backouts.map(backoutLinks)}` : ""}
+    <div class="bw-tt-sep"></div>
+    <div class="bw-tt-links">${external(TREESTATUS_LOG_URL, "→ Lando, the tree status log")}</div>`;
 }
 ```
 
@@ -614,6 +629,26 @@ const presetButton = (days) => {
 const presets = htl.html`<span class="sn-presets">${[1, 3, 7, 30, 90].map(presetButton)}</span>`;
 const resetButton = htl.html`<button type="button" class="bw-clear" title="Show the days of the start again">Reset</button>`;
 resetButton.onclick = () => setRange(DEFAULT_FROM, DEFAULT_TO);
+```
+
+```js
+// Picks the revision of a link in a tooltip without leaving the page, and shows the days
+// around it if it is not among the ones shown.
+{
+  const pick = ({detail: revision}) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("revision", `D${revision}`);
+    history.replaceState(null, "", `${window.location.pathname}?${params}${window.location.hash}`);
+    pickRevision(revision);
+    const landing = landings.find((candidate) => candidate.journey.revision === revision);
+    if (landing && !inDomain(domain, landing.time)) {
+      const day = d3.utcDay.floor(landing.time);
+      setRange(clampDay(new Date(+day - 3 * DAY_MS)), clampDay(new Date(+day + 3 * DAY_MS)));
+    }
+  };
+  document.addEventListener("sn-revision", pick);
+  invalidation.then(() => document.removeEventListener("sn-revision", pick));
+}
 ```
 
 ```js

@@ -77,9 +77,13 @@ export function candleChart({
   return plot;
 }
 
-// From the top down, the way the bar reads.
+// From the top down, the way the bar reads. A segment may have a `link`, which makes
+// the link to what it was about from the item, and goes at the end of its line.
 export const segmentLines = (segments, {durations, subject, format}) =>
   [...segments]
     .reverse()
     .filter(({applies}) => !applies || applies(subject))
-    .map(({key, title, color}) => html`<span><i class="bw-swatch" style="background:${color}"></i>${title}: <b>${format(durations[key] / 3600)}</b></span>`);
+    .map(({key, title, color, link}) => {
+      const anchor = link?.(subject);
+      return html`<span class=${anchor ? "bw-tt-links" : null}><i class="bw-swatch" style="background:${color}"></i>${title}: <b>${format(durations[key] / 3600)}</b>${anchor ? [" ", anchor] : ""}</span>`;
+    });

@@ -421,7 +421,7 @@ describe("parseBackouts", () => {
     assert.deepEqual(parseBackouts(null), []);
   });
 
-  test("leaves out what is not a pair", () => {
-    assert.deepEqual(parseBackouts("aaa: :bbb ccc"), []);
+  test("keeps a push whose backout is not known, and leaves out a backout without its push", () => {
+    assert.deepEqual(parseBackouts("aaa: :bbb ccc:ddd"), [{broken: "aaa", fix: ""}, {broken: "ccc", fix: "ddd"}]);
   });
 });

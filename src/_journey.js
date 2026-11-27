@@ -229,11 +229,12 @@ export function closureSummary(journeys, startS, endS) {
 }
 
 // The pushes to autoland that a closure was most likely about, each with the push that
-// backed it out, from the space separated "broken:backout" pairs of the tree status query.
+// backed it out when that is known, from the space separated "broken:backout" pairs of the
+// tree status query.
 export function parseBackouts(text) {
   return (text ?? "")
     .split(/\s+/)
     .map((pair) => pair.split(":"))
-    .filter(([broken, fix]) => broken && fix)
-    .map(([broken, fix]) => ({broken, fix}));
+    .filter(([broken]) => broken)
+    .map(([broken, fix]) => ({broken, fix: fix ?? ""}));
 }
