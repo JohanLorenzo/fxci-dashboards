@@ -8,7 +8,8 @@ import {attachPlotHover, nearestBar} from "./_tooltip.js";
 
 // The scales come from `maxHours`, so that filtering the items does not rescale the
 // chart, and what is taller than it is cut there. Segments hidden by the legend are left
-// out and the others close ranks, so the dot is at the top of what is left. The bars of a segment are one path, because
+// out and the others close ranks, so the dot is at the top of what is left. When some
+// `highlighted` items are given, the others are dimmed and those are drawn again over them. The bars of a segment are one path, because
 // the time the page takes to react to the pointer grows with the number of elements.
 // `extraHit` finds what is under the pointer when no bar is, for what the chart draws
 // besides the bars.
@@ -26,6 +27,7 @@ export function candleChart({
   tooltip,
   show,
   extraHit = null,
+  highlighted = [],
   before = [],
   after = null,
   drawnHours = (item, topHours) => topHours(item)
@@ -33,20 +35,23 @@ export function candleChart({
   const visible = segments.filter(({key}) => !hidden.has(key));
   const topHours = (item) => Math.min(maxHours, d3.sum(visible, ({key}) => durationsOf(item)[key]) / 3600);
   const ends = visible.length ? items : [];
-  const bars = items.flatMap((item) => {
-    let from = 0;
-    return visible.flatMap(({key}) => {
-      if (from >= maxHours) return [];
-      const to = Math.min(maxHours, from + durationsOf(item)[key] / 3600);
-      const bar = [
-        {time: item.time, key, hours: from},
-        {time: item.time, key, hours: to},
-        {time: item.time, key, hours: null}
-      ];
-      from = to;
-      return bar;
+  const barsOf = (list) =>
+    list.flatMap((item) => {
+      let from = 0;
+      return visible.flatMap(({key}) => {
+        if (from >= maxHours) return [];
+        const to = Math.min(maxHours, from + durationsOf(item)[key] / 3600);
+        const bar = [
+          {time: item.time, key, hours: from},
+          {time: item.time, key, hours: to},
+          {time: item.time, key, hours: null}
+        ];
+        from = to;
+        return bar;
+      });
     });
-  });
+  const barOptions = {x: "time", y: "hours", z: "key", stroke: "key", strokeWidth: barWidth, strokeLinecap: "butt"};
+  const dimmed = highlighted.length > 0;
   const plot = Plot.plot({
     width,
     height,
@@ -60,7 +65,8 @@ export function candleChart({
     marks: [
       Plot.ruleY([0], {strokeOpacity: 0.3}),
       ...before,
-      Plot.line(bars, {x: "time", y: "hours", z: "key", stroke: "key", strokeWidth: barWidth, strokeLinecap: "butt"}),
+      Plot.line(barsOf(items), {...barOptions, strokeOpacity: dimmed ? 0.2 : 1}),
+      ...(dimmed ? [Plot.line(barsOf(highlighted), barOptions)] : []),
       ...(after ? after({topHours, ends}) : [Plot.dot(ends, {x: "time", y: topHours, r: 3, fill: "currentColor"})])
     ]
   });

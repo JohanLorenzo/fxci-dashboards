@@ -359,9 +359,9 @@ function markerAt(px, py, frame, markers) {
 
 // A filled dot at each item, as one path: a point that has no length is drawn as a dot by a
 // round cap, and what the page does for each element it draws is what makes it slow.
-function dotPath(items, topHours, {r, fill}) {
+function dotPath(items, topHours, {r, fill, opacity = 1}) {
   const points = items.flatMap((item) => [{time: item.time, hours: topHours(item)}, {time: item.time, hours: topHours(item)}, {time: item.time, hours: null}]);
-  return Plot.line(points, {x: "time", y: "hours", stroke: fill, strokeWidth: 2 * r, strokeLinecap: "round"});
+  return Plot.line(points, {x: "time", y: "hours", stroke: fill, strokeWidth: 2 * r, strokeLinecap: "round", opacity});
 }
 
 // A thin line from the bottom to the top of the plot at each time, as one path.
@@ -382,6 +382,7 @@ function candlesChart({shown, width, hidden, domain}) {
   const taller = shown.filter((landing) => landing.candle.total / 3600 > maxHours).length;
   const barWidth = Math.min(5, Math.max(1, (width - MARGINS.left - MARGINS.right) / Math.max(1, items.length)));
   const chosen = new Set(selectedLandings);
+  const matches = items.filter((landing) => found.has(landing)).slice(-MAX_MARKED);
   const frame = {width, domain};
   const marked = [
     {items: nightlies, ...MARKS.nightly},
@@ -403,21 +404,25 @@ function candlesChart({shown, width, hidden, domain}) {
     hitRadius: HIT_RADIUS,
     tooltip,
     show: showCandle,
+    highlighted: matches,
     extraHit: (px, py) => markerAt(px, py, frame, markers) ?? (hidden.has(CLOSURES_KEY) ? null : closureAt(px, py, frame)),
     before: [
       eventRule(domain, new Set(), {key: CUTOFF_KEY, date: publishCutoff}),
       ...(hidden.has(CLOSURES_KEY) ? [] : [Plot.rectX(closuresIn(domain), {x1: "start", x2: "end", fill: BACKOUT_COLOR, fillOpacity: 0.15})]),
-      ...marked.map(({items, ...style}) => markerLines(items.map(({time}) => time), style, maxHours))
+      ...marked.map(({items, ...style}) => markerLines(items.map(({time}) => time), style, maxHours)),
+      ...(matches.length ? [markerLines([...new Set(matches.map(({time}) => +time))].map((time) => new Date(time)), {color: MATCH_COLOR, opacity: 0.85, width: 3}, maxHours)] : [])
     ],
     after: ({topHours, ends}) => {
-      const marks = END_KINDS.filter(({key}) => !hidden.has(key)).map(({kind, mark}) => {
-        const ended = ends.filter((landing) => landing.candle.kind === kind);
-        return mark.stroke === undefined ? dotPath(ended, topHours, mark) : Plot.dot(ended, {x: "time", y: topHours, ...mark});
-      });
+      const endMarks = (list, opacity) =>
+        END_KINDS.filter(({key}) => !hidden.has(key)).map(({kind, mark}) => {
+          const ended = list.filter((landing) => landing.candle.kind === kind);
+          return mark.stroke === undefined ? dotPath(ended, topHours, {...mark, opacity}) : Plot.dot(ended, {x: "time", y: topHours, ...mark, opacity});
+        });
       return [
-        ...marks,
+        ...endMarks(ends, matches.length ? 0.25 : 1),
+        ...(matches.length ? endMarks(matches, 1) : []),
         Plot.dot(ends.filter((landing) => chosen.has(landing)), {x: "time", y: topHours, r: 9, stroke: BACKOUT_COLOR, strokeWidth: 2, fill: "none"}),
-        Plot.dot(ends.filter((landing) => found.has(landing)).slice(-MAX_MARKED), {x: "time", y: topHours, r: 7, stroke: MATCH_COLOR, strokeWidth: 2, fill: "none"})
+        Plot.dot(matches, {x: "time", y: topHours, r: 8, stroke: MATCH_COLOR, strokeWidth: 2.5, fill: "none"})
       ];
     }
   });
