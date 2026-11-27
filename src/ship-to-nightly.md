@@ -49,7 +49,7 @@ const landings = journeys
 const merges = mergesOf(journeys).map((merge) => ({kind: "merge", time: secondsToDate(merge.merged)}));
 const closures = closureRows
   .filter((row) => row.status === "closed" && row.end_s !== null)
-  .map((row) => ({kind: "closure", time: secondsToDate(row.start_s), hours: (row.end_s - row.start_s) / 3600}));
+  .map((row) => ({kind: "closure", time: secondsToDate(row.start_s), days: (row.end_s - row.start_s) / 86400}));
 const closedPeriods = closureRows
   .filter((row) => row.status === "closed")
   .map((row) => {
@@ -76,6 +76,7 @@ const DEFAULT_TO = focusDay ? clampDay(new Date(+focusDay + 3 * DAY_MS)) : DATA_
 const formatCount = (n) => Math.round(n).toLocaleString("en-US");
 const formatPercent = (share) => `${Math.round(share * 1000) / 10}%`;
 const formatRatio = (n) => (Math.round(n * 10) / 10).toLocaleString("en-US");
+const formatDays = (days) => `${formatRatio(days)} d`;
 function formatWait(hours) {
   const seconds = Math.round(hours * 3600);
   if (seconds < 60) return `${seconds} s`;
@@ -119,8 +120,8 @@ const METRICS = [
     key: "closed",
     title: "Autoland tree closed",
     countless: true,
-    format: formatWait,
-    series: [{key: "closed", title: "closed", value: (items) => d3.sum(items.filter((item) => item.kind === "closure"), (item) => item.hours), color: "#b3202a"}]
+    format: formatDays,
+    series: [{key: "closed", title: "closed", value: (items) => d3.sum(items.filter((item) => item.kind === "closure"), (item) => item.days), color: "#b3202a"}]
   },
   {
     key: "backedout",

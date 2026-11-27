@@ -473,7 +473,7 @@
           ],
           [
             "Autoland tree closed",
-            "227 h 14 min"
+            "9.5 d"
           ],
           [
             "Revisions backed out",
@@ -496,7 +496,7 @@
         "nodes": 8313,
         "bodyNodes": 8831,
         "inlineErrors": 0,
-        "html": "673a94719af76df7",
+        "html": "d1af05cac83067fb",
         "styles": "d5702e42f525cfab"
       },
       "hover": {
@@ -558,7 +558,7 @@
           "circles": 7175,
           "lines": 32,
           "nodes": 8312,
-          "html": "6e725ce54aadd72e",
+          "html": "e018af3f5b3f66ad",
           "styles": "8799302324e03e9d"
         },
         "shown": {
@@ -575,7 +575,7 @@
           "circles": 7175,
           "lines": 32,
           "nodes": 8313,
-          "html": "baa127770780b14c",
+          "html": "ed072313dbea1fbb",
           "styles": "e8456ba7489d9b07"
         },
         "alone": {
@@ -592,7 +592,7 @@
           "circles": 7175,
           "lines": 32,
           "nodes": 8308,
-          "html": "2e04b3a40da62f3b",
+          "html": "beabe1e15f2eead0",
           "styles": "7fca88ba37a947bf"
         },
         "all": {
@@ -609,7 +609,7 @@
           "circles": 7175,
           "lines": 32,
           "nodes": 8313,
-          "html": "baa127770780b14c",
+          "html": "ed072313dbea1fbb",
           "styles": "e8456ba7489d9b07"
         },
         "collapsed": {
@@ -618,7 +618,7 @@
           "circles": 0,
           "lines": 22,
           "nodes": 224,
-          "html": "2b119d1d73cbf6c3",
+          "html": "ffd2da0aa172b61d",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -635,7 +635,7 @@
           "circles": 7175,
           "lines": 32,
           "nodes": 8313,
-          "html": "baa127770780b14c",
+          "html": "ed072313dbea1fbb",
           "styles": "e8456ba7489d9b07"
         },
         "restored": true
@@ -676,7 +676,7 @@
           ],
           [
             "Autoland tree closed",
-            "60 h 59 min"
+            "2.5 d"
           ],
           [
             "Revisions backed out",
@@ -699,7 +699,7 @@
         "nodes": 2515,
         "bodyNodes": 3045,
         "inlineErrors": 0,
-        "html": "f765c964e8d11248",
+        "html": "a1c72b6ec00dc026",
         "styles": "d5702e42f525cfab"
       },
       "errors": []
@@ -737,7 +737,7 @@
           ],
           [
             "Autoland tree closed",
-            "709 h 46 min"
+            "29.6 d"
           ],
           [
             "Revisions backed out",
@@ -760,7 +760,7 @@
         "nodes": 9207,
         "bodyNodes": 9725,
         "inlineErrors": 0,
-        "html": "163b2d948e5aedfa",
+        "html": "c0e76dcc9d3bda98",
         "styles": "54700acd0326ed25"
       },
       "hover": {
@@ -822,7 +822,7 @@
           "circles": 7444,
           "lines": 33,
           "nodes": 9206,
-          "html": "aecefd8400b66148",
+          "html": "dbed1c13a3a69f35",
           "styles": "a576ef840587004e"
         },
         "shown": {
@@ -839,7 +839,7 @@
           "circles": 7444,
           "lines": 33,
           "nodes": 9207,
-          "html": "b6f1c7bb95e46e6e",
+          "html": "01a7c46d7cfbb9a1",
           "styles": "c5d31c961e4d144e"
         },
         "alone": {
@@ -856,7 +856,7 @@
           "circles": 7444,
           "lines": 33,
           "nodes": 9202,
-          "html": "bd00594567c3c9c6",
+          "html": "09b52da1f71c709b",
           "styles": "991648d7428894ae"
         },
         "all": {
@@ -873,7 +873,7 @@
           "circles": 7444,
           "lines": 33,
           "nodes": 9207,
-          "html": "b6f1c7bb95e46e6e",
+          "html": "01a7c46d7cfbb9a1",
           "styles": "c5d31c961e4d144e"
         },
         "collapsed": {
@@ -882,7 +882,7 @@
           "circles": 0,
           "lines": 22,
           "nodes": 224,
-          "html": "5ef946b9c97e9375",
+          "html": "4fc61409c9dcf6bf",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -899,7 +899,7 @@
           "circles": 7444,
           "lines": 33,
           "nodes": 9207,
-          "html": "b6f1c7bb95e46e6e",
+          "html": "01a7c46d7cfbb9a1",
           "styles": "c5d31c961e4d144e"
         },
         "restored": true
@@ -940,7 +940,7 @@
           ],
           [
             "Autoland tree closed",
-            "188 h 40 min"
+            "7.9 d"
           ],
           [
             "Revisions backed out",
@@ -963,7 +963,7 @@
         "nodes": 6526,
         "bodyNodes": 7056,
         "inlineErrors": 0,
-        "html": "a9e547bafff863d1",
+        "html": "7ec203f0ff7dee01",
         "styles": "d5702e42f525cfab"
       },
       "errors": []
@@ -1001,7 +1001,7 @@
           ],
           [
             "Autoland tree closed",
-            "56 h 14 min"
+            "2.3 d"
           ],
           [
             "Revisions backed out",
@@ -1024,7 +1024,7 @@
         "nodes": 2127,
         "bodyNodes": 2680,
         "inlineErrors": 0,
-        "html": "3680643cb6758166",
+        "html": "935fb904d2b491af",
         "styles": "d5702e42f525cfab"
       },
       "hover": {
@@ -1086,7 +1086,7 @@
           "circles": 1655,
           "lines": 19,
           "nodes": 2126,
-          "html": "f1307c3b19aed590",
+          "html": "254dbeee46d82c96",
           "styles": "8799302324e03e9d"
         },
         "shown": {
@@ -1103,7 +1103,7 @@
           "circles": 1655,
           "lines": 19,
           "nodes": 2127,
-          "html": "77dbb14357eb0deb",
+          "html": "94d49633848057d7",
           "styles": "e8456ba7489d9b07"
         },
         "alone": {
@@ -1120,7 +1120,7 @@
           "circles": 1655,
           "lines": 19,
           "nodes": 2122,
-          "html": "635c21e2dfd85b5c",
+          "html": "d3d8197a9a0c2e04",
           "styles": "7fca88ba37a947bf"
         },
         "all": {
@@ -1137,7 +1137,7 @@
           "circles": 1655,
           "lines": 19,
           "nodes": 2127,
-          "html": "77dbb14357eb0deb",
+          "html": "94d49633848057d7",
           "styles": "e8456ba7489d9b07"
         },
         "collapsed": {
@@ -1146,7 +1146,7 @@
           "circles": 0,
           "lines": 11,
           "nodes": 202,
-          "html": "cc08003ebde59844",
+          "html": "97593940b7821ce1",
           "styles": "10d741139ccb98c8"
         },
         "expanded": {
@@ -1163,7 +1163,7 @@
           "circles": 1655,
           "lines": 19,
           "nodes": 2127,
-          "html": "77dbb14357eb0deb",
+          "html": "94d49633848057d7",
           "styles": "e8456ba7489d9b07"
         },
         "restored": true
@@ -1204,7 +1204,7 @@
           ],
           [
             "Autoland tree closed",
-            "22 h 51 min"
+            "1 d"
           ],
           [
             "Revisions backed out",
@@ -1227,7 +1227,7 @@
         "nodes": 1320,
         "bodyNodes": 1885,
         "inlineErrors": 0,
-        "html": "66d9213a26eeee6e",
+        "html": "b98a614e9116a546",
         "styles": "d5702e42f525cfab"
       },
       "errors": []
