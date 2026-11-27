@@ -5,7 +5,7 @@ toc: false
 
 # Ship to Nightly faster
 
-How long a patch takes from "Land" in Phabricator to a Nightly that people run.
+How long a patch takes from "Land" in Phabricator to a shipped Nightly.
 
 ```js
 import {candleOf, CANDLE_SEGMENTS, closureSummary, durationsOf, inCohort, journeyOf, matchesQuery, mergesOf, nightliesOf, parseBackouts, parseRevision, PUBLISH_HORIZON_S, quantile, STAGE_INFO, statusOf, UNMATCHED_AFTER_S, watermarksOf} from "./_journey.js";
@@ -71,7 +71,7 @@ const pickRevision = (revision) => (pickedRevision.value = revision);
 const focusLanding = landings.find((landing) => landing.journey.revision === urlRevision);
 const focusDay = focusLanding ? d3.utcDay.floor(focusLanding.time) : null;
 const clampDay = (day) => new Date(Math.min(+DATA_LAST_DAY, Math.max(+DATA_FIRST_DAY, +day)));
-const DEFAULT_FROM = focusDay ? clampDay(new Date(+focusDay - 3 * DAY_MS)) : new Date(Math.max(+DATA_FIRST_DAY, +DATA_LAST_DAY - 29 * DAY_MS));
+const DEFAULT_FROM = focusDay ? clampDay(new Date(+focusDay - 3 * DAY_MS)) : new Date(Math.max(+DATA_FIRST_DAY, +DATA_LAST_DAY - 89 * DAY_MS));
 const DEFAULT_TO = focusDay ? clampDay(new Date(+focusDay + 3 * DAY_MS)) : DATA_LAST_DAY;
 ```
 
@@ -159,7 +159,8 @@ const publishCutoff = secondsToDate(publishUntil - PUBLISH_HORIZON_S);
 const METRICS_TITLE = {chartKey: "chart-metrics", title: "Top line metrics"};
 const E2E_TITLE = {chartKey: "chart-endtoend", title: "From Land to a shipped Nightly"};
 const CANDLES_HEIGHT = 300;
-const MAX_CANDLES = 8000;
+const MAX_CANDLES = 30000;
+const TALLEST_SHARE = 0.99;
 const HIT_RADIUS = 8;
 const MAX_MARKED = 300;
 const MATCH_COLOR = "#0a84ff";
@@ -356,6 +357,13 @@ function markerAt(px, py, frame, markers) {
   return nearest ? {marker: nearest, x: px, y: py} : null;
 }
 
+// A filled dot at each item, as one path: a point that has no length is drawn as a dot by a
+// round cap, and what the page does for each element it draws is what makes it slow.
+function dotPath(items, topHours, {r, fill}) {
+  const points = items.flatMap((item) => [{time: item.time, hours: topHours(item)}, {time: item.time, hours: topHours(item)}, {time: item.time, hours: null}]);
+  return Plot.line(points, {x: "time", y: "hours", stroke: fill, strokeWidth: 2 * r, strokeLinecap: "round"});
+}
+
 // A thin line from the bottom to the top of the plot at each time, as one path.
 function markerLines(times, {color, opacity, width}, maxHours) {
   const points = times.flatMap((time) => [{time, hours: 0}, {time, hours: maxHours * 1.05}, {time, hours: null}]);
@@ -365,10 +373,13 @@ function markerLines(times, {color, opacity, width}, maxHours) {
 // A bar for each landing at the moment it was requested, stacked from what happened
 // first to what happened last, with a mark at its top that says how it ended. The
 // height scale comes from all the landings of the days shown, so that hiding some does
-// not rescale it. A bar is a line for each stage, so only the most recent are drawn.
+// not rescale it, and the tallest hundredth is cut at the top, so that a few landings
+// that never arrived do not flatten the rest. A bar is a line for each stage, so only the
+// most recent are drawn.
 function candlesChart({shown, width, hidden, domain}) {
   const items = shown.slice(-MAX_CANDLES);
-  const maxHours = Math.max(1, d3.max(shown, (landing) => landing.candle.total) / 3600);
+  const maxHours = Math.max(1, quantile(shown.map((landing) => landing.candle.total / 3600), TALLEST_SHARE) ?? 1);
+  const taller = shown.filter((landing) => landing.candle.total / 3600 > maxHours).length;
   const barWidth = Math.min(5, Math.max(1, (width - MARGINS.left - MARGINS.right) / Math.max(1, items.length)));
   const chosen = new Set(selectedLandings);
   const frame = {width, domain};
@@ -399,12 +410,10 @@ function candlesChart({shown, width, hidden, domain}) {
       ...marked.map(({items, ...style}) => markerLines(items.map(({time}) => time), style, maxHours))
     ],
     after: ({topHours, ends}) => {
-      const marks = END_KINDS.filter(({key}) => !hidden.has(key)).map(({kind, mark}) =>
-        Plot.dot(
-          ends.filter((landing) => landing.candle.kind === kind),
-          {x: "time", y: topHours, ...mark}
-        )
-      );
+      const marks = END_KINDS.filter(({key}) => !hidden.has(key)).map(({kind, mark}) => {
+        const ended = ends.filter((landing) => landing.candle.kind === kind);
+        return mark.stroke === undefined ? dotPath(ended, topHours, mark) : Plot.dot(ended, {x: "time", y: topHours, ...mark});
+      });
       return [
         ...marks,
         Plot.dot(ends.filter((landing) => chosen.has(landing)), {x: "time", y: topHours, r: 9, stroke: BACKOUT_COLOR, strokeWidth: 2, fill: "none"}),
@@ -413,7 +422,7 @@ function candlesChart({shown, width, hidden, domain}) {
     }
   });
   const cut = shown.length - items.length;
-  return htl.html`${chartBox(plot, CANDLES_HEIGHT)}${cut ? htl.html`<p class="bw-note">Only the ${formatCount(MAX_CANDLES)} most recent are drawn, of ${formatCount(shown.length)}.</p>` : ""}`;
+  return htl.html`${chartBox(plot, CANDLES_HEIGHT)}${cut ? htl.html`<p class="bw-note">Only the ${formatCount(MAX_CANDLES)} most recent are drawn, of ${formatCount(shown.length)}.</p>` : ""}${taller ? htl.html`<p class="bw-note">${countOf(taller, "candle")} taller than ${formatWait(maxHours)} ${taller === 1 ? "is" : "are"} cut there.</p>` : ""}`;
 }
 
 function section(width, hidden, requester, domain) {
@@ -574,7 +583,7 @@ invalidation.then(() => document.removeEventListener("sn-requester", chooseReque
 ```js
 // The days the charts show, from the date inputs, the presets or by dragging across a
 // chart, and kept in the address as ?from= and ?to=. Both are days, so the last one
-// is shown whole. The default is the last 30 days of data.
+// is shown whole. The default is the last 90 days of data.
 const dayParam = (name) => {
   const text = new URLSearchParams(window.location.search).get(name);
   const day = /^\d{4}-\d{2}-\d{2}$/.test(text ?? "") ? new Date(`${text}T00:00:00Z`) : null;

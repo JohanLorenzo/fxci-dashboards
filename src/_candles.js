@@ -7,8 +7,8 @@ import {dateAxis, MARGINS} from "./_time-charts.js";
 import {attachPlotHover, nearestBar} from "./_tooltip.js";
 
 // The scales come from `maxHours`, so that filtering the items does not rescale the
-// chart. Segments hidden by the legend are left out and the others close ranks, so
-// the dot is at the top of what is left. The bars of a segment are one path, because
+// chart, and what is taller than it is cut there. Segments hidden by the legend are left
+// out and the others close ranks, so the dot is at the top of what is left. The bars of a segment are one path, because
 // the time the page takes to react to the pointer grows with the number of elements.
 // `extraHit` finds what is under the pointer when no bar is, for what the chart draws
 // besides the bars.
@@ -31,12 +31,13 @@ export function candleChart({
   drawnHours = (item, topHours) => topHours(item)
 }) {
   const visible = segments.filter(({key}) => !hidden.has(key));
-  const topHours = (item) => d3.sum(visible, ({key}) => durationsOf(item)[key]) / 3600;
+  const topHours = (item) => Math.min(maxHours, d3.sum(visible, ({key}) => durationsOf(item)[key]) / 3600);
   const ends = visible.length ? items : [];
   const bars = items.flatMap((item) => {
     let from = 0;
     return visible.flatMap(({key}) => {
-      const to = from + durationsOf(item)[key] / 3600;
+      if (from >= maxHours) return [];
+      const to = Math.min(maxHours, from + durationsOf(item)[key] / 3600);
       const bar = [
         {time: item.time, key, hours: from},
         {time: item.time, key, hours: to},
