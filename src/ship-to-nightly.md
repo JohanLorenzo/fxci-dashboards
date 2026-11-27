@@ -135,7 +135,7 @@ const METRICS = [
   },
   {
     key: "over24",
-    title: "Landings that took over 24 h to publish",
+    title: "Revisions that took over 24 h to publish",
     countless: true,
     format: formatPercent,
     series: [{key: "over24", title: "share", value: shareOf((landing) => landing.durations.total > 24 * 3600), color: "#c2476f"}]
@@ -155,7 +155,7 @@ const METRICS = [
   },
   {
     key: "backedout",
-    title: "Landings backed out",
+    title: "Revisions backed out",
     countless: true,
     format: formatPercent,
     series: [{key: "backedout", title: "share", value: (items) => (settled(items).length ? settled(items).filter((landing) => landing.status === "backed out").length / settled(items).length : undefined), color: "#b3202a"}]
@@ -165,12 +165,12 @@ const METRICS = [
     title: "Backed out after a Nightly had published them",
     countless: true,
     format: formatCount,
-    series: [{key: "afternightly", title: "landings", value: (items) => landingsOf(items).filter(({journey}) => journey.backedOut && journey.published !== null && journey.published < journey.backout).length, color: "#7a1f26"}]
+    series: [{key: "afternightly", title: "revisions", value: (items) => landingsOf(items).filter(({journey}) => journey.backedOut && journey.published !== null && journey.published < journey.backout).length, color: "#7a1f26"}]
   },
-  {key: "inflight", title: "In flight", countless: true, format: formatCount, series: [{key: "inflight", title: "landings", value: countOfStatus("in flight"), color: "#d99a00"}]},
+  {key: "inflight", title: "Revisions in flight", countless: true, format: formatCount, series: [{key: "inflight", title: "revisions", value: countOfStatus("in flight"), color: "#d99a00"}]},
   {
     key: "oldest",
-    title: "Oldest in flight",
+    title: "Oldest revision in flight",
     countless: true,
     format: formatWait,
     series: [
@@ -185,7 +185,7 @@ const METRICS = [
       }
     ]
   },
-  {key: "unmatched", title: "Unmatched after 7 days", countless: true, format: formatCount, series: [{key: "unmatched", title: "landings", value: countOfStatus("unmatched"), color: "#888"}]}
+  {key: "unmatched", title: `Revisions unmatched after ${UNMATCHED_AFTER_S / 86400} days`, countless: true, format: formatCount, series: [{key: "unmatched", title: "revisions", value: countOfStatus("unmatched"), color: "#888"}]}
 ];
 
 const CUTOFF_KEY = "cohort";
@@ -308,7 +308,7 @@ function metricsBlock(items, width, domain) {
     tooltip,
     noun: "item",
     eventRules: (days) => [eventRule(days, new Set(), {key: CUTOFF_KEY, date: publishCutoff})]
-  })}<p class="bw-note">Times to publish count the ${formatCount(cohort)} of ${formatCount(landingsOf(items).length)} landings that had 48 h to finish, which is every one requested before ${formatTime(publishCutoff)}. Times to uptake wait for 96 h. The dashed line marks the first: to its right, a day is not complete.</p>`;
+  })}<p class="bw-note">Times to publish count the ${formatCount(cohort)} of ${formatCount(landingsOf(items).length)} revisions that had ${PUBLISH_HORIZON_S / 3600} h to finish, which is every one requested before ${formatTime(publishCutoff)}. Times to uptake wait for ${UPTAKE_HORIZON_S / 3600} h${neverHalf ? ` and leave out the ${formatCount(neverHalf)} whose build did not get to half of the clients` : ""}. The dashed line marks the first: to its right, a day is not complete.</p>`;
 }
 
 function showLanding(event, point, chartRect) {
@@ -350,7 +350,7 @@ function landingsChart({shown, width, hidden, domain, measure, scheme, modeKey})
   const notDrawn = shown.length - measured.length;
   const cut = visible.length - dots.length;
   const notes = [
-    notDrawn ? `${formatCount(notDrawn)} of the ${formatCount(shown.length)} landings have no dot, because they have not been through this stage.` : "",
+    notDrawn ? `${formatCount(notDrawn)} of the ${formatCount(shown.length)} revisions have no dot, because they have not been through this stage.` : "",
     cut ? `Only the ${formatCount(MAX_DOTS)} most recent are drawn, of ${formatCount(visible.length)}.` : ""
   ].filter(Boolean);
   return htl.html`${chartBox(plot, LANDINGS_HEIGHT)}${notes.length ? htl.html`<p class="bw-note">${notes.join(" ")}</p>` : ""}`;
@@ -365,7 +365,7 @@ function section(width, hidden, requester, domain, measure, modeKey) {
     "chart-metrics": {groups: () => null, draw: () => metricsBlock(items, width, domain)},
     "chart-landings": {
       groups: () => [{title: modeTitle, entries: scheme.entries.map(({key, title, color}) => ({key: `${modeKey}-${key}`, title, marker: () => LEGEND_MARKERS.dot(color)}))}],
-      draw: (ownHidden) => (shown.length ? landingsChart({shown, width, hidden: ownHidden, domain, measure, scheme, modeKey}) : htl.html`<p class="bw-note">No landings in this range.</p>`)
+      draw: (ownHidden) => (shown.length ? landingsChart({shown, width, hidden: ownHidden, domain, measure, scheme, modeKey}) : htl.html`<p class="bw-note">No revisions in this range.</p>`)
     }
   };
   const block = (item) =>
@@ -555,10 +555,10 @@ const {setHiddenKeys, setHidden} = hiddenKeys;
   ${resize((width) => section(width, hidden, requester, domain, measure, modeKey))}
 </div>
 
-## Landings
+## Revisions
 
 ```js
-// The landings of the days and requester shown, in a table that can be searched by D
+// The revisions of the days and requester shown, in a table that can be searched by D
 // number, bug, requester or the start of a revision.
 const tableRows = itemsIn(domain, requester)
   .filter((item) => item.kind === "landing")
@@ -577,7 +577,7 @@ const tableRows = itemsIn(domain, requester)
     build: landing.durations.build,
     uptake: landing.durations.uptake
   }));
-const searchInput = Inputs.search(tableRows, {placeholder: "Search a D number, a bug, a requester or a revision", width: 460, filter: (query) => (row) => matchesQuery(row.journey, query)});
+const searchInput = Inputs.search(tableRows, {placeholder: "Search a D number, a bug, a requester or an hg revision", width: 460, filter: (query) => (row) => matchesQuery(row.journey, query)});
 const searched = Generators.input(searchInput);
 ```
 
