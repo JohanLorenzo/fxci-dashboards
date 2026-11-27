@@ -8,7 +8,7 @@ toc: false
 How long a patch takes from "Land" in Phabricator to a Nightly that people run.
 
 ```js
-import {candleOf, CANDLE_SEGMENTS, closureSummary, durationsOf, inCohort, journeyOf, matchesQuery, mergesOf, nightliesOf, parseRevision, PUBLISH_HORIZON_S, quantile, STAGE_INFO, statusOf, UNMATCHED_AFTER_S, watermarksOf} from "./_journey.js";
+import {candleOf, CANDLE_SEGMENTS, closureSummary, durationsOf, inCohort, journeyOf, matchesQuery, mergesOf, nightliesOf, parseBackouts, parseRevision, PUBLISH_HORIZON_S, quantile, STAGE_INFO, statusOf, UNMATCHED_AFTER_S, watermarksOf} from "./_journey.js";
 import {journeyProfile} from "./_journey-profile.js";
 import {openProfile} from "./_profiler.js";
 import {createTooltip, timelineLink} from "./_tooltip.js";
@@ -55,7 +55,7 @@ const closedPeriods = closureRows
   .filter((row) => row.status === "closed")
   .map((row) => {
     const endS = row.end_s ?? marks.landoUntil;
-    return {start: secondsToDate(row.start_s), end: secondsToDate(endS), startS: row.start_s, endS, tag: row.reason_tag};
+    return {start: secondsToDate(row.start_s), end: secondsToDate(endS), startS: row.start_s, endS, tag: row.reason_tag, backouts: parseBackouts(row.backouts)};
   });
 
 const DATA_FIRST_DAY = d3.utcDay.floor(secondsToDate(d3.min(journeys, (journey) => journey.requested)));
@@ -247,14 +247,16 @@ function mergeLines({rev, time, by, landed}) {
 const revisionLink = (revision) => htl.html`<a href="?revision=D${revision}">D${revision}</a>`;
 const MAX_LISTED = 6;
 
-function closureLines({startS, endS, start, tag}) {
-  const {requested, longestWait, backedOut, firstPush, lastPush} = closureSummary(journeys, startS, endS);
-  const range = firstPush === lastPush ? `revision=${firstPush}` : `fromchange=${firstPush}&tochange=${lastPush}`;
+const autolandPush = (rev) => `${TREEHERDER_URL}/jobs?repo=autoland&revision=${rev}`;
+const backoutLinks = ({broken, fix}) => htl.html`<div class="bw-tt-links">${external(autolandPush(broken), "→ Treeherder, a push that was backed out")} by ${external(autolandPush(fix), "this one")}</div>`;
+
+function closureLines({startS, endS, start, tag, backouts}) {
+  const {requested, longestWait, backedOut} = closureSummary(journeys, startS, endS);
   return htl.html`<span><b>Autoland closed</b>${tag ? `, ${tag.replaceAll("_", " ")}` : ""}</span>
     <span>${formatTime(start)}, for ${hoursText(endS - startS)}</span>
     ${requested ? htl.html`<span class="bw-tt-pool">${countOf(requested, "revision")} asked to land during it${longestWait ? `, the longest waited ${hoursText(longestWait)} in the Lando queue` : ""}</span>` : ""}
     ${backedOut.length ? htl.html`<div class="bw-tt-links">backed out during it: ${backedOut.slice(0, MAX_LISTED).map(revisionLink)}${backedOut.length > MAX_LISTED ? ` and ${backedOut.length - MAX_LISTED} more` : ""}</div>` : ""}
-    ${firstPush ? htl.html`<div class="bw-tt-sep"></div><div class="bw-tt-links">${external(`${TREEHERDER_URL}/jobs?repo=autoland&${range}`, "→ Treeherder, the pushes from an hour before it")}</div>` : ""}`;
+    ${backouts.length ? htl.html`<div class="bw-tt-sep"></div>${backouts.map(backoutLinks)}` : ""}`;
 }
 ```
 

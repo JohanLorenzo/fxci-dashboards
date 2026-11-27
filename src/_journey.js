@@ -209,19 +209,20 @@ export function nightliesOf(journeys) {
 }
 
 // What went on while the tree was closed from startS to endS: the revisions that asked to
-// land and the longest they waited in the Lando queue, the ones backed out, and the first
-// and last push to autoland from an hour before it began, which is the range to look at
-// in Treeherder to see what broke.
-export function closureSummary(journeys, startS, endS, {leadS = 3600} = {}) {
+// land and the longest they waited in the Lando queue, and the ones backed out.
+export function closureSummary(journeys, startS, endS) {
   const requested = journeys.filter(({requested: at}) => at >= startS && at < endS);
   const waits = requested.map((journey) => between(journey.landoStarted, journey.requested)).filter((wait) => wait !== null);
   const backedOut = [...new Set(journeys.filter(({backedOut: out, backout}) => out && backout >= startS && backout < endS).map(({revision}) => revision))];
-  const pushed = journeys.filter(({autolandRev, pushed: at}) => autolandRev && at !== null && at >= startS - leadS && at <= endS).sort((a, b) => a.pushed - b.pushed);
-  return {
-    requested: requested.length,
-    longestWait: waits.length ? Math.max(...waits) : null,
-    backedOut,
-    firstPush: pushed[0]?.autolandRev ?? null,
-    lastPush: pushed.at(-1)?.autolandRev ?? null
-  };
+  return {requested: requested.length, longestWait: waits.length ? Math.max(...waits) : null, backedOut};
+}
+
+// The pushes to autoland that a closure was most likely about, each with the push that
+// backed it out, from the space separated "broken:backout" pairs of the tree status query.
+export function parseBackouts(text) {
+  return (text ?? "")
+    .split(/\s+/)
+    .map((pair) => pair.split(":"))
+    .filter(([broken, fix]) => broken && fix)
+    .map(([broken, fix]) => ({broken, fix}));
 }

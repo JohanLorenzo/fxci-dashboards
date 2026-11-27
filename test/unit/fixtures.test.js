@@ -124,5 +124,14 @@ describe("the fixtures of the Ship to Nightly queries", () => {
       assert.ok(closures.every((row) => row.end_s > row.start_s));
       assert.ok(closures.some((row) => row.status === "approval required"));
     });
+
+    test("list the backouts of most closures as pairs of revisions, and none for the others", () => {
+      const closures = tables["nightly-treestatus"];
+      const closed = closures.filter((row) => row.status === "closed");
+      const traced = closed.filter((row) => row.backouts !== "");
+      assert.ok(traced.length / closed.length > 0.7 && traced.length < closed.length, `${traced.length} of ${closed.length}`);
+      assert.ok(traced.every((row) => row.backouts.split(" ").every((pair) => /^[0-9a-f]{40}:[0-9a-f]{40}$/.test(pair))));
+      assert.ok(closures.filter((row) => row.status !== "closed").every((row) => row.backouts === ""));
+    });
   });
 });

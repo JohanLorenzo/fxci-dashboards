@@ -11,6 +11,7 @@ import {
   matchesQuery,
   mergesOf,
   nightliesOf,
+  parseBackouts,
   parseRevision,
   PUBLISH_HORIZON_S,
   quantile,
@@ -377,22 +378,29 @@ describe("closureSummary", () => {
     assert.deepEqual(closureSummary(stack, ...closed).backedOut, [4]);
   });
 
-  test("gives the first and the last push to autoland from an hour before it began until it ended", () => {
-    const summary = closureSummary(journeys, ...closed);
-    assert.equal(summary.firstPush, "before");
-    assert.equal(summary.lastPush, "during-b");
-    assert.equal(closureSummary(journeys, ...closed, {leadS: 0}).firstPush, "during-a");
-  });
-
   test("has nothing to say about a closure that nothing happened in", () => {
-    assert.deepEqual(closureSummary(journeys, T0 + 20 * HOUR, T0 + 21 * HOUR, {leadS: 0}), {requested: 0, longestWait: null, backedOut: [], firstPush: null, lastPush: null});
+    assert.deepEqual(closureSummary(journeys, T0 + 20 * HOUR, T0 + 21 * HOUR), {requested: 0, longestWait: null, backedOut: []});
   });
 
-  test("leaves out the pushes that are not matched to a revision of autoland yet", () => {
+  test("does not count a wait for a landing that has not left the Lando queue", () => {
     const unpushed = [at({autoland_rev: null, autoland_pushed_s: null, land_requested_s: T0 + HOUR, lando_started_s: null})];
     const summary = closureSummary(unpushed, ...closed);
     assert.equal(summary.requested, 1);
     assert.equal(summary.longestWait, null);
-    assert.equal(summary.firstPush, null);
+  });
+});
+
+describe("parseBackouts", () => {
+  test("pairs each push that was backed out with its backout", () => {
+    assert.deepEqual(parseBackouts("aaa:bbb ccc:ddd"), [{broken: "aaa", fix: "bbb"}, {broken: "ccc", fix: "ddd"}]);
+  });
+
+  test("is nothing for a closure without any", () => {
+    assert.deepEqual(parseBackouts(""), []);
+    assert.deepEqual(parseBackouts(null), []);
+  });
+
+  test("leaves out what is not a pair", () => {
+    assert.deepEqual(parseBackouts("aaa: :bbb ccc"), []);
   });
 });

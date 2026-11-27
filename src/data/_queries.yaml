@@ -88,7 +88,7 @@
   queryId: 132278
   secretEnv: REDASH_API_KEY_SHIP_TO_NIGHTLY_TREESTATUS
   minRows: 100
-  columns: [start_s, end_s, status, reason_tag]
+  columns: [start_s, end_s, status, reason_tag, backouts]
 
 # The six below are `archive` queries: every run of some task queues, one row
 # per run, about a million rows each. Their loader (data/tasks/[chunk].tar.js)

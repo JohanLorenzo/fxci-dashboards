@@ -168,6 +168,16 @@ function journeys(rand, closures, nightlyList, mergeList) {
   return rows.sort((a, b) => a.land_requested_s - b.land_requested_s || a.revision_id - b.revision_id);
 }
 
+// What the real query finds for most closures: the pushes that were backed out, each
+// with its backout. It has its own stream, so that it leaves the rest of the data as it was.
+function withBackouts(closures) {
+  const rand = random(11);
+  return closures.map((closure) => {
+    const pairs = closure.status === "closed" && rand() < 0.83 ? Array.from({length: between(rand, 1, 3)}, () => `${revision(rand)}:${revision(rand)}`) : [];
+    return {...closure, backouts: pairs.join(" ")};
+  });
+}
+
 let cached;
 function everything() {
   if (!cached) {
@@ -177,7 +187,7 @@ function everything() {
     const nightlyList = nightlies(rand, mergeList);
     cached = {
       "nightly-journeys": journeys(rand, closures, nightlyList, mergeList),
-      "nightly-treestatus": closures
+      "nightly-treestatus": withBackouts(closures)
     };
   }
   return cached;
